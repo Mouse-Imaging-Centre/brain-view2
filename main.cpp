@@ -1,11 +1,12 @@
-#include <QApplication>
+#include <Quarter/QuarterApplication.h>
+
+//#include <QApplication>
 
 #include "MainWindow.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    //Q_INIT_RESOURCE(dockwidgets);
+    QuarterApplication app(argc, argv);
     MainWindow mainWin;
     mainWin.show();
     return app.exec();
