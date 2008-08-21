@@ -1,10 +1,20 @@
+QT += opengl
+
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE == $$system(coin-config --includedir)
 
 INCLUDEPATH += $$COININCLUDE
-LIBS += $$COINLIBS -lCoin
+LIBS += $$COINLIBS
 
-LIBS += -L/usr/local/lib -lQuarter
+!macx {
+ 	LIBS += -lCoin
+ 	LIBS += -L/usr/local/lib -lQuarter
+}
+
+macx {
+	LIBS += -Wl,-framework -Wl,Quarter
+}
+
 INCLUDEPATH += /usr/local/include
 
 FORMS = colourBarForm.ui
