@@ -7,6 +7,7 @@ BrainQuarter::BrainQuarter(QWidget *parent, const QGLWidget *sharewidget) : Quar
 BrainQuarter::~BrainQuarter() {
 }
 
+// create the sample scene - a yellow cone
 void BrainQuarter::createSampleSceneGraph() {
     root = new SoSeparator;
     root->ref();

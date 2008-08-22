@@ -1,6 +1,12 @@
 #ifndef BRAINQUARTER_H_
 #define BRAINQUARTER_H_
 
+/* BrainQuarter
+ * A simple subclass of the QuarterWidget at this moment in time.
+ * Will eventually contain the functions to load different scene graphs.
+ */
+
+
 #include <Inventor/nodes/SoBaseColor.h>
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoSeparator.h>
@@ -11,12 +17,16 @@ using namespace SIM::Coin3D::Quarter;
 
 class BrainQuarter : public QuarterWidget {
 public:
+	// constructor
 	BrainQuarter(QWidget * parent = 0, const QGLWidget * sharewidget = 0);
+	// destructor
 	virtual ~BrainQuarter();
+	// creates a yellow cone - i.e. just for testing purposes.
 	void createSampleSceneGraph();
+	// don't let the window get too small
 	virtual QSize minimumSizeHint(void) const;
 private:
-
+	// bits for the sample scene graph
 	SoSeparator *root;
 	SoBaseColor *col;
 };

@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 
 MainWindow::MainWindow() : QMainWindow(){
-	
+
 	createActions();
 	createMenus();
 

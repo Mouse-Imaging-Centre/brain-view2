@@ -8,6 +8,7 @@
 ColourBarForm::ColourBarForm(QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
 	
+	// the famous yellow cone as a place holder
     SoSeparator *root = new SoSeparator;
     root->ref();
 
