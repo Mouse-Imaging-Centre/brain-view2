@@ -17,11 +17,19 @@ macx {
 
 INCLUDEPATH += /usr/local/include
 
-FORMS = colourBarForm.ui
+FORMS = colourBarForm.ui \
+		resourceForm.ui
+		
 HEADERS = MainWindow.h \
           ColourBarForm.h \
-          BrainQuarter.h
+          BrainQuarter.h \
+          TreeItem.h \
+          TreeModel.h \
+          ResourceForm.h
 SOURCES = MainWindow.cpp \
           ColourBarForm.cpp \
           BrainQuarter.cpp \
+          TreeItem.cpp \
+          TreeModel.cpp \
+          ResourceForm.cpp \
           main.cpp

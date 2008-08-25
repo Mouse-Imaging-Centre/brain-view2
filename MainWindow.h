@@ -11,6 +11,7 @@
 
 #include "ColourBarForm.h"
 #include "BrainQuarter.h"
+#include "ResourceForm.h"
 
 using namespace SIM::Coin3D::Quarter;
 class MainWindow : public QMainWindow {
@@ -33,7 +34,12 @@ private:
 	ColourBarForm *colourBar;
 	// dock for the colour bar widget
 	QDockWidget *colourBarDock;
-	
+	// tree to keep track of open resources
+	//QTreeView *treeview;
+	ResourceForm *resourceForm;
+	// dock to hold the tree view
+	QDockWidget *resourceDock;
+	//void sampleTreeSetup();
 
 };
 

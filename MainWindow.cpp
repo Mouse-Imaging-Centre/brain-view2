@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "TreeModel.h"
 
 MainWindow::MainWindow() : QMainWindow(){
 
@@ -11,6 +12,13 @@ MainWindow::MainWindow() : QMainWindow(){
 	addDockWidget(Qt::LeftDockWidgetArea, colourBarDock);
 	colourBarDock->setWidget(colourBar);
 
+	resourceForm = new ResourceForm(this);
+	resourceDock = new QDockWidget(tr("Resources"), this);
+	addDockWidget(Qt::RightDockWidgetArea, resourceDock);
+	resourceDock->setWidget(resourceForm);
+	
+	
+	
 	setCentralWidget(viewer);
 	
 }
@@ -19,6 +27,8 @@ MainWindow::MainWindow() : QMainWindow(){
 
 MainWindow::~MainWindow() {
 }
+
+
 
 void MainWindow::createActions() {
 	
