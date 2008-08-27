@@ -9,6 +9,8 @@ LIBS += $$COINLIBS
 !macx {
  	LIBS += -lCoin
  	LIBS += -L/usr/local/lib -lQuarter
+ 	
+ 	LIBS += -L/projects/mice/share/arch/linux64/lib/ -lbicInventor -lbicpl -lvolume_io2 -lminc2
 }
 
 macx {

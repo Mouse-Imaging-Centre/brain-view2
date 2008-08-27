@@ -56,9 +56,14 @@ TreeModel::TreeModel(const QStringList &headers, const QString &data,
         rootData << header;
 
     rootItem = new TreeItem(rootData);
-    setupModelData(data.split(QString("\n")), rootItem);
+    //setupModelData(data.split(QString("\n")), rootItem);
 }
 //! [0]
+
+TreeItem* TreeModel::getRootItem() {
+	return rootItem;
+}
+
 
 //! [1]
 TreeModel::~TreeModel()

@@ -44,9 +44,12 @@
 #ifndef TREEITEM_H
 #define TREEITEM_H
 
-#include <QList>
-#include <QVariant>
-#include <QVector>
+//#include <QList>
+//#include <QVariant>
+//#include <QVector>
+#include <QtGui>
+
+#include "BrainQuarter.h"
 
 //! [0]
 class TreeItem
@@ -66,11 +69,16 @@ public:
     bool removeColumns(int position, int columns);
     int childNumber() const;
     bool setData(int column, const QVariant &value);
-
+    bool insertGeometry(QFile &file);
+    bool createRootSeparator();
+    bool insertCone();
+    void setViewer(BrainQuarter *quarterViewer);
+    
 private:
     QList<TreeItem*> childItems;
     QVector<QVariant> itemData;
     TreeItem *parentItem;
+    BrainQuarter *viewer;
 };
 //! [0]
 

@@ -12,7 +12,7 @@ MainWindow::MainWindow() : QMainWindow(){
 	addDockWidget(Qt::LeftDockWidgetArea, colourBarDock);
 	colourBarDock->setWidget(colourBar);
 
-	resourceForm = new ResourceForm(this);
+	resourceForm = new ResourceForm(this, viewer);
 	resourceDock = new QDockWidget(tr("Resources"), this);
 	addDockWidget(Qt::RightDockWidgetArea, resourceDock);
 	resourceDock->setWidget(resourceForm);

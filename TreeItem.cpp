@@ -50,6 +50,12 @@
 #include <QStringList>
 
 #include "TreeItem.h"
+#include <Inventor/nodes/SoBaseColor.h>
+#include <Inventor/nodes/SoCone.h>
+#include <Inventor/nodes/SoSeparator.h>
+
+// forward declaration
+SoSeparator* bic_graphics_file_to_iv( const char* filename );
 
 //! [0]
 TreeItem::TreeItem(const QVector<QVariant> &data, TreeItem *parent)
@@ -169,7 +175,9 @@ bool TreeItem::removeColumns(int position, int columns)
 
     return true;
 }
-
+void TreeItem::setViewer(BrainQuarter *quarterViewer) {
+	viewer = quarterViewer;
+}
 //! [11]
 bool TreeItem::setData(int column, const QVariant &value)
 {
@@ -180,3 +188,31 @@ bool TreeItem::setData(int column, const QVariant &value)
     return true;
 }
 //! [11]
+
+bool TreeItem::insertGeometry(QFile &file) {
+	SoSeparator *geometry = new SoSeparator();
+	geometry = bic_graphics_file_to_iv( file.fileName().toLatin1().data() );
+	
+	SoSeparator *root = viewer->getRootSeparator();
+	root->addChild(geometry);
+	viewer->viewAll();
+	
+	insertChildren(childCount(), 1, columnCount());
+	child(childCount() - 1)->setData(0, QFileInfo(file).baseName());
+}
+
+bool TreeItem::insertCone() {
+	SoSeparator *root = viewer->getRootSeparator();
+	SoBaseColor *col = new SoBaseColor;
+	col->rgb = SbColor(1, 1, 0);
+	root->addChild(col);
+	root->addChild(new SoCone);
+	viewer->viewAll();
+	
+	insertChildren(childCount(), 1, columnCount());
+	child(childCount() - 1)->setData(0, "Cone");
+}
+
+bool TreeItem::createRootSeparator() {
+	
+}

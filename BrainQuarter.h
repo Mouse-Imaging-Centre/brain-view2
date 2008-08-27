@@ -23,6 +23,7 @@ public:
 	virtual ~BrainQuarter();
 	// creates a yellow cone - i.e. just for testing purposes.
 	void createSampleSceneGraph();
+	SoSeparator* getRootSeparator();
 	// don't let the window get too small
 	virtual QSize minimumSizeHint(void) const;
 private:
