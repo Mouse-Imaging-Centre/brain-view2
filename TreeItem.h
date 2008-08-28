@@ -56,7 +56,7 @@ class TreeItem
 {
 public:
     TreeItem(const QVector<QVariant> &data, TreeItem *parent = 0);
-    ~TreeItem();
+    virtual ~TreeItem();
 
     TreeItem *child(int number);
     int childCount() const;
@@ -74,7 +74,7 @@ public:
     bool insertCone();
     void setViewer(BrainQuarter *quarterViewer);
     
-private:
+protected:
     QList<TreeItem*> childItems;
     QVector<QVariant> itemData;
     TreeItem *parentItem;

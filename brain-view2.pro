@@ -1,3 +1,5 @@
+CONFIG += qt debug
+
 QT += opengl
 
 COINLIBS = $$system(coin-config --ldflags)
@@ -27,6 +29,7 @@ HEADERS = MainWindow.h \
           BrainQuarter.h \
           TreeItem.h \
           TreeModel.h \
+          GeometryScene.h \
           ResourceForm.h
 SOURCES = MainWindow.cpp \
           ColourBarForm.cpp \
@@ -34,4 +37,5 @@ SOURCES = MainWindow.cpp \
           TreeItem.cpp \
           TreeModel.cpp \
           ResourceForm.cpp \
+          GeometryScene.cpp \
           main.cpp

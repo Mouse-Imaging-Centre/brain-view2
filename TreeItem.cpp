@@ -50,12 +50,11 @@
 #include <QStringList>
 
 #include "TreeItem.h"
+#include "GeometryScene.h"
 #include <Inventor/nodes/SoBaseColor.h>
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoSeparator.h>
 
-// forward declaration
-SoSeparator* bic_graphics_file_to_iv( const char* filename );
 
 //! [0]
 TreeItem::TreeItem(const QVector<QVariant> &data, TreeItem *parent)
@@ -189,7 +188,17 @@ bool TreeItem::setData(int column, const QVariant &value)
 }
 //! [11]
 
+
 bool TreeItem::insertGeometry(QFile &file) {
+	QVector<QVariant> data(columnCount());
+	GeometryScene *item = new GeometryScene(data, this);
+	item->setViewer(viewer);
+	childItems.insert(childCount(), item);	
+    item->loadGeometry(file);
+
+    return true;
+	
+	/*
 	SoSeparator *geometry = new SoSeparator();
 	geometry = bic_graphics_file_to_iv( file.fileName().toLatin1().data() );
 	
@@ -199,6 +208,7 @@ bool TreeItem::insertGeometry(QFile &file) {
 	
 	insertChildren(childCount(), 1, columnCount());
 	child(childCount() - 1)->setData(0, QFileInfo(file).baseName());
+	*/
 }
 
 bool TreeItem::insertCone() {

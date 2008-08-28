@@ -1,6 +1,6 @@
 #include "ResourceForm.h"
 #include <QtGui>
-#include "TreeItem.h"
+#include "GeometryScene.h"
 
 
 ResourceForm::ResourceForm(QWidget *parent, BrainQuarter *viewer) : QWidget(parent){
