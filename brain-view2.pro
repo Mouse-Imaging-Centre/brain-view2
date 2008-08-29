@@ -11,7 +11,7 @@ LIBS += $$COINLIBS
 !macx {
  	LIBS += -lCoin
  	LIBS += -L/usr/local/lib -lQuarter
- 	
+ 	INCLUDEPATH += /projects/mice/share/arch/linux64/include
  	LIBS += -L/projects/mice/share/arch/linux64/lib/ -lbicInventor -lbicpl -lvolume_io2 -lminc2
 }
 
@@ -30,7 +30,9 @@ HEADERS = MainWindow.h \
           TreeItem.h \
           TreeModel.h \
           GeometryScene.h \
-          ResourceForm.h
+          ResourceForm.h \
+          GeometryNode.h
+          
 SOURCES = MainWindow.cpp \
           ColourBarForm.cpp \
           BrainQuarter.cpp \
@@ -38,4 +40,5 @@ SOURCES = MainWindow.cpp \
           TreeModel.cpp \
           ResourceForm.cpp \
           GeometryScene.cpp \
+          GeometryNode.cpp \
           main.cpp

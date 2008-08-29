@@ -1,9 +1,11 @@
 #include "BrainQuarter.h"
+#include "Inventor/actions/SoGLRenderAction.h"
 
 BrainQuarter::BrainQuarter(QWidget *parent, const QGLWidget *sharewidget) : QuarterWidget(parent, sharewidget) {
     root = new SoSeparator;
     root->ref();
     setSceneGraph(root); 
+    setTransparencyType(SoGLRenderAction:: SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
 	//createSampleSceneGraph();
 }
 
