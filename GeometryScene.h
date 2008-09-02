@@ -7,7 +7,8 @@
 
 class GeometryScene : public TreeItem {
 public:
-	GeometryScene(const QVector<QVariant> &data, TreeItem *parent = 0);
+	GeometryScene(const QVector<QVariant> &data,
+			ResourceForm *rf, TreeItem *parent = 0);
 	virtual ~GeometryScene();
 	bool loadGeometry(QFile &file);
 	bool loadVertstats(QFile &file);

@@ -12,9 +12,16 @@ class ResourceForm : public QWidget {
 public:
 	ResourceForm(QWidget *parent, BrainQuarter *viewer);
 	virtual ~ResourceForm();
-private:
 	Ui::resourceForm ui;
+public slots:
+	void setPropertyForm(const QModelIndex & index);
+private:
+	QWidget *propWidget;
+	QVBoxLayout *propLayout;
+	TreeItem *currentPropItem;
+	bool haveProps;
 	void sampleTreeSetup(BrainQuarter *viewer);
+
 };
 
 #endif /*RESOURCEFORM_H_*/

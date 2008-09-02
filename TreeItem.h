@@ -50,12 +50,14 @@
 #include <QtGui>
 
 #include "BrainQuarter.h"
+#include "ResourceForm.h"
 
 //! [0]
-class TreeItem
-{
+class TreeItem : public QObject {
+	Q_OBJECT
 public:
-    TreeItem(const QVector<QVariant> &data, TreeItem *parent = 0);
+    TreeItem(const QVector<QVariant> &data,
+    		ResourceForm *rf, TreeItem *parent = 0);
     virtual ~TreeItem();
 
     TreeItem *child(int number);
@@ -73,12 +75,22 @@ public:
     bool createRootSeparator();
     bool insertCone();
     void setViewer(BrainQuarter *quarterViewer);
-    
+    virtual QWidget* createForm();
+    virtual void destroyForm();
+    virtual bool havePropForm() { return haveProps; };
+
+signals:
+	void propertyFormInstantiated(QWidget *widget);
+
 protected:
+	bool haveProps;
     QList<TreeItem*> childItems;
     QVector<QVariant> itemData;
     TreeItem *parentItem;
     BrainQuarter *viewer;
+    ResourceForm *form;
+    QWidget *formWidget;
+    bool formInstantiated;
 };
 //! [0]
 

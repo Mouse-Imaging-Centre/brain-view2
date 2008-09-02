@@ -16,11 +16,11 @@ MainWindow::MainWindow() : QMainWindow(){
 	resourceDock = new QDockWidget(tr("Resources"), this);
 	addDockWidget(Qt::RightDockWidgetArea, resourceDock);
 	resourceDock->setWidget(resourceForm);
-	
-	
-	
+
+
+
 	setCentralWidget(viewer);
-	
+
 }
 
 
@@ -31,11 +31,11 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::createActions() {
-	
+
 }
 
 void MainWindow::createMenus() {
-	
+
 }
 
 

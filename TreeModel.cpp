@@ -48,14 +48,15 @@
 
 //! [0]
 TreeModel::TreeModel(const QStringList &headers, const QString &data,
-                     QObject *parent)
+                     ResourceForm *rf, QObject *parent)
     : QAbstractItemModel(parent)
 {
+	form = rf;
     QVector<QVariant> rootData;
     foreach (QString header, headers)
         rootData << header;
 
-    rootItem = new TreeItem(rootData);
+    rootItem = new TreeItem(rootData, form);
     //setupModelData(data.split(QString("\n")), rootItem);
 }
 //! [0]

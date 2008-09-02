@@ -3,7 +3,7 @@ CONFIG += qt debug
 QT += opengl
 
 COINLIBS = $$system(coin-config --ldflags)
-COININCLUDE == $$system(coin-config --includedir)
+COININCLUDE = $$system(coin-config --includedir)
 
 INCLUDEPATH += $$COININCLUDE
 LIBS += $$COINLIBS
@@ -17,12 +17,15 @@ LIBS += $$COINLIBS
 
 macx {
 	LIBS += -Wl,-framework -Wl,Quarter
+	LIBS += -L/usr/local/minc2/lib -lbicpl -lvolume_io2 -lminc2
+	INCLUDEPATH += /usr/local/minc2/include
 }
 
 INCLUDEPATH += /usr/local/include
 
 FORMS = colourBarForm.ui \
-		resourceForm.ui
+		resourceForm.ui \
+		geometryProps.ui
 		
 HEADERS = MainWindow.h \
           ColourBarForm.h \

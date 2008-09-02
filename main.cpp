@@ -1,7 +1,5 @@
 #include <Quarter/QuarterApplication.h>
 
-//#include <QApplication>
-
 #include "MainWindow.h"
 
 int main(int argc, char *argv[]) {

@@ -1,49 +1,10 @@
 /****************************************************************************
-**
+** Part of this file was copied from the Qt4 examples, and so is still ...
 ** Copyright (C) 2005-2008 Trolltech ASA. All rights reserved.
 **
-** This file is part of the example classes of the Qt Toolkit.
-**
-** This file may be used under the terms of the GNU General Public
-** License versions 2.0 or 3.0 as published by the Free Software
-** Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file.  Alternatively you may (at
-** your option) use any later version of the GNU General Public
-** License if such license has been publicly approved by Trolltech ASA
-** (or its successors, if any) and the KDE Free Qt Foundation. In
-** addition, as a special exception, Trolltech gives you certain
-** additional rights. These rights are described in the Trolltech GPL
-** Exception version 1.2, which can be found at
-** http://www.trolltech.com/products/qt/gplexception/ and in the file
-** GPL_EXCEPTION.txt in this package.
-**
-** Please review the following information to ensure GNU General
-** Public Licensing requirements will be met:
-** http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-** you are unsure which license is appropriate for your use, please
-** review the following information:
-** http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-** or contact the sales department at sales@trolltech.com.
-**
-** In addition, as a special exception, Trolltech, as the sole
-** copyright holder for Qt Designer, grants users of the Qt/Eclipse
-** Integration plug-in the right for the Qt/Eclipse Integration to
-** link to functionality provided by Qt Designer and its related
-** libraries.
-**
-** This file is provided "AS IS" with NO WARRANTY OF ANY KIND,
-** INCLUDING THE WARRANTIES OF DESIGN, MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE. Trolltech reserves all rights not expressly
-** granted herein.
-**
-** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-**
-****************************************************************************/
 
 /*
     treeitem.cpp
-
     A container for items of data supplied by the simple tree model.
 */
 
@@ -51,16 +12,19 @@
 
 #include "TreeItem.h"
 #include "GeometryScene.h"
-#include <Inventor/nodes/SoBaseColor.h>
-#include <Inventor/nodes/SoCone.h>
-#include <Inventor/nodes/SoSeparator.h>
+
 
 
 //! [0]
-TreeItem::TreeItem(const QVector<QVariant> &data, TreeItem *parent)
+TreeItem::TreeItem(const QVector<QVariant> &data,
+		ResourceForm *rf, TreeItem *parent) : QObject()
 {
+	form = rf;
     parentItem = parent;
     itemData = data;
+    haveProps = false;
+
+
 }
 //! [0]
 
@@ -117,7 +81,7 @@ bool TreeItem::insertChildren(int position, int count, int columns)
 
     for (int row = 0; row < count; ++row) {
         QVector<QVariant> data(columns);
-        TreeItem *item = new TreeItem(data, this);
+        TreeItem *item = new TreeItem(data, form, this);
         childItems.insert(position, item);
     }
 
@@ -191,24 +155,13 @@ bool TreeItem::setData(int column, const QVariant &value)
 
 bool TreeItem::insertGeometry(QFile &file) {
 	QVector<QVariant> data(columnCount());
-	GeometryScene *item = new GeometryScene(data, this);
+	GeometryScene *item = new GeometryScene(data, form, this);
 	item->setViewer(viewer);
-	childItems.insert(childCount(), item);	
+	childItems.insert(childCount(), item);
     item->loadGeometry(file);
 
     return true;
-	
-	/*
-	SoSeparator *geometry = new SoSeparator();
-	geometry = bic_graphics_file_to_iv( file.fileName().toLatin1().data() );
-	
-	SoSeparator *root = viewer->getRootSeparator();
-	root->addChild(geometry);
-	viewer->viewAll();
-	
-	insertChildren(childCount(), 1, columnCount());
-	child(childCount() - 1)->setData(0, QFileInfo(file).baseName());
-	*/
+
 }
 
 bool TreeItem::insertCone() {
@@ -218,11 +171,18 @@ bool TreeItem::insertCone() {
 	root->addChild(col);
 	root->addChild(new SoCone);
 	viewer->viewAll();
-	
+
 	insertChildren(childCount(), 1, columnCount());
 	child(childCount() - 1)->setData(0, "Cone");
 }
 
+QWidget* TreeItem::createForm() {
+
+}
+
+void TreeItem::destroyForm() {
+
+}
 bool TreeItem::createRootSeparator() {
-	
+
 }

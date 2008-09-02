@@ -47,6 +47,9 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
+#include <QMainWindow>
+
+class ResourceForm;
 
 class TreeItem;
 
@@ -57,7 +60,7 @@ class TreeModel : public QAbstractItemModel
 
 public:
     TreeModel(const QStringList &headers, const QString &data,
-              QObject *parent = 0);
+              ResourceForm *rf, QObject *parent = 0);
     ~TreeModel();
 //! [0] //! [1]
     TreeItem* getRootItem();
@@ -94,6 +97,7 @@ private:
     TreeItem *getItem(const QModelIndex &index) const;
 
     TreeItem *rootItem;
+    ResourceForm *form;
 };
 //! [2]
 
