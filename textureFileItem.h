@@ -14,8 +14,12 @@ private:
 	void createColumn();
 	// holds the geometry separator to which the Switch node will be attached.
 	SoSeparator *root;
+	// holds the texture complexity node
+	SoComplexity *textureComplexity;
 	// all the texture columns will be attached to this switch.
 	SoSwitch *textureSwitch;
+	// the texture coordinate Binding
+	SoTextureCoordinateBinding *textureBinding;
 	// the actual vertstats file
 	mniVertstatsFile *vertstatsFile;
 };
