@@ -40,11 +40,13 @@ void GeometryNode::updateTransparency(double newVal) {
 	material->transparency.set1Value(0, newVal);
 }
 
+/*
 void GeometryNode::updateColour(QColor *colour) {
 	int r,g,b;
 	colour->getRgb(&r,&g,&b);
 	material->diffuseColor.setValue(r/255, g/255, b/255);
 }
+*/
 
 void GeometryNode::destroyForm() {
 	if (formInstantiated) {
