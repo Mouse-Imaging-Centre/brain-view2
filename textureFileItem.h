@@ -10,6 +10,7 @@ public:
     				ResourceForm *rf, TreeItem *parent = 0);
 	void loadFile(QFile &file);
 	virtual ~textureFileItem();
+    void getAllColumns();
 private:
 	void createColumn();
 	// holds the geometry separator to which the Switch node will be attached.
@@ -22,6 +23,8 @@ private:
 	SoTextureCoordinateBinding *textureBinding;
 	// the actual vertstats file
 	mniVertstatsFile *vertstatsFile;
+	// holds all of the texture Columns;
+	//QVector <textureColumn*> *columns;
 };
 
 #endif /*TEXTUREFILEITEM_H_*/

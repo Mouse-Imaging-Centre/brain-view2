@@ -5,7 +5,7 @@ textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &da
 		ResourceForm *rf, TreeItem *parent) : TreeItem(data, rf, parent){) {
 
 	this->root = root;
-	
+
 	/* Scene Graph:
 	 * root holds the geometry scene
 	 * textureComplexity is inserted at the beginning of the geometry scene graph
@@ -16,14 +16,14 @@ textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &da
 	textureComplexity = new SoComplexity;
 	textureComplexity->textureQuality = 1;
 	root->insertChild(textureComplexity, 0);
-	
+
 	textureSwitch = new SoSwitch;
 	root->insertChild(textureSwitch, 1);
-	
+
 	textureBinding = new SoTextureCoordinateBinding;
 	textureBinding->value.setValue(SoTextureCoordinateBinding::PER_VERTEX_INDEXED);
 	root->insertChild(textureBinding, 2);
-	
+
 	// create the vertstats file
 	vertstatsFile = new mniVertstatsFile;
 }
@@ -36,6 +36,20 @@ void textureFileItem::loadFile(QFile &file) {
 	setData(0, QFileInfo(file).baseName());
 
 	vertstatsFile->loadFile( (char *) file.fileName().toLatin1().data());
-	
-	
+
+
+}
+
+
+/*!
+    \fn textureFileItem::getAllColumns()
+ */
+void textureFileItem::getAllColumns() {
+	vector <string> headers = vertstatsFile->getDataHeader();
+	vector <string>::iterator it;
+	for (it = headers.begin(); it < headers.end(); it++) {
+		textureColumn *newColumn = new textureColumn(textureSwitch, data, rf, this);
+		newColumn->loadTextureColumn(vertstatsFile, *it);
+		childItems.insert(childCount(), newColumn);
+	}	
 }

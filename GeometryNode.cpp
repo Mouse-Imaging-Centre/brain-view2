@@ -35,7 +35,7 @@ QWidget* GeometryNode::createForm() {
 	}
 	return formWidget;
 }
-
+//test
 void GeometryNode::updateTransparency(double newVal) {
 	material->transparency.set1Value(0, newVal);
 }
