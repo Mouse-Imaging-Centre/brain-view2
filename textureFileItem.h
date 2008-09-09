@@ -2,6 +2,13 @@
 #define TEXTUREFILEITEM_H_
 
 #include "TreeItem.h"
+#include "TextureColumn.h"
+
+#include <Inventor/nodes/SoComplexity.h>
+#include <Inventor/nodes/SoSwitch.h>
+#include <Inventor/nodes/SoTextureCoordinateBinding.h>
+
+#include <mniVertstatsFile.h>
 
 class textureFileItem : public TreeItem
 {

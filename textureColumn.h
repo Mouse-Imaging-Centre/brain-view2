@@ -2,23 +2,29 @@
 #define TEXTURECOLUMN_H_
 
 #include "TreeItem.h"
-#inlcude "mniVertstatsFile.h"
+#include "ResourceForm.h"
+#include "mniVertstatsFile.h"
 
-class textureColumn : public TreeItem
-{
+#include <Inventor/nodes/SoTextureCoordinate2.h>
+#include <Inventor/nodes/SoSwitch.h>
+
+#include <QtGui>
+
+class textureColumn : public TreeItem {
+	Q_OBJECT
 public:
 	textureColumn(SoSwitch *root, const QVector <QVariant> &data, 
-		      ResourceForm *rf, TreeItem *parent);
+				  ResourceForm *rf, TreeItem *parent = 0);
 	virtual ~textureColumn();
-	void loadTextureColumn(mniVertstatsFile *file, string columnName);
-	void scaleTexture(float min, float max);
+	void loadTextureColumn(mniVertstatsFile *file, QString columnName);
+	void scaleTexture(float low, float high);
 private:
 	// holds the actual texture to be displayed - modified with each rescale
 	SoTextureCoordinate2 *texture;
 	// holds the original data - will not be modified.
 	vertexColumn *data;
-	float *min;
-	float *max;
+	float *low;
+	float *high;
 
 };
 

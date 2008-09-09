@@ -1,4 +1,4 @@
-MINCDIR = /projects/mice/share/arch/linux64
+MINCDIR = /usr/local/minc2
 QUARTERDIR = /usr/local
 
 COINLIBS = $$system(coin-config --ldflags)
@@ -13,16 +13,16 @@ LIBS += $$COINLIBS
 
 !macx {
     LIBS += -lCoin
-    LIBS += -L$$(QUARTERDIR) -lQuarter
-    INCLUDEPATH += $$(MINCDIR)/include
-    INCLUDEPATH += $$(QUARTERDIR)/include
-    LIBS += -L$$(MINCDIR)/lib/ -lbicpl -lvolume_io2 -lminc2
+    LIBS += -L$${QUARTERDIR} -lQuarter
+    INCLUDEPATH += $${MINCDIR}/include
+    INCLUDEPATH += $${QUARTERDIR}/include
+    LIBS += -L$${MINCDIR}/lib/ -lbicpl -lvolume_io2 -lminc2
 }
 
 macx {
     LIBS += -Wl,-framework -Wl,Quarter
-    LIBS += -L$$(MINCDIR)/lib -lbicpl -lvolume_io2 -lminc2
-    INCLUDEPATH += $$(MINCDIR)/include
+    LIBS += -L$${MINCDIR}/lib -loobicpl -lpcre++ -lpcre -lbicpl -lvolume_io2 -lminc2
+    INCLUDEPATH += $${MINCDIR}/include
 }
 
 INCLUDEPATH += /usr/local/include

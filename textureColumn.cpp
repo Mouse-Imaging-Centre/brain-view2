@@ -2,36 +2,38 @@
 
 textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data, 
 			    ResourceForm *rf, TreeItem *parent) 
-	: TreeItem(rf, data, parent) {
+	: TreeItem(data, rf, parent) {
 	
-	min = new float;
-	max = new float;
+	low = new float;
+	high = new float;
 	texture = new SoTextureCoordinate2;
 	root->addChild(texture);
 }
 
-void textureColumn::loadTextureColumn(mniVerstatsFile *file, QString columnName) {
+void textureColumn::loadTextureColumn(mniVertstatsFile *file, QString columnName) {
 	setData(0, columnName);
 	*this->data = file->getDataColumn(columnName.toLatin1().data());
-	// determine the min and max
+	// deterlowe the low and high
 	vertexColumn::iterator it;
-	*this->min = *data.begin();
-	*this->max = *this->min;
-	for (it = *data.begin(); it < *data.end(); it++) {
-		if ( *it > *max )
-			*max = *it;
-		else if ( *it < *min )
-			*min = *it;
+	*this->low = *data->begin();
+	*this->high = *this->low;
+	for (it = data->begin(); it < data->end(); it++) {
+		if ( *it > *high )
+			*high = *it;
+		else if ( *it < *low )
+			*low = *it;
 	}
-	scaleTexture(*min, *max);
+	scaleTexture(*low, *high);
 }
 
-void textureColumn::scaleTexture(float min, float max) {
+void textureColumn::scaleTexture(float low, float high) {
+	*this->low = low;
+	*this->high = high;
 	vertexColumn::iterator it;
 	int i = 0;
 	SbVec2f *vertValues = texture->point.startEditing();
 	for (it = data->begin(); it < data->end(); it++) {
-		float newVal = ( *it - *min ) / ( *max - *min);
+		float newVal = ( *it - *this->low ) / ( *this->high - *this->low);
 		if (newVal < 0.0) {
 			newVal = 0.0;
 		}

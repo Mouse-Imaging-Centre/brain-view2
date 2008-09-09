@@ -2,7 +2,7 @@
 
 
 textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &data,
-		ResourceForm *rf, TreeItem *parent) : TreeItem(data, rf, parent){) {
+		ResourceForm *rf, TreeItem *parent) : TreeItem(data, rf, parent) {
 
 	this->root = root;
 
@@ -48,8 +48,8 @@ void textureFileItem::getAllColumns() {
 	vector <string> headers = vertstatsFile->getDataHeader();
 	vector <string>::iterator it;
 	for (it = headers.begin(); it < headers.end(); it++) {
-		textureColumn *newColumn = new textureColumn(textureSwitch, data, rf, this);
-		newColumn->loadTextureColumn(vertstatsFile, *it);
+		textureColumn *newColumn = new textureColumn(textureSwitch, itemData, form, this);
+		newColumn->loadTextureColumn(vertstatsFile, QString::fromStdString(*it));
 		childItems.insert(childCount(), newColumn);
 	}	
 }
