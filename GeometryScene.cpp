@@ -24,7 +24,9 @@ bool GeometryScene::loadGeometry(QFile &file) {
 }
 
 bool GeometryScene::loadVertstats(QFile &file) {
-
+	textureFileItem *v = new textureFileItem(scene, itemData, form, this);
+	v->loadFile(file);
+	childItems.insert(childCount(), v);
 }
 
 GeometryScene::~GeometryScene() {

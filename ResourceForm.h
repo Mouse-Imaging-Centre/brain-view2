@@ -15,6 +15,7 @@ public:
 	Ui::resourceForm ui;
 public slots:
 	void setPropertyForm(const QModelIndex & index);
+	void selectedItem(const QModelIndex & index);
 private:
 	QWidget *propWidget;
 	QVBoxLayout *propLayout;

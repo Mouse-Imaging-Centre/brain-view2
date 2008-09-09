@@ -10,10 +10,17 @@ ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidge
 	//this->parentWindow = (ResourceForm *) parentWindow; //static_cast<QMainWindow *>(parent);
 	connect(ui.treeView, SIGNAL(clicked(const QModelIndex&)),
 			this, SLOT(setPropertyForm(const QModelIndex&)));
+	connect(ui.treeView, SIGNAL(clicked(const QModelIndex&)),
+			this, SLOT(selectedItem(const QModelIndex&)));
 	haveProps = false;
 }
 
 ResourceForm::~ResourceForm() {
+}
+
+void ResourceForm::selectedItem(const QModelIndex &index) {
+	TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+	item->wasSelected();
 }
 
 void ResourceForm::setPropertyForm(const QModelIndex & index) {
@@ -53,6 +60,10 @@ void ResourceForm::sampleTreeSetup(BrainQuarter *viewer) {
 	QFile f1("mni_icbm_00101_gray_surface_left_81920.obj");
 	QFile f2("mni_icbm_00101_white_surface_right_81920.obj");
 	parent->insertGeometry(f1);
+	GeometryScene *g = static_cast<GeometryScene*>(parent->child(0));
+	QFile f3("mni_icbm_00101_native_rms_tlink_20mm_right.txt");
+	g->loadVertstats(f3);
+
 	parent->insertGeometry(f2);
 	//parent->insertChildren(parent->childCount(), 1, parent->columnCount() );
 	//parent->child(parent->childCount() - 1)->setData(0, "testing");

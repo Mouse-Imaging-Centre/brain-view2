@@ -13,11 +13,12 @@
 class textureColumn : public TreeItem {
 	Q_OBJECT
 public:
-	textureColumn(SoSwitch *root, const QVector <QVariant> &data, 
+	textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 				  ResourceForm *rf, TreeItem *parent = 0);
 	virtual ~textureColumn();
 	void loadTextureColumn(mniVertstatsFile *file, QString columnName);
 	void scaleTexture(float low, float high);
+	void wasSelected() { std::cout << "Me me" << std::endl; };
 private:
 	// holds the actual texture to be displayed - modified with each rescale
 	SoTextureCoordinate2 *texture;

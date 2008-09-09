@@ -2,11 +2,12 @@
 #define TEXTUREFILEITEM_H_
 
 #include "TreeItem.h"
-#include "TextureColumn.h"
+#include "textureColumn.h"
 
 #include <Inventor/nodes/SoComplexity.h>
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoTextureCoordinateBinding.h>
+#include <Inventor/nodes/SoTexture2.h>
 
 #include <mniVertstatsFile.h>
 
@@ -30,6 +31,7 @@ private:
 	SoTextureCoordinateBinding *textureBinding;
 	// the actual vertstats file
 	mniVertstatsFile *vertstatsFile;
+	SoTexture2 *texture;
 	// holds all of the texture Columns;
 	//QVector <textureColumn*> *columns;
 };

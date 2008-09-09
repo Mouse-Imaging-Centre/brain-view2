@@ -52,6 +52,7 @@
 #include "BrainQuarter.h"
 #include "ResourceForm.h"
 
+#include <iostream>
 //! [0]
 class TreeItem : public QObject {
 	Q_OBJECT
@@ -79,8 +80,14 @@ public:
     virtual void destroyForm();
     virtual bool havePropForm() { return haveProps; };
 
-signals:
-	void propertyFormInstantiated(QWidget *widget);
+    // this method is called every time the user selectes the particular item in the GUI.
+    // subclasses can reimplement to do something useful here
+    virtual void wasSelected() { std::cout << "Eeeek" << std::endl; };
+
+    signals:
+    	void propertyFormInstantiated(QWidget *widget);
+//public slots:
+
 
 protected:
 	bool haveProps;

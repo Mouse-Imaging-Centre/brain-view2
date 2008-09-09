@@ -3,6 +3,7 @@
 
 #include "TreeItem.h"
 #include "GeometryNode.h"
+#include "textureFileItem.h"
 #include "Inventor/nodes/SoSeparator.h"
 
 class GeometryScene : public TreeItem {

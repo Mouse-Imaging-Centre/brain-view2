@@ -17,12 +17,18 @@ textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &da
 	textureComplexity->textureQuality = 1;
 	root->insertChild(textureComplexity, 0);
 
+	texture = new SoTexture2;
+	texture->filename.setValue("spectral.png");
+	texture->wrapT = SoTexture2::CLAMP;
+	texture->wrapS = SoTexture2::CLAMP;
+	root->insertChild(texture, 1);
+
 	textureSwitch = new SoSwitch;
-	root->insertChild(textureSwitch, 1);
+	root->insertChild(textureSwitch, 2);
 
 	textureBinding = new SoTextureCoordinateBinding;
 	textureBinding->value.setValue(SoTextureCoordinateBinding::PER_VERTEX_INDEXED);
-	root->insertChild(textureBinding, 2);
+	root->insertChild(textureBinding, 3);
 
 	// create the vertstats file
 	vertstatsFile = new mniVertstatsFile;
@@ -36,6 +42,7 @@ void textureFileItem::loadFile(QFile &file) {
 	setData(0, QFileInfo(file).baseName());
 
 	vertstatsFile->loadFile( (char *) file.fileName().toLatin1().data());
+	getAllColumns();
 
 
 }
@@ -51,5 +58,5 @@ void textureFileItem::getAllColumns() {
 		textureColumn *newColumn = new textureColumn(textureSwitch, itemData, form, this);
 		newColumn->loadTextureColumn(vertstatsFile, QString::fromStdString(*it));
 		childItems.insert(childCount(), newColumn);
-	}	
+	}
 }
