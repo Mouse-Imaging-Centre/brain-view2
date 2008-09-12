@@ -6,10 +6,34 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 
 	low = new float;
 	high = new float;
+	textureGroup = new SoGroup;
+
+	textureSwitch = root;
+	root->addChild(textureGroup);
+
+	textureComplexity = new SoComplexity;
+	textureComplexity->textureQuality = 1;
+	textureGroup->addChild(textureComplexity);
+
+	textureImage = new SoTexture2;
+	textureImage->filename.setValue("spectral.png");
+	textureImage->wrapT = SoTexture2::CLAMP;
+	textureImage->wrapS = SoTexture2::CLAMP;
+	textureGroup->addChild(textureImage);
+
 	texture = new SoTextureCoordinate2;
 	this->data = new vertexColumn;
-	root->addChild(texture);
-	root->whichChild = 0;
+	textureGroup->addChild(texture);
+
+	textureBinding = new SoTextureCoordinateBinding;
+	textureBinding->value.setValue(SoTextureCoordinateBinding::PER_VERTEX_INDEXED);
+	textureGroup->addChild(textureBinding);
+
+	//root->whichChild = 0;
+}
+
+void textureColumn::wasSelected() {
+	textureSwitch->whichChild = this->childNumber();
 }
 
 void textureColumn::loadTextureColumn(mniVertstatsFile *file, QString columnName) {

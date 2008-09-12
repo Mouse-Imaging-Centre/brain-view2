@@ -8,27 +8,11 @@ textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &da
 
 	/* Scene Graph:
 	 * root holds the geometry scene
-	 * textureComplexity is inserted at the beginning of the geometry scene graph
-	 * textureSwitch is inserted after the complexity node.
-	 * 		the textureSwitch will hold the textureCoordinates.
-	 * a textureBinding node to hold, well, the texture binding.
+	 * The textureSwitch is filled by textureColumns
 	 */
-	textureComplexity = new SoComplexity;
-	textureComplexity->textureQuality = 1;
-	root->insertChild(textureComplexity, 0);
-
-	texture = new SoTexture2;
-	texture->filename.setValue("spectral.png");
-	texture->wrapT = SoTexture2::CLAMP;
-	texture->wrapS = SoTexture2::CLAMP;
-	root->insertChild(texture, 1);
 
 	textureSwitch = new SoSwitch;
-	root->insertChild(textureSwitch, 2);
-
-	textureBinding = new SoTextureCoordinateBinding;
-	textureBinding->value.setValue(SoTextureCoordinateBinding::PER_VERTEX_INDEXED);
-	root->insertChild(textureBinding, 3);
+	root->insertChild(textureSwitch, 0);
 
 	// create the vertstats file
 	vertstatsFile = new mniVertstatsFile;

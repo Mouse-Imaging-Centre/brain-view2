@@ -61,10 +61,14 @@ void ResourceForm::sampleTreeSetup(BrainQuarter *viewer) {
 	QFile f2("mni_icbm_00101_white_surface_right_81920.obj");
 	parent->insertGeometry(f1);
 	GeometryScene *g = static_cast<GeometryScene*>(parent->child(0));
-	QFile f3("mni_icbm_00101_native_rms_tlink_20mm_right.txt");
+	QFile f3("/micehome/jlerch/bzr/brain-view2/debug/average.vertstats");
 	g->loadVertstats(f3);
 
+
 	parent->insertGeometry(f2);
+	g = static_cast<GeometryScene*>(parent->child(1));
+	g->loadVertstats(f3);
+	//g->loadVertstats(f3);
 	//parent->insertChildren(parent->childCount(), 1, parent->columnCount() );
 	//parent->child(parent->childCount() - 1)->setData(0, "testing");
 
