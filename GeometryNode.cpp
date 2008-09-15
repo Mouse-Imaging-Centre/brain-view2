@@ -31,22 +31,35 @@ QWidget* GeometryNode::createForm() {
 		//emit propertyFormInstantiated(formWidget);
 		connect(ui.transparencySpinBox, SIGNAL(valueChanged(double)),
 				this, SLOT(updateTransparency(double)));
+		connect(ui.colourButton, SIGNAL(clicked()),
+				this, SLOT(colourDialog()));
 
 	}
 	return formWidget;
 }
-//test
+
 void GeometryNode::updateTransparency(double newVal) {
 	material->transparency.set1Value(0, newVal);
+	//QColor col(255,0,0);
+	//updateColour(col);
 }
 
-/*
-void GeometryNode::updateColour(QColor *colour) {
+void GeometryNode::colourDialog() {
+	QColor colour = QColorDialog::getColor();
+	if (colour.isValid()) {
+		ui.colourButton->setText(colour.name());
+		ui.colourButton->setPalette(QPalette(colour));
+		ui.colourButton->setAutoFillBackground(true);
+		updateColour(colour);
+	}
+}
+
+void GeometryNode::updateColour(QColor &colour) {
 	int r,g,b;
-	colour->getRgb(&r,&g,&b);
+	colour.getRgb(&r,&g,&b);
 	material->diffuseColor.setValue(r/255, g/255, b/255);
 }
-*/
+
 
 void GeometryNode::destroyForm() {
 	if (formInstantiated) {

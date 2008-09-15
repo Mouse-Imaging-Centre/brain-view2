@@ -14,6 +14,8 @@
 
 #include <QtGui>
 
+#include "ui_textureColumnForm.h"
+
 class textureColumn : public TreeItem {
 	Q_OBJECT
 public:
@@ -23,6 +25,12 @@ public:
 	void loadTextureColumn(mniVertstatsFile *file, QString columnName);
 	void scaleTexture(float low, float high);
 	void wasSelected();
+	QWidget *createForm();
+	void destroyForm();
+
+public slots:
+	void upperValueChanged(double newVal);
+	void lowerValueChanged(double newVal);
 private:
 	// holds the actual texture to be displayed - modified with each rescale
 	SoTextureCoordinate2 *texture;
@@ -31,6 +39,8 @@ private:
 	// low and high are used for scaling the column
 	float *low;
 	float *high;
+	float *minValue;
+	float *maxValue;
 	// holds a pointe to the parents texture switch
 	SoGroup *textureGroup;
 	// holds the texture complexity node
@@ -42,6 +52,8 @@ private:
 	// the actual vertstats file
 	mniVertstatsFile *vertstatsFile;
 	SoTexture2 *textureImage;
+
+	Ui::textureProps ui;
 
 };
 

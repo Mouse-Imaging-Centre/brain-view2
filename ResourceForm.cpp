@@ -24,6 +24,11 @@ void ResourceForm::selectedItem(const QModelIndex &index) {
 }
 
 void ResourceForm::setPropertyForm(const QModelIndex & index) {
+	// destroy the currently in use form
+	if (haveProps) {
+		currentPropItem->destroyForm();
+	}
+
 	// get a pointer to the selected item
 	currentPropItem = static_cast<TreeItem*>(index.internalPointer());
 
@@ -33,7 +38,6 @@ void ResourceForm::setPropertyForm(const QModelIndex & index) {
 		// remove the current layout in the property box
 		delete ui.propertiesBox->layout();
 
-		// destroy the currently in use form
 		if (haveProps) {
 			currentPropItem->destroyForm();
 		}

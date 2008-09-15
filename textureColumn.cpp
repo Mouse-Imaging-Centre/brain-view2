@@ -4,8 +4,10 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 			    ResourceForm *rf, TreeItem *parent)
 	: TreeItem(data, rf, parent) {
 
-	low = new float;
-	high = new float;
+	low = new float(0.0);
+	high = new float(0.0);
+	minValue = new float(0.0);
+	maxValue = new float(0.0);
 	textureGroup = new SoGroup;
 
 	textureSwitch = root;
@@ -29,7 +31,55 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 	textureBinding->value.setValue(SoTextureCoordinateBinding::PER_VERTEX_INDEXED);
 	textureGroup->addChild(textureBinding);
 
+	haveProps = true;
+	formInstantiated = false;
 	//root->whichChild = 0;
+}
+
+QWidget* textureColumn::createForm() {
+	if (!formInstantiated) {
+		formWidget = new QWidget;
+		ui.setupUi(formWidget);
+		formInstantiated = true;
+
+		ui.upperSpinBox->setValue(*high);
+		ui.lowerSpinBox->setValue(*low);
+		ui.upperSpinBox->setRange(*minValue, *maxValue);
+		ui.lowerSpinBox->setRange(*minValue, *maxValue);
+		ui.upperSpinBox->setSingleStep(0.05);
+		ui.lowerSpinBox->setSingleStep(0.05);
+
+		QFile texFile(textureImage->filename.getValue().getString());
+
+		ui.imageLabel->setBackgroundRole(QPalette::Base);
+	    ui.imageLabel->setScaledContents(true);
+
+	    QImage image(texFile.fileName());
+	    ui.imageLabel->setPixmap(QPixmap::fromImage(image));
+
+		connect(ui.upperSpinBox, SIGNAL(valueChanged(double)),
+				this, SLOT(upperValueChanged(double)));
+		connect(ui.lowerSpinBox, SIGNAL(valueChanged(double)),
+				this, SLOT(lowerValueChanged(double)));
+	}
+	return formWidget;
+}
+
+void textureColumn::destroyForm() {
+	if (formInstantiated) {
+		delete formWidget;
+		formInstantiated = false;
+	}
+}
+
+void textureColumn::upperValueChanged(double newVal) {
+	*high = newVal;
+	scaleTexture(*low, *high);
+}
+
+void textureColumn::lowerValueChanged(double newVal) {
+	*low = newVal;
+	scaleTexture(*low, *high);
 }
 
 void textureColumn::wasSelected() {
@@ -49,6 +99,8 @@ void textureColumn::loadTextureColumn(mniVertstatsFile *file, QString columnName
 		else if ( *it < *low )
 			*low = *it;
 	}
+	*minValue = *low;
+	*maxValue = *high;
 	scaleTexture(*low, *high);
 }
 

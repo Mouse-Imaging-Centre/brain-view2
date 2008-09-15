@@ -17,12 +17,17 @@ class GeometryNode : public TreeItem {
 public:
 	GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 			ResourceForm *rf, TreeItem *parent = 0);
+	// loads a BIC obj format file (currently only supports polygons)
 	bool loadObj(QFile &file);
 	virtual ~GeometryNode();
 	QWidget *createForm();
 	void destroyForm();
+	void updateColour(QColor &colour);
+
 public slots:
 	void updateTransparency(double newVal);
+	// pops up a dialog to allow the user to chose a colour for the surface
+	void colourDialog();
 private:
 	// holds all the scene elements
 	SoSeparator *root;

@@ -1,4 +1,4 @@
-MINCDIR = /usr/local/minc2
+MINCDIR = /projects/mice/share/arch/linux64
 QUARTERDIR = /usr/local
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
@@ -34,9 +34,11 @@ macx {
     INCLUDEPATH += $${MINCDIR}/include
 }
 INCLUDEPATH += /usr/local/include
-FORMS = colourBarForm.ui \
+FORMS = textureColumnForm.ui \
+    colourBarForm.ui \
     resourceForm.ui \
-    geometryProps.ui
+    geometryProps.ui \
+    textureColumnForm.ui
 HEADERS = MainWindow.h \
     ColourBarForm.h \
     BrainQuarter.h \

@@ -23,6 +23,7 @@ TreeItem::TreeItem(const QVector<QVariant> &data,
     parentItem = parent;
     itemData = data;
     haveProps = false;
+    formInstantiated = false;
 
 
 }
