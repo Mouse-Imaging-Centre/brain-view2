@@ -16,7 +16,7 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 	textureGroup->addChild(textureComplexity);
 
 	textureImage = new SoTexture2;
-	textureImage->filename.setValue("spectral.png");
+	textureImage->filename.setValue("/tmp/spectral.png");
 	textureImage->wrapT = SoTexture2::CLAMP;
 	textureImage->wrapS = SoTexture2::CLAMP;
 	textureGroup->addChild(textureImage);
