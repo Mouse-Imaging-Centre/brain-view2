@@ -21,6 +21,12 @@ public:
 	MainWindow();
 	// destructor
 	virtual ~MainWindow();
+	// opens file based on extension
+	bool openFile(QFile &filename);
+	
+public slots:
+	// prompts user for filename from file dialog
+	void openFileFromDialog();
 	
 private:
 	// set up the actions (file open, etc.)
@@ -28,12 +34,15 @@ private:
 	// set up the menu
 	void createMenus();
 		
+	QMenu *fileMenu;
+	QAction *openAction;
+	
 	// holds the main viewer application
 	BrainQuarter *viewer;
 	// holds the widget to display the colour bar
-	ColourBarForm *colourBar;
+	//ColourBarForm *colourBar;
 	// dock for the colour bar widget
-	QDockWidget *colourBarDock;
+	//QDockWidget *colourBarDock;
 	// tree to keep track of open resources
 	//QTreeView *treeview;
 	ResourceForm *resourceForm;

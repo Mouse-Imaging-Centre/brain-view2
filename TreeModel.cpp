@@ -223,7 +223,19 @@ bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
 
     TreeItem *item = getItem(index);
 
-    return item->setData(index.column(), value);
+    bool rv =  item->setData(index.column(), value);
+	//emit dataChanged(index, index);
+	//emit this->modelReset();
+	//emit layoutChanged();
+	//reset();
+	//std::cout << "hello?" << std::endl;
+
+	return rv;
+}
+
+void TreeModel::somethingChanged() {
+	emit layoutChanged();
+	std::cout << "Grunkle" << std::endl;
 }
 
 bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,

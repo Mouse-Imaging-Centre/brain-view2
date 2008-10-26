@@ -3,7 +3,6 @@
 ** Copyright (C) 2005-2008 Trolltech ASA. All rights reserved.
 **
 
-/*
     treeitem.cpp
     A container for items of data supplied by the simple tree model.
 */
