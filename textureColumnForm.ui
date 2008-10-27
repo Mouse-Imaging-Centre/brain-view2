@@ -27,6 +27,12 @@
        <height>0</height>
       </size>
      </property>
+     <property name="maximumSize" >
+      <size>
+       <width>30</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="text" >
       <string/>
      </property>
@@ -35,7 +41,14 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" >
      <item>
-      <widget class="QDoubleSpinBox" name="upperSpinBox" />
+      <widget class="QDoubleSpinBox" name="upperSpinBox" >
+       <property name="maximumSize" >
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer" >
@@ -51,7 +64,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="lowerSpinBox" />
+      <widget class="QDoubleSpinBox" name="lowerSpinBox" >
+       <property name="maximumSize" >
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
