@@ -18,7 +18,7 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 	textureGroup->addChild(textureComplexity);
 
 	textureImage = new SoTexture2;
-	textureImage->filename.setValue("/tmp/spectral.png");
+	//textureImage->filename.setValue("/tmp/spectral.png");
 	textureImage->wrapT = SoTexture2::CLAMP;
 	textureImage->wrapS = SoTexture2::CLAMP;
 	textureGroup->addChild(textureImage);
@@ -31,11 +31,31 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 	textureBinding->value.setValue(SoTextureCoordinateBinding::PER_VERTEX_INDEXED);
 	textureGroup->addChild(textureBinding);
 
+	textureFiles = new QVector<QString>;
+	fillTextureVector();
+		
+		
 	haveProps = true;
 	formInstantiated = false;
 	//root->whichChild = 0;
 }
 
+void textureColumn::fillTextureVector() {
+	QString textureDir = QString("/tmp/textures");
+	QDir d = QDir(textureDir);
+	QFileInfoList list = d.entryInfoList();
+	for (int i=0; i<list.size(); ++i) {
+		QFileInfo fileInfo = list.at(i);
+		QString fileName = fileInfo.fileName();
+		if (fileName.endsWith(".png")) {
+			fileName.prepend("/");
+			fileName.prepend(textureDir);
+			cout << fileName.toStdString() << endl;
+			textureFiles->append(fileName);
+		}
+	}
+}
+	
 QWidget* textureColumn::createForm() {
 	if (!formInstantiated) {
 		formWidget = new QWidget;
@@ -53,16 +73,32 @@ QWidget* textureColumn::createForm() {
 
 		ui.imageLabel->setBackgroundRole(QPalette::Base);
 	    ui.imageLabel->setScaledContents(true);
+		
+		// populate the combo box with texture filenames
+		for (int i=0; i < textureFiles->size(); ++i) {
+			ui.textureCombo->addItem(textureFiles->at(i));
+		}
 
-	    QImage image(texFile.fileName());
-	    ui.imageLabel->setPixmap(QPixmap::fromImage(image));
-
+		// connect signals and slots
 		connect(ui.upperSpinBox, SIGNAL(valueChanged(double)),
 				this, SLOT(upperValueChanged(double)));
 		connect(ui.lowerSpinBox, SIGNAL(valueChanged(double)),
 				this, SLOT(lowerValueChanged(double)));
+		connect(ui.textureCombo, SIGNAL(currentIndexChanged(int)),
+				this, SLOT(newTextureSelected(int)));
+		
+		// set default texture to be the first one.
+		newTextureSelected(0);
 	}
 	return formWidget;
+}
+
+void textureColumn::newTextureSelected(int index) {
+	// set the texture in Coin
+	textureImage->filename.setValue(textureFiles->at(index).toLatin1());
+	// and set the texture in the resourceForm
+	QImage image(textureFiles->at(index));
+	ui.imageLabel->setPixmap(QPixmap::fromImage(image));
 }
 
 void textureColumn::destroyForm() {

@@ -1,8 +1,19 @@
 #include "MainWindow.h"
 #include "TreeModel.h"
+#include <iostream>
 
 MainWindow::MainWindow() : QMainWindow(){
 
+	// stuff for QSettings
+	QCoreApplication::setOrganizationName("MINC");
+	QCoreApplication::setApplicationName("brain-view");
+	
+	QSettings settings;
+	std::cout << "SETTINGS PATH: " << settings.fileName().toStdString() << std::endl;
+	QSettings set2(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
+	std::cout << "SETTINGS PATH: " << set2.fileName().toStdString() << std::endl;
+	std::cout << "PID: " << QCoreApplication::applicationPid() << std::endl;
+	
 	createActions();
 	createMenus();
 

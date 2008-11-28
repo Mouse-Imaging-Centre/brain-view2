@@ -31,6 +31,8 @@ public:
 public slots:
 	void upperValueChanged(double newVal);
 	void lowerValueChanged(double newVal);
+	// when new texture selected in combo-box.
+	void newTextureSelected(int index);
 private:
 	// holds the actual texture to be displayed - modified with each rescale
 	SoTextureCoordinate2 *texture;
@@ -51,8 +53,14 @@ private:
 	SoTextureCoordinateBinding *textureBinding;
 	// the actual vertstats file
 	mniVertstatsFile *vertstatsFile;
+	// the texture image itself
 	SoTexture2 *textureImage;
+	// a vector holding texture filenames
+	QVector<QString> *textureFiles;
 
+	void fillTextureVector();
+	
+	
 	Ui::textureProps ui;
 
 };

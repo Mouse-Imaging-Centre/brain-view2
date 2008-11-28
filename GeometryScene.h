@@ -13,7 +13,10 @@ public:
 	virtual ~GeometryScene();
 	bool loadGeometry(QFile &file);
 	bool loadVertstats(QFile &file);
+	void wasSelected();
 private:
+	
+	ResourceForm *rf;
 	// the root separator from the viewer
 	SoSeparator *root;
 	// the separator which will hold all the geometry bits

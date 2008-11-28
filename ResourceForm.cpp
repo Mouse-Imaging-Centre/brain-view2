@@ -40,6 +40,10 @@ void ResourceForm::selectedItem(const QModelIndex &index) {
 	item->wasSelected();
 }
 
+void ResourceForm::geometrySelected(int childNum) {
+	lastGeometry = static_cast<GeometryScene*>(parent->child(childNum));
+}
+
 void ResourceForm::setPropertyForm(const QModelIndex & index) {
 	// destroy the currently in use form
 	if (haveProps) {

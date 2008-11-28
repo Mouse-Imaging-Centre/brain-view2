@@ -12,6 +12,7 @@ GeometryScene::GeometryScene(const QVector<QVariant> &data,
 	scene = new SoSeparator();
 	geometry = new GeometryNode(scene, data, rf, this);
 	childItems.insert(childCount(), geometry);
+	this->rf = rf;
 
 }
 
@@ -21,6 +22,10 @@ bool GeometryScene::loadGeometry(QFile &file) {
 	root->addChild(scene);
 	return geometry->loadObj(file);
 
+}
+
+void GeometryScene::wasSelected() {
+	rf->setLastGeometry(this);
 }
 
 bool GeometryScene::loadVertstats(QFile &file) {

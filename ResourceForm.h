@@ -20,9 +20,11 @@ public:
 	Ui::resourceForm ui;
 	bool insertGeometry(QFile &filename);
 	bool insertVertstats(QFile &filename);
+	void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
 public slots:
 	void setPropertyForm(const QModelIndex & index);
 	void selectedItem(const QModelIndex & index);
+	void geometrySelected(int childNum);
 private:
 	QWidget *propWidget;
 	QVBoxLayout *propLayout;
