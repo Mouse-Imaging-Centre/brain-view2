@@ -28,7 +28,8 @@ MainWindow::MainWindow() : QMainWindow(){
 	addDockWidget(Qt::RightDockWidgetArea, resourceDock);
 	resourceDock->setWidget(resourceForm);
 
-	setCentralWidget(viewer);
+        setCentralWidget(viewer);
+
 
 }
 

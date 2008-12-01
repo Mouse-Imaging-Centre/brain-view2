@@ -1,63 +1,86 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>textureProps</class>
- <widget class="QWidget" name="textureProps" >
-  <property name="geometry" >
+ <widget class="QWidget" name="textureProps">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>129</width>
+    <width>127</width>
     <height>184</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" >
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" >
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="imageLabel" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Ignored" hsizetype="Ignored" >
+      <widget class="QLabel" name="imageLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize" >
+       <property name="minimumSize">
         <size>
-         <width>20</width>
+         <width>30</width>
          <height>0</height>
         </size>
        </property>
-       <property name="maximumSize" >
+       <property name="maximumSize">
         <size>
          <width>30</width>
          <height>16777215</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" >
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QDoubleSpinBox" name="upperSpinBox" >
-         <property name="maximumSize" >
+        <widget class="QLineEdit" name="upperLimit">
+         <property name="minimumSize">
           <size>
-           <width>50</width>
-           <height>16777215</height>
+           <width>40</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>60</width>
+           <height>38</height>
           </size>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer" >
-         <property name="orientation" >
+        <spacer name="verticalSpacer">
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>68</height>
@@ -66,11 +89,17 @@
         </spacer>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="lowerSpinBox" >
-         <property name="maximumSize" >
+        <widget class="QLineEdit" name="lowerLimit">
+         <property name="minimumSize">
           <size>
-           <width>50</width>
-           <height>16777215</height>
+           <width>40</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>60</width>
+           <height>38</height>
           </size>
          </property>
         </widget>
@@ -80,7 +109,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QComboBox" name="textureCombo" />
+    <widget class="QComboBox" name="textureCombo"/>
    </item>
   </layout>
  </widget>

@@ -106,7 +106,7 @@ bool GeometryNode::loadPolygons(const polygons_struct& p) {
 
     // test materials bit
     //material->diffuseColor.set1Value(0, 1,0,0);
-    material->transparency.set1Value(0, 0.5);
+    material->transparency.set1Value(0, 0.0);
     //material->diffuseColor.setValue(1.0, 0, 0);
     root->addChild(material);
     materialBinding->value = SoMaterialBinding::OVERALL;

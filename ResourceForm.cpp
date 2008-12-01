@@ -37,7 +37,7 @@ ResourceForm::~ResourceForm() {
 
 void ResourceForm::selectedItem(const QModelIndex &index) {
 	TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
-	item->wasSelected();
+        item->wasSelected();
 }
 
 void ResourceForm::geometrySelected(int childNum) {

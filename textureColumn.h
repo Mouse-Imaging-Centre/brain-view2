@@ -29,8 +29,8 @@ public:
 	void destroyForm();
 
 public slots:
-	void upperValueChanged(double newVal);
-	void lowerValueChanged(double newVal);
+        void upperValueChanged();
+        void lowerValueChanged();
 	// when new texture selected in combo-box.
 	void newTextureSelected(int index);
 private:

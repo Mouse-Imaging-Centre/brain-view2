@@ -41,7 +41,13 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 }
 
 void textureColumn::fillTextureVector() {
-	QString textureDir = QString("/tmp/textures");
+        // get the path to the textures from either the
+        // settings or the default path
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
+        QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
+        QString textureDir = settings.value("textureDir", defaultDir).toString();
+        std::cout << "USING TEXTUREDIR: " << textureDir.toStdString() << std::endl;
+        settings.setValue("textureDir", textureDir);
 	QDir d = QDir(textureDir);
 	QFileInfoList list = d.entryInfoList();
 	for (int i=0; i<list.size(); ++i) {
@@ -61,18 +67,25 @@ QWidget* textureColumn::createForm() {
 		formWidget = new QWidget;
 		ui.setupUi(formWidget);
 		formInstantiated = true;
-
+                /*
 		ui.upperSpinBox->setValue(*high);
 		ui.lowerSpinBox->setValue(*low);
 		ui.upperSpinBox->setRange(*minValue, *maxValue);
 		ui.lowerSpinBox->setRange(*minValue, *maxValue);
 		ui.upperSpinBox->setSingleStep(0.05);
 		ui.lowerSpinBox->setSingleStep(0.05);
+                */
 
+                // the validator does not appear to actually work - hrm?
+                const QDoubleValidator dv((double)*low, (double)*high, 3, this);
+                ui.lowerLimit->setValidator(&dv);
+                ui.upperLimit->setValidator(&dv);
+                ui.lowerLimit->setText(QString::number(*low));
+                ui.upperLimit->setText(QString::number(*high));
 		QFile texFile(textureImage->filename.getValue().getString());
 
 		ui.imageLabel->setBackgroundRole(QPalette::Base);
-	    ui.imageLabel->setScaledContents(true);
+                ui.imageLabel->setScaledContents(true);
 		
 		// populate the combo box with texture filenames
 		for (int i=0; i < textureFiles->size(); ++i) {
@@ -80,10 +93,10 @@ QWidget* textureColumn::createForm() {
 		}
 
 		// connect signals and slots
-		connect(ui.upperSpinBox, SIGNAL(valueChanged(double)),
-				this, SLOT(upperValueChanged(double)));
-		connect(ui.lowerSpinBox, SIGNAL(valueChanged(double)),
-				this, SLOT(lowerValueChanged(double)));
+                connect(ui.upperLimit, SIGNAL(editingFinished()),
+                                this, SLOT(upperValueChanged()));
+                connect(ui.lowerLimit, SIGNAL(editingFinished()),
+                                this, SLOT(lowerValueChanged()));
 		connect(ui.textureCombo, SIGNAL(currentIndexChanged(int)),
 				this, SLOT(newTextureSelected(int)));
 		
@@ -108,13 +121,13 @@ void textureColumn::destroyForm() {
 	}
 }
 
-void textureColumn::upperValueChanged(double newVal) {
-	*high = newVal;
+void textureColumn::upperValueChanged() {
+        *high = ui.upperLimit->text().toFloat();
 	scaleTexture(*low, *high);
 }
 
-void textureColumn::lowerValueChanged(double newVal) {
-	*low = newVal;
+void textureColumn::lowerValueChanged() {
+        *low = ui.lowerLimit->text().toFloat();
 	scaleTexture(*low, *high);
 }
 
