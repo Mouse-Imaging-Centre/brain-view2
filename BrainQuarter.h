@@ -10,8 +10,13 @@
 #include <Inventor/nodes/SoBaseColor.h>
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoPerspectiveCamera.h>
+
+#include <Inventor/events/SoMouseButtonEvent.h>
 
 #include <Quarter/QuarterWidget.h>
+#include <iostream>
 
 using namespace SIM::Coin3D::Quarter;
 
@@ -29,7 +34,9 @@ public:
 private:
 	// bits for the sample scene graph
 	SoSeparator *root;
-	SoBaseColor *col;
+        SoBaseColor *col;
+        SoPerspectiveCamera *pcam;
+        SoEventCallback *ecb;
 };
 
 #endif /*BRAINQUARTER_H_*/
