@@ -63,12 +63,21 @@ void MainWindow::openFileFromDialog() {
 
 void MainWindow::createActions() {
 	openAction = new QAction(tr("&Open File"), this);
-	connect(openAction, SIGNAL(triggered()), this, SLOT(openFileFromDialog()));
+        connect(openAction, SIGNAL(triggered()), this, SLOT(openFileFromDialog()));
+
+        quitAction = new QAction(tr("&Quit"), this);
+        connect(quitAction, SIGNAL(triggered()), this, SLOT(quitApplication()));
+}
+
+void MainWindow::quitApplication() {
+        // code to prompt for exit, save stuff, etc. could go here
+        exit(0);
 }
 
 void MainWindow::createMenus() {
 	fileMenu = menuBar()->addMenu(tr("&File"));
-	fileMenu->addAction(openAction);
+        fileMenu->addAction(openAction);
+        fileMenu->addAction(quitAction);
 }
 
 

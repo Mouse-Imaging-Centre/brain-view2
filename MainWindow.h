@@ -23,11 +23,12 @@ public:
 	virtual ~MainWindow();
 	// opens file based on extension
 	bool openFile(QFile &filename);
-	
+
 public slots:
 	// prompts user for filename from file dialog
-	void openFileFromDialog();
-	
+        void openFileFromDialog();
+        // exits the application
+        void quitApplication();
 private:
 	// set up the actions (file open, etc.)
 	void createActions();
@@ -35,7 +36,8 @@ private:
 	void createMenus();
 		
 	QMenu *fileMenu;
-	QAction *openAction;
+        QAction *openAction;
+        QAction *quitAction;
 	
 	// holds the main viewer application
 	BrainQuarter *viewer;
