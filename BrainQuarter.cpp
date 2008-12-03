@@ -26,6 +26,10 @@ static void event_cb(void *ud, SoEventCallback *n) {
             SoFaceDetail *fd = (SoFaceDetail *) point->getDetail();
             const SoPointDetail *pd = fd->getPoint(0);
             std::cout << "Index: " << pd->getCoordinateIndex() << std::endl;
+
+            SoPath *path = point->getPath();
+            std::cout << "ID: " << path->getTail()->getNodeId() << std::endl;
+
         }
     }
 }

@@ -157,6 +157,7 @@ bool GeometryNode::loadPolygons(const polygons_struct& p) {
     	indexedFaceSet->coordIndex.set1Value( fs_index++, -1 );
     }
     root->addChild(indexedFaceSet);
+    std::cout << "ID: " << indexedFaceSet->getNodeId() << std::endl;
     return true;
 }
 
