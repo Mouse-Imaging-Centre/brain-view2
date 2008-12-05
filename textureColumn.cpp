@@ -40,6 +40,13 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 	//root->whichChild = 0;
 }
 
+void textureColumn::setPickInfo(int index) {
+    // set the second column to be the value at the picked point.
+    QString data = QString::number(this->data->at(index));
+    this->setData(1, data);
+    std::cout << "in textureColumn" << std::endl;
+}
+
 void textureColumn::fillTextureVector() {
         // get the path to the textures from either the
         // settings or the default path

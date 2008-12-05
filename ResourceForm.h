@@ -20,7 +20,8 @@ public:
 	Ui::resourceForm ui;
 	bool insertGeometry(QFile &filename);
 	bool insertVertstats(QFile &filename);
-	void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
+        void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
+        void somethingChanged();
 public slots:
 	void setPropertyForm(const QModelIndex & index);
 	void selectedItem(const QModelIndex & index);
@@ -36,7 +37,7 @@ private:
 	bool haveGeometry;
 	GeometryScene *lastGeometry;
 	void sampleTreeSetup(BrainQuarter *viewer);
-	void somethingChanged();
+
 
 };
 

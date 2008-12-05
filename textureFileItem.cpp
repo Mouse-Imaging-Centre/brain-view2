@@ -41,6 +41,8 @@ void textureFileItem::getAllColumns() {
 	for (it = headers.begin(); it < headers.end(); it++) {
 		textureColumn *newColumn = new textureColumn(textureSwitch, itemData, form, this);
 		newColumn->loadTextureColumn(vertstatsFile, QString::fromStdString(*it));
-		childItems.insert(childCount(), newColumn);
+                childItems.insert(childCount(), newColumn);
+
+                connect(this, SIGNAL(setPickedPoint(int)), newColumn, SLOT(setPickInfo(int)));
 	}
 }

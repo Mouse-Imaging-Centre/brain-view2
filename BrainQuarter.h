@@ -12,6 +12,7 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoEventCallback.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
+#include <Inventor/SoPickedPoint.h>
 
 #include <Inventor/events/SoMouseButtonEvent.h>
 
@@ -21,6 +22,7 @@
 using namespace SIM::Coin3D::Quarter;
 
 class BrainQuarter : public QuarterWidget {
+    Q_OBJECT
 public:
 	// constructor
 	BrainQuarter(QWidget * parent = 0, const QGLWidget * sharewidget = 0);
@@ -30,7 +32,11 @@ public:
 	void createSampleSceneGraph();
 	SoSeparator* getRootSeparator();
 	// don't let the window get too small
-	virtual QSize minimumSizeHint(void) const;
+        virtual QSize minimumSizeHint(void) const;
+        void getPickedPoint(SoPickedPoint *point);
+signals:
+        void pointPicked(int index, int id, int x, int y, int z);
+
 private:
 	// bits for the sample scene graph
 	SoSeparator *root;

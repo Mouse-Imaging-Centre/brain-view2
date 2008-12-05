@@ -24,6 +24,26 @@ bool GeometryScene::loadGeometry(QFile &file) {
 
 }
 
+void GeometryScene::pickReceived(int index, int id, int x, int y, int z) {
+    // check to see whether picked point belongs to this scene.
+    if (id == geometry->getID()) {
+        // picked point does belong to this scene
+        // set the info column in the GUI
+        QString info = "Point: ";
+        info.append(QString::number(index));
+        this->setData(1, info);
+        // emit a signal that will be picked up eventually by all the
+        // texture columns, causing them to update their GUI info values.
+        emit localPointPicked(index);
+        // make sure that the GUI will actually be updated
+        rf->somethingChanged();
+    }
+    else {
+        // point does not belong to the scene - unset text
+        this->setData(1, "");
+    }
+}
+
 void GeometryScene::wasSelected() {
 	rf->setLastGeometry(this);
 }
@@ -31,7 +51,10 @@ void GeometryScene::wasSelected() {
 bool GeometryScene::loadVertstats(QFile &file) {
 	textureFileItem *v = new textureFileItem(scene, itemData, form, this);
 	v->loadFile(file);
-	childItems.insert(childCount(), v);
+        childItems.insert(childCount(), v);
+        // make sure that the texture file receives the signal if local point was selected in
+        // a ray-picking action.
+        connect(this, SIGNAL(localPointPicked(int)), v, SLOT(pickedPointReceived(int)));
 }
 
 GeometryScene::~GeometryScene() {

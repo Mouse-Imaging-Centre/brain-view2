@@ -22,7 +22,8 @@ public:
 	virtual ~GeometryNode();
 	QWidget *createForm();
 	void destroyForm();
-	void updateColour(QColor &colour);
+        void updateColour(QColor &colour);
+        int getID() { return indexedFaceSet->getNodeId(); };
 
 public slots:
 	void updateTransparency(double newVal);

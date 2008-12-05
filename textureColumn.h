@@ -17,7 +17,7 @@
 #include "ui_textureColumnForm.h"
 
 class textureColumn : public TreeItem {
-	Q_OBJECT
+        Q_OBJECT
 public:
 	textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 				  ResourceForm *rf, TreeItem *parent = 0);
@@ -32,7 +32,8 @@ public slots:
         void upperValueChanged();
         void lowerValueChanged();
 	// when new texture selected in combo-box.
-	void newTextureSelected(int index);
+        void newTextureSelected(int index);
+        void setPickInfo(int index);
 private:
 	// holds the actual texture to be displayed - modified with each rescale
 	SoTextureCoordinate2 *texture;

@@ -85,9 +85,17 @@ public:
     virtual void wasSelected() { std::cout << "Eeeek " << parent()->childNumber() << std::endl; };
 
     signals:
-    	void propertyFormInstantiated(QWidget *widget);
-//public slots:
+        void propertyFormInstantiated(QWidget *widget);
+        void setPickedItem(int);
+        void setPickedPoint(int);
 
+        void localPointPicked(int);
+public slots:
+        // only used by geometryScene, but QT appears to need it in the superclass too for some oddreason
+        virtual void pickReceived(int index, int id, int x, int y, int z) { /* nothing */ };
+        virtual void pickedPointReceived(int) { /* do nothing */ };
+        // ditto
+        //virtual void localPointPicked(int index);
 
 protected:
 	bool haveProps;

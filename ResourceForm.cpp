@@ -76,7 +76,11 @@ void ResourceForm::setPropertyForm(const QModelIndex & index) {
 bool ResourceForm::insertGeometry(QFile &filename) {
 	
 	parent->insertGeometry(filename);
-	lastGeometry = static_cast<GeometryScene*>(parent->child(parent->childCount()-1));
+        lastGeometry = static_cast<GeometryScene*>(parent->child(parent->childCount()-1));
+
+        connect(viewer, SIGNAL(pointPicked(int, int, int, int, int)),
+                lastGeometry, SLOT(pickReceived(int, int, int, int, int)));
+
 	haveGeometry = true;
 	viewer->viewAll();
 	somethingChanged();
