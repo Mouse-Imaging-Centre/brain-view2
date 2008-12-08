@@ -1,6 +1,6 @@
 #MINCDIR = /usr/local/minc2
-MINCDIR = /projects/mice/share/arch/linux64
-QUARTERDIR = /usr/local
+#MINCDIR = /projects/mice/share/arch/linux64
+#QUARTERDIR = /usr/local
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
 CONFIG += qt
@@ -20,7 +20,9 @@ LIBS += $$COINLIBS
         -lpcre \
         -lbicpl \
         -lvolume_io2 \
-        -lminc2
+        -lminc2 \
+        -lhdf5 \
+        -lnetcdf
 }
 macx { 
     LIBS += -Wl,-framework \
@@ -36,11 +38,9 @@ macx {
 }
 INCLUDEPATH += /usr/local/include
 FORMS = textureColumnForm.ui \
-    colourBarForm.ui \
     resourceForm.ui \
     geometryProps.ui 
 HEADERS = MainWindow.h \
-    ColourBarForm.h \
     BrainQuarter.h \
     TreeItem.h \
     TreeModel.h \
@@ -50,7 +50,6 @@ HEADERS = MainWindow.h \
     textureColumn.h \
     textureFileItem.h
 SOURCES = MainWindow.cpp \
-    ColourBarForm.cpp \
     BrainQuarter.cpp \
     TreeItem.cpp \
     TreeModel.cpp \

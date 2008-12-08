@@ -12,7 +12,7 @@ MainWindow::MainWindow() : QMainWindow(){
 	std::cout << "SETTINGS PATH: " << settings.fileName().toStdString() << std::endl;
 	QSettings set2(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
 	std::cout << "SETTINGS PATH: " << set2.fileName().toStdString() << std::endl;
-	std::cout << "PID: " << QCoreApplication::applicationPid() << std::endl;
+	//std::cout << "PID: " << QCoreApplication::applicationPid() << std::endl;
 	
 	createActions();
 	createMenus();

@@ -9,7 +9,7 @@
 
 #include <Quarter/QuarterWidget.h>
 
-#include "ColourBarForm.h"
+//#include "ColourBarForm.h"
 #include "BrainQuarter.h"
 #include "ResourceForm.h"
 
