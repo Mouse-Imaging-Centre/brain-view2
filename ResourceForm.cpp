@@ -86,6 +86,10 @@ bool ResourceForm::insertGeometry(QFile &filename) {
 	somethingChanged();
 }	
 
+bool ResourceForm::insertTagfile(QFile &filename) {
+    parent->insertTags(filename);
+}
+
 bool ResourceForm::insertVertstats(QFile &filename) {
 	if (haveGeometry) {
 		lastGeometry->loadVertstats(filename);

@@ -39,22 +39,25 @@ MainWindow::~MainWindow() {
 }
 
 bool MainWindow::openFile(QFile &filename) {
-	QFileInfo fileInfo(filename);
-	QString ext = fileInfo.suffix();
-	if (ext == "obj") {
-		return resourceForm->insertGeometry(filename);
-	}
-	else if (ext == "txt" || ext == "vertstats") {
-		return resourceForm->insertVertstats(filename);
-	}
-	else {
-		return false;
-	}
+    QFileInfo fileInfo(filename);
+    QString ext = fileInfo.suffix();
+    if (ext == "obj") {
+        return resourceForm->insertGeometry(filename);
+    }
+    else if (ext == "txt" || ext == "vertstats") {
+        return resourceForm->insertVertstats(filename);
+    }
+    else if (ext == "tag") {
+        return resourceForm->insertTagfile(filename);
+    }
+    else {
+        return false;
+    }
 }
 
 void MainWindow::openFileFromDialog() {
 	QString name = QFileDialog::getOpenFileName(this,
-		tr("Open File"), QString(), tr("Files (*.obj *.txt *.vertstats)"));
+                tr("Open File"), QString(), tr("Files (*.obj *.txt *.vertstats *.tag)"));
 	if (! name.isNull()) {
 		QFile filename(name);
 		openFile(filename);

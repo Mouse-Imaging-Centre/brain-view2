@@ -73,6 +73,7 @@ public:
     int childNumber() const;
     bool setData(int column, const QVariant &value);
     bool insertGeometry(QFile &file);
+    bool insertTags(QFile &file);
     bool createRootSeparator();
     bool insertCone();
     void setViewer(BrainQuarter *quarterViewer);

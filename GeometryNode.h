@@ -41,7 +41,7 @@ private:
 	// the material for the surface
 	SoMaterial *material;
 	// the material binding
-	SoMaterialBinding *materialBinding;
+        SoMaterialBinding *materialBinding;
 	// the indices into the coordinates to build the surfaces
 	SoIndexedFaceSet *indexedFaceSet;
 

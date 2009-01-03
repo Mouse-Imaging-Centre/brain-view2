@@ -11,6 +11,7 @@
 
 #include "TreeItem.h"
 #include "GeometryScene.h"
+#include "tagFileItem.h"
 
 
 
@@ -162,6 +163,14 @@ bool TreeItem::insertGeometry(QFile &file) {
 
     return true;
 
+}
+
+bool TreeItem::insertTags(QFile &file) {
+    QVector<QVariant> data(columnCount());
+    tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
+                                        data, form, this);
+    childItems.insert(childCount(), item);
+    item->loadFile(file);
 }
 
 bool TreeItem::insertCone() {

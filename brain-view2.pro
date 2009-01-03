@@ -1,6 +1,7 @@
-#MINCDIR = /usr/local/minc2
-#MINCDIR = /projects/mice/share/arch/linux64
-#QUARTERDIR = /usr/local
+MINCDIR = /usr/local/minc2
+
+# MINCDIR = /projects/mice/share/arch/linux64
+QUARTERDIR = /usr/local
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
 CONFIG += qt
@@ -39,7 +40,7 @@ macx {
 INCLUDEPATH += /usr/local/include
 FORMS = textureColumnForm.ui \
     resourceForm.ui \
-    geometryProps.ui 
+    geometryProps.ui
 HEADERS = MainWindow.h \
     BrainQuarter.h \
     TreeItem.h \
@@ -48,7 +49,9 @@ HEADERS = MainWindow.h \
     ResourceForm.h \
     GeometryNode.h \
     textureColumn.h \
-    textureFileItem.h
+    textureFileItem.h \
+    tagFileItem.h \
+    tagPointItem.h
 SOURCES = MainWindow.cpp \
     BrainQuarter.cpp \
     TreeItem.cpp \
@@ -58,4 +61,6 @@ SOURCES = MainWindow.cpp \
     GeometryNode.cpp \
     main.cpp \
     textureColumn.cpp \
-    textureFileItem.cpp
+    textureFileItem.cpp \
+    tagFileItem.cpp \
+    tagPointItem.cpp

@@ -20,6 +20,7 @@ public:
 	Ui::resourceForm ui;
 	bool insertGeometry(QFile &filename);
 	bool insertVertstats(QFile &filename);
+        bool insertTagfile(QFile &filename);
         void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
         void somethingChanged();
 public slots:
