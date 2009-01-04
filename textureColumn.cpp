@@ -53,6 +53,7 @@ void textureColumn::fillTextureVector() {
         QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
         QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
         QString textureDir = settings.value("textureDir", defaultDir).toString();
+        //QString textureDir = QDir(":/resources/colourbars").absolutePath();
         std::cout << "USING TEXTUREDIR: " << textureDir.toStdString() << std::endl;
         settings.setValue("textureDir", textureDir);
 	QDir d = QDir(textureDir);

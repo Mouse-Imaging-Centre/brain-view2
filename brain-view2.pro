@@ -64,3 +64,4 @@ SOURCES = MainWindow.cpp \
     textureFileItem.cpp \
     tagFileItem.cpp \
     tagPointItem.cpp
+RESOURCES += colourbars.qrc

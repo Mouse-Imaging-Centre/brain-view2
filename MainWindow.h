@@ -34,6 +34,8 @@ private:
 	void createActions();
 	// set up the menu
 	void createMenus();
+        // create the colourbars if they don't already exist
+        void initColourbars();
 		
 	QMenu *fileMenu;
         QAction *openAction;

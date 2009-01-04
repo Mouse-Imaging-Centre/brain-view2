@@ -16,6 +16,7 @@ MainWindow::MainWindow() : QMainWindow(){
 	
 	createActions();
 	createMenus();
+        initColourbars();
 
 	viewer = new BrainQuarter();
 	//colourBar = new ColourBarForm(this);
@@ -33,7 +34,41 @@ MainWindow::MainWindow() : QMainWindow(){
 
 }
 
+void MainWindow::initColourbars() {
+    // get the path from the settings
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
+    QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
+    QString textureDir = settings.value("textureDir", defaultDir).toString();
+    settings.setValue("textureDir", textureDir);
+    QDir td(textureDir);
 
+    std::cout << "TextureDir: " << textureDir.toStdString() << std::endl;
+
+    // create the texture dir if it does not already exist
+    if (! td.exists()) {
+        td.mkpath(textureDir);
+    }
+
+    // for every colourbar in the resource file check to see if it
+    // already exists. If not, write it out to file
+    QDir d(":/resources/colourbars");
+    QFileInfoList list = d.entryInfoList();
+    for (int i=0; i<list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+        QString fileName = fileInfo.baseName();
+        std::cout << "Basename: " << fileName.toStdString() << std::endl;
+        fileName.append(".png");
+        fileName.prepend("/");
+        fileName.prepend(textureDir);
+        if (! QFile(fileName).exists()) {
+            std::cout << "FILENAME: " << fileInfo.filePath().toStdString() << std::endl;
+            QImage i(fileInfo.filePath());
+            bool a = i.isNull();
+            bool b = i.save(fileName);
+            std::cout << "Created colourbar: " << fileName.toStdString() << " " << a << " " << b << std::endl;
+        }
+    }
+}
 
 MainWindow::~MainWindow() {
 }
