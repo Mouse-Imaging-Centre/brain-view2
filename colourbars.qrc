@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/resources" >
+        <file>colourbars/full_saturation.png</file>
+        <file>colourbars/hotblue.png</file>
+        <file>colourbars/hotred.png</file>
+        <file>colourbars/spectral.png</file>
+        <file>colourbars/sunrise.png</file>
+    </qresource>
+</RCC>

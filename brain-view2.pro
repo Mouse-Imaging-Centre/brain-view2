@@ -1,7 +1,7 @@
-MINCDIR = /usr/local/minc2
+#MINCDIR = /usr/local/minc2
 
 # MINCDIR = /projects/mice/share/arch/linux64
-QUARTERDIR = /usr/local
+#QUARTERDIR = /usr/local
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
 CONFIG += qt
