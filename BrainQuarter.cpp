@@ -41,7 +41,7 @@ static void event_cb(void *ud, SoEventCallback *n) {
     }
 }
 
-BrainQuarter::BrainQuarter(QWidget *parent, const QGLWidget *sharewidget) : QuarterWidget(parent, sharewidget) {
+BrainQuarter::BrainQuarter(QWidget *parent) : QuarterWidget(parent) {
     root = new SoSeparator;
     root->ref();
     pcam = new SoPerspectiveCamera;
@@ -51,8 +51,9 @@ BrainQuarter::BrainQuarter(QWidget *parent, const QGLWidget *sharewidget) : Quar
     ecb->addEventCallback(SoMouseButtonEvent::getClassTypeId(), event_cb, this);
     root->addChild(ecb);
 
+    setNavigationModeFile();
     setSceneGraph(root); 
-    setTransparencyType(SoGLRenderAction:: SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
+    //setTransparencyType(SoGLRenderAction:: SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
 	//createSampleSceneGraph();
 }
 

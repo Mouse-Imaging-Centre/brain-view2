@@ -1,7 +1,7 @@
 #MINCDIR = /usr/local/minc2
 
-# MINCDIR = /projects/mice/share/arch/linux64
-#QUARTERDIR = /usr/local
+MINCDIR = /projects/mice/share/arch/linux64
+QUARTERDIR = /home/jlerch/linux-experimental/Coin3/
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
 CONFIG += qt
@@ -34,7 +34,9 @@ macx {
         -lpcre \
         -lbicpl \
         -lvolume_io2 \
-        -lminc2
+        -lminc2 \
+        -lhdf5 \
+        -lnetcdf
     INCLUDEPATH += $${MINCDIR}/include
 }
 INCLUDEPATH += /usr/local/include

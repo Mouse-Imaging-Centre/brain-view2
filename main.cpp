@@ -1,10 +1,14 @@
+#include <Quarter/Quarter.h>
 #include <Quarter/QuarterApplication.h>
 #include <iostream>
 #include "MainWindow.h"
 
+using namespace SIM::Coin3D::Quarter;
+
 int main(int argc, char *argv[]) {
 	// instantiate as a Quarter application
-    QuarterApplication app(argc, argv);
+    QApplication app(argc, argv);
+    Quarter::init();
     // initialize and show the main window
     MainWindow mainWin;
 

@@ -25,7 +25,7 @@ class BrainQuarter : public QuarterWidget {
     Q_OBJECT
 public:
 	// constructor
-	BrainQuarter(QWidget * parent = 0, const QGLWidget * sharewidget = 0);
+        BrainQuarter(QWidget * parent = 0);
 	// destructor
 	virtual ~BrainQuarter();
 	// creates a yellow cone - i.e. just for testing purposes.
