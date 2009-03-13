@@ -1,7 +1,10 @@
-#MINCDIR = /usr/local/minc2
+VERSION = 0.1.1
 
-MINCDIR = /projects/mice/share/arch/linux64
-QUARTERDIR = /home/jlerch/linux-experimental/Coin3/
+MINCDIR = /usr/local/minc2
+
+#MINCDIR = /projects/mice/share/arch/linux64
+QUARTERDIR = /usr/local
+
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
 CONFIG += qt

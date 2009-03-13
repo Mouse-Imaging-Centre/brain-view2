@@ -65,7 +65,7 @@ void textureColumn::fillTextureVector() {
 			fileName.prepend("/");
 			fileName.prepend(textureDir);
 			cout << fileName.toStdString() << endl;
-			textureFiles->append(fileName);
+                        textureFiles->append(fileName);
 		}
 	}
 }
@@ -170,7 +170,7 @@ void textureColumn::scaleTexture(float low, float high) {
 	for (it = data->begin(); it < data->end(); it++) {
 		float newVal = ( *it - *this->low ) / ( *this->high - *this->low);
 		if (newVal < 0.0) {
-			newVal = 0.0;
+                        newVal = 0.01;
 		}
 		else if (newVal > 1.0) {
 			newVal = 1.0;
