@@ -1,8 +1,18 @@
 VERSION = 0.1.1
 
-MINCDIR = /usr/local/minc2
 
+# Note: Remember to run:
+#      >qmake -spec macx-g++       [ regen the make file ]
+#      >make                       [ build ]
+
+
+# set where to get the Minc libs and includes
+# ... there really *must* be a better way of doing this
 #MINCDIR = /projects/mice/share/arch/linux64
+#MINCDIR = /usr/local/minc2
+MINCDIR = /usr/local/bic/current
+
+
 QUARTERDIR = /usr/local
 
 COINLIBS = $$system(coin-config --ldflags)

@@ -1,7 +1,7 @@
 #include "BrainQuarter.h"
 #include "Inventor/actions/SoGLRenderAction.h"
 
-#include "Quarter/SoRenderManager.h"
+#include "Inventor/SoRenderManager.h"
 #include "Inventor/details/SoFaceDetail.h"
 #include "Inventor/details/SoPointDetail.h"
 

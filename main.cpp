@@ -1,5 +1,4 @@
 #include <Quarter/Quarter.h>
-#include <Quarter/QuarterApplication.h>
 #include <iostream>
 #include "MainWindow.h"
 
