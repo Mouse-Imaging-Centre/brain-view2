@@ -5,6 +5,7 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 		ResourceForm *rf, TreeItem *parent)
 	: TreeItem(data, rf, parent){
 
+	qDebug() << "Debug. >>GeometryNode::GeometryNode()";
 	// this class has a property form
 	haveProps = true;
 
@@ -19,9 +20,12 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 	material = new SoMaterial;
 	materialBinding = new SoMaterialBinding;
 	indexedFaceSet = new SoIndexedFaceSet;
+
+	qDebug() << "Debug. <<GeometryNode::GeometryNode()";
 }
 
 QWidget* GeometryNode::createForm() {
+	qDebug() << "Debug. >>GeometryNode::createForm()";
 	if (!formInstantiated) {
 		formWidget = new QWidget;
 		ui.setupUi(formWidget);
@@ -35,16 +39,20 @@ QWidget* GeometryNode::createForm() {
 				this, SLOT(colourDialog()));
 
 	}
+	qDebug() << "Debug. <<GeometryNode::createForm()";
 	return formWidget;
 }
 
 void GeometryNode::updateTransparency(double newVal) {
+	qDebug() << "Debug. >>GeometryNode::updateTransparency()";
 	material->transparency.set1Value(0, newVal);
 	//QColor col(255,0,0);
 	//updateColour(col);
+	qDebug() << "Debug. <<GeometryNode::updateTransparency()";
 }
 
 void GeometryNode::colourDialog() {
+	qDebug() << "Debug. >>GeometryNode::colourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
 		ui.colourButton->setText(colour.name());
@@ -52,25 +60,31 @@ void GeometryNode::colourDialog() {
 		ui.colourButton->setAutoFillBackground(true);
 		updateColour(colour);
 	}
+	qDebug() << "Debug. <<GeometryNode::colourDialog()";
 }
 
 void GeometryNode::updateColour(QColor &colour) {
+	qDebug() << "Debug. >>GeometryNode::updateColour()";
 	int r,g,b;
 	colour.getRgb(&r,&g,&b);
 	material->diffuseColor.setValue(r/255, g/255, b/255);
+	qDebug() << "Debug. <<GeometryNode::updateColour()";
 }
 
 
 void GeometryNode::destroyForm() {
+	qDebug() << "Debug. >>GeometryNode::destroyForm()";
 	if (formInstantiated) {
 		delete formWidget;
 		formInstantiated = false;
 	}
+	qDebug() << "Debug. <<GeometryNode::destroyForm()";
 }
 
 
 bool GeometryNode::loadObj(QFile &file) {
 
+	qDebug() << "Debug. >>GeometryNode::loadObj()";
 	// set the name of this tree item:
 	setData(0, QFileInfo(file).baseName());
 
@@ -95,9 +109,13 @@ bool GeometryNode::loadObj(QFile &file) {
     }
     // go ahead and load them thar polygons.
     return loadPolygons(object_list[0]->specific.polygons);
+
+	qDebug() << "Debug. >>GeometryNode::loadObj()";
 }
 
+
 bool GeometryNode::loadPolygons(const polygons_struct& p) {
+	qDebug() << "Debug. >>GeometryNode::loadPolygons()";
 
 	//SoBaseColor* color = add_color_nodes( root, p.colour_flag, p.colours[0] );
 
@@ -158,6 +176,8 @@ bool GeometryNode::loadPolygons(const polygons_struct& p) {
     }
     root->addChild(indexedFaceSet);
     std::cout << "ID: " << indexedFaceSet->getNodeId() << std::endl;
+
+	qDebug() << "Debug. <<GeometryNode::loadPolygons()";
     return true;
 }
 

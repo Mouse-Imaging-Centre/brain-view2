@@ -1,22 +1,24 @@
+#include <QtDebug>
+
 #include "MainWindow.h"
 #include "TreeModel.h"
-#include <iostream>
 
-MainWindow::MainWindow() : QMainWindow(){
+MainWindow::MainWindow() {
+	qDebug() << "Debug. >>MainWindow::MainWindow()";
 
 	// stuff for QSettings
 	QCoreApplication::setOrganizationName("MINC");
 	QCoreApplication::setApplicationName("brain-view");
 	
 	QSettings settings;
-	std::cout << "SETTINGS PATH: " << settings.fileName().toStdString() << std::endl;
+	qDebug() << "Debug. [ MainWindow() ] Settings path 1: " << settings.fileName();
 	QSettings set2(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
-	std::cout << "SETTINGS PATH: " << set2.fileName().toStdString() << std::endl;
-	//std::cout << "PID: " << QCoreApplication::applicationPid() << std::endl;
+	qDebug() << "Debug. [ MainWindow() ] Settings path 2: " << set2.fileName();
+	qDebug() << "Debug. [ MainWindow() ] Application Pid: " << QCoreApplication::applicationPid();
 	
 	createActions();
 	createMenus();
-        initColourbars();
+	initColourbars();
 
 	viewer = new BrainQuarter();
 	//colourBar = new ColourBarForm(this);
@@ -29,66 +31,77 @@ MainWindow::MainWindow() : QMainWindow(){
 	addDockWidget(Qt::RightDockWidgetArea, resourceDock);
 	resourceDock->setWidget(resourceForm);
 
-        setCentralWidget(viewer);
-
-
+	setCentralWidget(viewer);
+	qDebug() << "Debug. <<MainWindow::MainWindow()";
 }
 
+
 void MainWindow::initColourbars() {
+	qDebug() << "Debug. >>MainWindow::initColourbars()";
+
     // get the path from the settings
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
     QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
     QString textureDir = settings.value("textureDir", defaultDir).toString();
     settings.setValue("textureDir", textureDir);
-    QDir td(textureDir);
-
-    std::cout << "TextureDir: " << textureDir.toStdString() << std::endl;
+    qDebug() << "Debug. [ initColourbars() ] TextureDir: " << textureDir;
 
     // create the texture dir if it does not already exist
+    QDir td(textureDir);
     if (! td.exists()) {
         td.mkpath(textureDir);
     }
 
     // for every colourbar in the resource file check to see if it
     // already exists. If not, write it out to file
-    QDir d(":/resources/colourbars");
-    QFileInfoList list = d.entryInfoList();
-    for (int i=0; i<list.size(); ++i) {
-        QFileInfo fileInfo = list.at(i);
+	QDirIterator it(":/resources/colourbars");
+	while ( it.hasNext() ) {
+		QString fileNameFull = it.next();
+        qDebug() << "Debug. [ initColourbars() ] Texture file full path: " << fileNameFull;
+		QFileInfo fileInfo = it.fileInfo();
         QString fileName = fileInfo.baseName();
-        std::cout << "Basename: " << fileName.toStdString() << std::endl;
+        qDebug() << "Debug. [ initColourbars() ] Texture file basename: " << fileName;
         fileName.append(".png");
         fileName.prepend("/");
         fileName.prepend(textureDir);
         if (! QFile(fileName).exists()) {
-            std::cout << "FILENAME: " << fileInfo.filePath().toStdString() << std::endl;
+            qDebug() << "Debug. [ initColourbars() ] Adding texture to local texture dir: " << fileInfo.filePath();
             QImage i(fileInfo.filePath());
             bool a = i.isNull();
             bool b = i.save(fileName);
-            std::cout << "Created colourbar: " << fileName.toStdString() << " " << a << " " << b << std::endl;
+            qDebug() << "Debug. [ initColourbars() ] Created colourbar: " << fileName << " " << a << " " << b;
         }
-    }
+	}
+
+	qDebug() << "Debug. <<MainWindow::initColourbars()";
 }
+
 
 MainWindow::~MainWindow() {
 }
 
 bool MainWindow::openFile(QFile &filename) {
+	qDebug() << "Debug. >>MainWindow::openFile()";
+
     QFileInfo fileInfo(filename);
     QString ext = fileInfo.suffix();
+
+	bool status = false;
     if (ext == "obj") {
-        return resourceForm->insertGeometry(filename);
+        status = resourceForm->insertGeometry(filename);
     }
     else if (ext == "txt" || ext == "vertstats") {
-        return resourceForm->insertVertstats(filename);
+        status = resourceForm->insertVertstats(filename);
     }
     else if (ext == "tag") {
-        return resourceForm->insertTagfile(filename);
+        status = resourceForm->insertTagfile(filename);
     }
-    else {
-        return false;
-    }
+
+	Q_ASSERT_X( status == true, "MainWindow::openFile", "Failed insert into Resource form" );
+	qDebug() << "Debug. <<MainWindow::openFile()";
+	return true;
 }
+
 
 void MainWindow::openFileFromDialog() {
 	QString name = QFileDialog::getOpenFileName(this,
@@ -99,23 +112,33 @@ void MainWindow::openFileFromDialog() {
 	}
 }
 
+
 void MainWindow::createActions() {
+	qDebug() << "Debug. >>MainWindow::createActions()";
+
 	openAction = new QAction(tr("&Open File"), this);
-        connect(openAction, SIGNAL(triggered()), this, SLOT(openFileFromDialog()));
+	connect(openAction, SIGNAL(triggered()), this, SLOT(openFileFromDialog()));
 
-        quitAction = new QAction(tr("&Quit"), this);
-        connect(quitAction, SIGNAL(triggered()), this, SLOT(quitApplication()));
+	quitAction = new QAction(tr("&Quit"), this);
+	connect(quitAction, SIGNAL(triggered()), this, SLOT(quitApplication()));
+
+	qDebug() << "Debug. <<MainWindow::createActions()";
 }
 
-void MainWindow::quitApplication() {
-        // code to prompt for exit, save stuff, etc. could go here
-        exit(0);
-}
 
 void MainWindow::createMenus() {
+	qDebug() << "Debug. >>MainWindow::createMenus()";
+
 	fileMenu = menuBar()->addMenu(tr("&File"));
-        fileMenu->addAction(openAction);
-        fileMenu->addAction(quitAction);
+	fileMenu->addAction(openAction);
+	fileMenu->addAction(quitAction);
+
+	qDebug() << "Debug. <<MainWindow::createMenus()";
 }
 
+
+void MainWindow::quitApplication() {
+	// code to prompt for exit, save stuff, etc. could go here
+	exit(0);
+}
 

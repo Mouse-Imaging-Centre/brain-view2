@@ -1,8 +1,11 @@
+#include <QtDebug>
 #include "textureColumn.h"
 
 textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 			    ResourceForm *rf, TreeItem *parent)
 	: TreeItem(data, rf, parent) {
+
+	qDebug() << "Debug. >>textureColumn::textureColumn()";
 
 	low = new float(0.0);
 	high = new float(0.0);
@@ -38,24 +41,34 @@ textureColumn::textureColumn(SoSwitch *root, const QVector <QVariant> &data,
 	haveProps = true;
 	formInstantiated = false;
 	//root->whichChild = 0;
+
+	qDebug() << "Debug. <<textureColumn::textureColumn()";
 }
 
+
 void textureColumn::setPickInfo(int index) {
+	qDebug() << "Debug. >>textureColumn::setPickInfo()";
+
     // set the second column to be the value at the picked point.
     QString data = QString::number(this->data->at(index));
     this->setData(1, data);
-    std::cout << "in textureColumn" << std::endl;
+
+	qDebug() << "Debug. <<textureColumn::setPickInfo()";
 }
 
+
 void textureColumn::fillTextureVector() {
-        // get the path to the textures from either the
-        // settings or the default path
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
-        QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
-        QString textureDir = settings.value("textureDir", defaultDir).toString();
-        //QString textureDir = QDir(":/resources/colourbars").absolutePath();
-        std::cout << "USING TEXTUREDIR: " << textureDir.toStdString() << std::endl;
-        settings.setValue("textureDir", textureDir);
+	qDebug() << "Debug. >>textureColumn::fillTextureVector()";
+
+	// get the path to the textures from either the
+	// settings or the default path
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
+	QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
+	QString textureDir = settings.value("textureDir", defaultDir).toString();
+	//QString textureDir = QDir(":/resources/colourbars").absolutePath();
+	qDebug() << "Debug. [ fillTextureVector() ] Using texture directory: " << textureDir;
+	settings.setValue("textureDir", textureDir);
+
 	QDir d = QDir(textureDir);
 	QFileInfoList list = d.entryInfoList();
 	for (int i=0; i<list.size(); ++i) {
@@ -64,14 +77,17 @@ void textureColumn::fillTextureVector() {
 		if (fileName.endsWith(".png")) {
 			fileName.prepend("/");
 			fileName.prepend(textureDir);
-			cout << fileName.toStdString() << endl;
-                        textureFiles->append(fileName);
+			qDebug() << "Debug. [ fillTextureVector() ] Texture full filename: "<< fileName;
+			textureFiles->append(fileName);
 		}
 	}
+	qDebug() << "Debug. <<textureColumn::fillTextureVector()";
 }
-	
+
+
 QWidget* textureColumn::createForm() {
-	if (!formInstantiated) {
+	qDebug() << "Debug. >>textureColumn::createForm()";
+	if ( !formInstantiated ) {
 		formWidget = new QWidget;
 		ui.setupUi(formWidget);
 		formInstantiated = true;
@@ -83,67 +99,80 @@ QWidget* textureColumn::createForm() {
 		ui.upperSpinBox->setSingleStep(0.05);
 		ui.lowerSpinBox->setSingleStep(0.05);
                 */
-
-                // the validator does not appear to actually work - hrm?
-                const QDoubleValidator dv((double)*low, (double)*high, 3, this);
-                ui.lowerLimit->setValidator(&dv);
-                ui.upperLimit->setValidator(&dv);
-                ui.lowerLimit->setText(QString::number(*low));
-                ui.upperLimit->setText(QString::number(*high));
+		// the validator does not appear to actually work - hrm?
+		const QDoubleValidator dv((double)*low, (double)*high, 3, this);
+		ui.lowerLimit->setValidator(&dv);
+		ui.upperLimit->setValidator(&dv);
+		ui.lowerLimit->setText(QString::number(*low));
+		ui.upperLimit->setText(QString::number(*high));
 		QFile texFile(textureImage->filename.getValue().getString());
 
 		ui.imageLabel->setBackgroundRole(QPalette::Base);
-                ui.imageLabel->setScaledContents(true);
+		ui.imageLabel->setScaledContents(true);
 		
 		// populate the combo box with texture filenames
-		for (int i=0; i < textureFiles->size(); ++i) {
+		for ( int i=0; i < textureFiles->size(); ++i ) {
 			ui.textureCombo->addItem(textureFiles->at(i));
 		}
 
 		// connect signals and slots
-                connect(ui.upperLimit, SIGNAL(editingFinished()),
-                                this, SLOT(upperValueChanged()));
-                connect(ui.lowerLimit, SIGNAL(editingFinished()),
-                                this, SLOT(lowerValueChanged()));
+		connect(ui.upperLimit, SIGNAL(editingFinished()),
+			this, SLOT(upperValueChanged()));
+		connect(ui.lowerLimit, SIGNAL(editingFinished()),
+			this, SLOT(lowerValueChanged()));
 		connect(ui.textureCombo, SIGNAL(currentIndexChanged(int)),
-				this, SLOT(newTextureSelected(int)));
+			this, SLOT(newTextureSelected(int)));
 		
 		// set default texture to be the first one.
 		newTextureSelected(0);
 	}
+
+	qDebug() << "Debug. <<textureColumn::createForm()";
 	return formWidget;
 }
 
+
 void textureColumn::newTextureSelected(int index) {
+	qDebug() << "Debug. >>textureColumn::newTextureSelected()";
 	// set the texture in Coin
 	textureImage->filename.setValue(textureFiles->at(index).toLatin1());
 	// and set the texture in the resourceForm
 	QImage image(textureFiles->at(index));
 	ui.imageLabel->setPixmap(QPixmap::fromImage(image));
+	qDebug() << "Debug. <<textureColumn::newTextureSelected()";
 }
 
+
 void textureColumn::destroyForm() {
+	qDebug() << "Debug. >>textureColumn::destroyForm()";
 	if (formInstantiated) {
 		delete formWidget;
 		formInstantiated = false;
 	}
+	qDebug() << "Debug. <<textureColumn::destroyForm()";
 }
+
 
 void textureColumn::upperValueChanged() {
-        *high = ui.upperLimit->text().toFloat();
+	*high = ui.upperLimit->text().toFloat();
 	scaleTexture(*low, *high);
 }
 
+
 void textureColumn::lowerValueChanged() {
-        *low = ui.lowerLimit->text().toFloat();
+	*low = ui.lowerLimit->text().toFloat();
 	scaleTexture(*low, *high);
 }
+
 
 void textureColumn::wasSelected() {
 	textureSwitch->whichChild = this->childNumber();
 }
 
+
 void textureColumn::loadTextureColumn(mniVertstatsFile *file, QString columnName) {
+	qDebug() << "Debug. >>textureColumn::loadTextureColumn()";
+
 	setData(0, columnName);
 	*this->data = file->getDataColumn(columnName.toLatin1().data());
 	// determine the low and high
@@ -159,9 +188,14 @@ void textureColumn::loadTextureColumn(mniVertstatsFile *file, QString columnName
 	*minValue = *low;
 	*maxValue = *high;
 	scaleTexture(*low, *high);
+
+	qDebug() << "Debug. <<textureColumn::loadTextureColumn()";
 }
 
+
 void textureColumn::scaleTexture(float low, float high) {
+	qDebug() << "Debug. >>textureColumn::scaleTexture()";
+
 	*this->low = low;
 	*this->high = high;
 	vertexColumn::iterator it;
@@ -181,8 +215,13 @@ void textureColumn::scaleTexture(float low, float high) {
 	}
 	//texture->point.finishEditing();
 
+	qDebug() << "Debug. <<textureColumn::scaleTexture()";
 }
 
-textureColumn::~textureColumn()
-{
-}
+textureColumn::~textureColumn() {}
+
+
+
+
+
+

@@ -20,9 +20,9 @@ public:
 	Ui::resourceForm ui;
 	bool insertGeometry(QFile &filename);
 	bool insertVertstats(QFile &filename);
-        bool insertTagfile(QFile &filename);
-        void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
-        void somethingChanged();
+	bool insertTagfile(QFile &filename);
+	void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
+	void somethingChanged();
 public slots:
 	void setPropertyForm(const QModelIndex & index);
 	void selectedItem(const QModelIndex & index);

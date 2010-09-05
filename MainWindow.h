@@ -14,6 +14,7 @@
 #include "ResourceForm.h"
 
 using namespace SIM::Coin3D::Quarter;
+
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 public:
