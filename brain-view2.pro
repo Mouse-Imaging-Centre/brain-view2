@@ -3,6 +3,8 @@ VERSION = 0.1.1
 
 # Note: Remember to run:
 #      >qmake -spec macx-g++       [ regen the make file ]
+#  OR  >qmake -spec linux-g++
+#
 #      >make                       [ build ]
 
 
@@ -10,7 +12,7 @@ VERSION = 0.1.1
 # ... there really *must* be a better way of doing this
 #MINCDIR = /projects/mice/share/arch/linux64
 #MINCDIR = /usr/local/minc2
-MINCDIR = /usr/local/bic/current
+MINCDIR = /usr/local/bic
 
 
 QUARTERDIR = /usr/local
