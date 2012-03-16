@@ -12,8 +12,8 @@ VERSION = 0.1.1
 # ... there really *must* be a better way of doing this
 #MINCDIR = /projects/mice/share/arch/linux64
 #MINCDIR = /usr/local/minc2
-MINCDIR = /usr/local/bic
-
+#MINCDIR = /usr/local/bic
+MINCDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
 
 QUARTERDIR = /usr/local
 
@@ -22,14 +22,19 @@ COININCLUDE = $$system(coin-config --includedir)
 CONFIG += qt
 CONFIG += debug
 QT += opengl
+INCLUDEPATH += $${QUARTERDIR}/include
+INCLUDEPATH += $${MINCDIR}/include
 INCLUDEPATH += $$COININCLUDE
 LIBS += $$COINLIBS
+LIBS += -L/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/lib
 !macx { 
     LIBS += -lCoin
-    LIBS += -L$${QUARTERDIR} \
-        -lQuarter
-    INCLUDEPATH += $${MINCDIR}/include
-    INCLUDEPATH += $${QUARTERDIR}/include
+    LIBS += -L$${QUARTERDIR}/lib/ \
+        -lQuarter \
+        -lbicInventor
+#    INCLUDEPATH += $${QUARTERDIR}/include
+ #   INCLUDEPATH += $${MINCDIR}/include
+
     LIBS += -L$${MINCDIR}/lib/ \
         -loobicpl \
         -lpcre++ \
@@ -38,6 +43,7 @@ LIBS += $$COINLIBS
         -lvolume_io2 \
         -lminc2 \
         -lhdf5 \
+        -lhdf5_cpp \
         -lnetcdf
 }
 macx { 
@@ -51,13 +57,19 @@ macx {
         -lvolume_io2 \
         -lminc2 \
         -lhdf5 \
+        -lhdf5_cpp \
         -lnetcdf
-    INCLUDEPATH += $${MINCDIR}/include
+#   INCLUDEPATH += $${MINCDIR}/include
 }
 INCLUDEPATH += /usr/local/include
+#INCLUDEPATH += /usr/include
+INCLUDEPATH += /usr/include/Inventor
+INCLUDEPATH += /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/include
 FORMS = textureColumnForm.ui \
     resourceForm.ui \
-    geometryProps.ui
+    geometryProps.ui \
+    tagProps.ui \
+    labelProps.ui
 HEADERS = MainWindow.h \
     BrainQuarter.h \
     TreeItem.h \

@@ -24,7 +24,7 @@ TreeItem::TreeItem(const QVector<QVariant> &data,
     itemData = data;
     haveProps = false;
     formInstantiated = false;
-
+	currentTagSize=0.05; 	//initialize tag size to defult of SpinBox in Widget
 
 }
 //! [0]
@@ -154,16 +154,21 @@ bool TreeItem::setData(int column, const QVariant &value)
 //! [11]
 
 
+
 bool TreeItem::insertGeometry(QFile &file) {
+	qDebug() << "Debug. >>TreeItem::insertGeometry()";
 	QVector<QVariant> data(columnCount());
 	GeometryScene *item = new GeometryScene(data, form, this);
 	item->setViewer(viewer);
 	childItems.insert(childCount(), item);
-    item->loadGeometry(file);
+    item->loadGeometry(file, data, form, this);
 
-    return true;
-
+	qDebug() << "Debug. >>TreeItem::insertGeometry()";
+//     return item;
+	return true;
 }
+
+
 
 bool TreeItem::insertTags(QFile &file) {
     QVector<QVariant> data(columnCount());
@@ -171,6 +176,27 @@ bool TreeItem::insertTags(QFile &file) {
                                         data, form, this);
     childItems.insert(childCount(), item);
     item->loadFile(file);
+}
+
+bool TreeItem::createTag(float *tagpoint){
+	QVector<QVariant> data(columnCount());
+    tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
+                                        data, form, this);
+    childItems.insert(childCount(), item);
+	std::cout<<"current tag size : " << currentTagSize << std::endl;
+	item->showTag(tagpoint,currentTagSize);	
+}
+
+void TreeItem::updateTagSize(double newsize){
+//	qDebug() << "Debug. >>TreeItem::updateTagSize()";
+	QVector<QVariant> data(columnCount());
+    tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
+                                        data, form, this);
+//	std::cout << "viewer root number of children: " << 	viewer->getRootSeparator()->getNumChildren() << std::endl;								
+//     childItems.insert(childCount(), item);
+// 	item->updateSize(newsize,currentTagSize);
+	currentTagSize= newsize;		//update the tagsize for next tags
+//	qDebug() << "Debug. <<TreeItem::updateTagSize()";
 }
 
 bool TreeItem::insertCone() {
@@ -186,6 +212,7 @@ bool TreeItem::insertCone() {
 }
 
 QWidget* TreeItem::createForm() {
+	qDebug() << "Debug. >>TreeItem::createForm()";
 
 }
 

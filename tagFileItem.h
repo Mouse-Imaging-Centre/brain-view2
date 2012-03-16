@@ -9,13 +9,15 @@
 #include <Inventor/nodes/SoScale.h>
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoPickStyle.h>
+#include <Inventor/nodes/SoScale.h>
 
 class tagFileItem : public TreeItem {
 public:
     tagFileItem(SoSeparator *root, const QVector<QVariant> &data,
                 ResourceForm *rf, TreeItem *parent = 0);
     bool loadFile(QFile &file);
-    virtual ~tagFileItem();
+	bool showTag(float *tagpoint, double tagsize);
+	virtual ~tagFileItem();
 private:
     // function to create a sphere for every tag item
     //void createSpheresFromTags();
@@ -35,6 +37,8 @@ private:
     SoMaterial *material;
     // pick style - whether following nodes are pickage.
     SoPickStyle *pickStyle;
+
+	
 };
 
 #endif // TAGFILEITEM_H

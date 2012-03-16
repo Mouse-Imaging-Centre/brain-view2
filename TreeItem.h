@@ -72,11 +72,14 @@ public:
     bool removeColumns(int position, int columns);
     int childNumber() const;
     bool setData(int column, const QVariant &value);
+
     bool insertGeometry(QFile &file);
-    bool insertTags(QFile &file);
-    bool createRootSeparator();
+	bool insertTags(QFile &file);
+	bool createTag(float *tagpoint);
+	bool createRootSeparator();
     bool insertCone();
-    void setViewer(BrainQuarter *quarterViewer);
+    void setViewer(BrainQuarter *quarterViewer); 
+	double currentTagSize;
     virtual QWidget* createForm();
     virtual void destroyForm();
     virtual bool havePropForm() { return haveProps; };
@@ -89,12 +92,18 @@ public:
         void propertyFormInstantiated(QWidget *widget);
         void setPickedItem(int);
         void setPickedPoint(int);
-
+// 		void valueChanged(int);
         void localPointPicked(int);
 public slots:
         // only used by geometryScene, but QT appears to need it in the superclass too for some oddreason
-        virtual void pickReceived(int index, int id, int x, int y, int z) { /* nothing */ };
+        virtual void pickReceived(int index, int id, int x, int y, int z, SoType objtype) { /* nothing */ };
+		virtual void noPointReceived() { /* nothing */ };
         virtual void pickedPointReceived(int) { /* do nothing */ };
+		virtual void getUserLabel() { /* do nothing */ };
+		virtual void saveLabel() { /* do nothing */ };
+		virtual void updateRadiusTransparency(int newVal){/* do nothing */};
+		//virtual void bckgrncolourDialog(){/* do nothing */};
+		void updateTagSize(double newsize);
         // ditto
         //virtual void localPointPicked(int index);
 

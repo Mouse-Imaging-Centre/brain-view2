@@ -93,6 +93,9 @@ public:
                     const QModelIndex &parent = QModelIndex());
 
 	void somethingChanged();
+	
+
+	
 private:
     void setupModelData(const QStringList &lines, TreeItem *parent);
     TreeItem *getItem(const QModelIndex &index) const;

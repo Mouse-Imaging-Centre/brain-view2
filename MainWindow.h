@@ -12,6 +12,7 @@
 //#include "ColourBarForm.h"
 #include "BrainQuarter.h"
 #include "ResourceForm.h"
+// #include "TagForm.h"
 
 using namespace SIM::Coin3D::Quarter;
 
@@ -22,14 +23,19 @@ public:
 	MainWindow();
 	// destructor
 	virtual ~MainWindow();
+
 	// opens file based on extension
 	bool openFile(QFile &filename);
-
+	void saveTagFileFunc(QFile &filename);
+	
 public slots:
 	// prompts user for filename from file dialog
         void openFileFromDialog();
         // exits the application
         void quitApplication();
+		void saveTagFromDialog();
+		void createTagFunc();
+		void addTagFunc();
 private:
 	// set up the actions (file open, etc.)
 	void createActions();
@@ -37,11 +43,15 @@ private:
 	void createMenus();
         // create the colourbars if they don't already exist
         void initColourbars();
-		
+/*	//creat buttons to create a new tag point or save tags in a file	
+	void createTagbuttons();*/
+	
 	QMenu *fileMenu;
         QAction *openAction;
+		QAction *saveTagAction;
         QAction *quitAction;
-	
+		
+
 	// holds the main viewer application
 	BrainQuarter *viewer;
 	// holds the widget to display the colour bar
@@ -51,9 +61,15 @@ private:
 	// tree to keep track of open resources
 	//QTreeView *treeview;
 	ResourceForm *resourceForm;
+// 	TagForm *tagForm;
 	// dock to hold the tree view
 	QDockWidget *resourceDock;
+// 	QDockWidget *tagDock;
 	//void sampleTreeSetup();
+	QVector <float> tagsVect;
+	QVector <float> goodtagsVect;
+	float *Tagpoint;
+
 
 };
 

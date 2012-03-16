@@ -18,6 +18,10 @@
 
 #include <Quarter/QuarterWidget.h>
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <QtDebug>
+#include <QtGui>
 
 using namespace SIM::Coin3D::Quarter;
 
@@ -31,11 +35,13 @@ public:
 	// creates a yellow cone - i.e. just for testing purposes.
 	void createSampleSceneGraph();
 	SoSeparator* getRootSeparator();
+	float * pickedtag;
 	// don't let the window get too small
         virtual QSize minimumSizeHint(void) const;
-        void getPickedPoint(SoPickedPoint *point);
+        void getPickedPoint(SoPickedPoint *point,SoPickedPoint *point2);
 signals:
-        void pointPicked(int index, int id, int x, int y, int z);
+        void pointPicked(int index, int id, int x, int y, int z,SoType objtype);
+		void pointNotPicked();
 
 private:
 	// bits for the sample scene graph

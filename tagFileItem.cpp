@@ -1,4 +1,5 @@
 #include "tagFileItem.h"
+#include "tagPointItem.h"
 
 tagFileItem::tagFileItem(SoSeparator *root,
                          const QVector<QVariant> &data,
@@ -12,7 +13,8 @@ tagFileItem::tagFileItem(SoSeparator *root,
     // the root separator from calling function onto which
     // all new bits will be attached.
     this->root = root;
-
+// 	this->root=viewer->getRootSeparator();
+// std::cout << "Woohooo!" << std::endl;
     // create all the necessary nodes
     tagSeparator = new SoSeparator;
     scale = new SoScale;
@@ -22,8 +24,8 @@ tagFileItem::tagFileItem(SoSeparator *root,
     // set the tags to be unpickable for the moment.
     pickStyle->style = SoPickStyle::UNPICKABLE;
 
-    // initialize some properties - make tags red for the moment
-    material->diffuseColor.setValue(1.0, 0.0, 0.0);
+//     // initialize some properties - make tags red for the moment
+//     material->diffuseColor.setValue(1.0, 0.0, 0.0);
 
     // attach bits to the scenegraph.
     tagSeparator->addChild(pickStyle);
@@ -31,6 +33,7 @@ tagFileItem::tagFileItem(SoSeparator *root,
     tagSeparator->addChild(scale);
 
     root->addChild(tagSeparator);
+//   	inittagsize=0.05;	//initialize to the initial value of the tagSize QWidget
 }
 
 tagFileItem::~tagFileItem() {
@@ -68,4 +71,33 @@ bool tagFileItem::loadFile(QFile &file) {
     }
     return true;
 }
+
+bool tagFileItem::showTag(float *tagpoint, double tagsize){
+	tagPointItem *newTag = new tagPointItem(tagSeparator,
+                                                itemData,
+                                                form,
+                                                this,0,255,0, tagsize);
+										
+        newTag->setLocation(tagpoint[0],
+                            tagpoint[1],
+                            tagpoint[2]);
+		
+/*		newTagVect.append(newTag);			
+		std::cout <<"size of newTagVect in create tag: " << newTagVect.size() << std::endl;*/
+//         childItems.insert(childCount(), newTag);
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -237,10 +237,10 @@ bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
 }
 
 void TreeModel::somethingChanged() {
-	qDebug() << "Debug. >>TreeModel::somethingChanged()";
+// 	qDebug() << "Debug. >>TreeModel::somethingChanged()";
 	emit layoutChanged();
 	qDebug() << "Debug. [ somethingChanged() ]  GRUNKLE";
-	qDebug() << "Debug. <<TreeModel::somethingChanged()";
+// 	qDebug() << "Debug. <<TreeModel::somethingChanged()";
 }
 
 bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
