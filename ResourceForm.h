@@ -23,11 +23,14 @@ public:
 	Ui::resourceForm ui;
 	Ui::tagProps uitag;
 	Ui::labelProps uilabel;
+// 	bool insertGeometry(QFile &filename, bool cylinder_flag=false, char* dbfile=NULL);
 	bool insertGeometry(QFile &filename);
+// 	bool insertH5Geometry(QFile &filename);
 	bool insertVertstats(QFile &filename);
 	bool insertTagfile(QFile &filename);
 	bool insertLabelLUfile(QFile &filename);
 	float * addTagpoint();
+	double returnTagsize();
 	void setLastGeometry( GeometryScene *geom) { lastGeometry = geom; };
 	void somethingChanged();
 	void updatebckgrndColour(QColor &colour);
@@ -45,6 +48,7 @@ public slots:
 	void geometrySelected(int childNum);
 	void enableCreateTag();
 	void enableSaveTag();
+	void disableAddTag();
 	void enableSaveLabel();
 	//void updateTagSize(double newsize);//{/* do nothing */};
 private:

@@ -170,6 +170,8 @@ void GeometryScene::createLabelForm() {
 
 	connect(rf->uilabel.radiusSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(updateRadiusTransparency(int)));
+// 	connect(rf->uilabel.LabelVessels, SIGNAL(clicked()),
+// 			this, SLOT(getUserLabel()));
 	connect(rf->uilabel.LabelVessel, SIGNAL(activated( int )),
 			this, SLOT(getUserLabel()));		
 	connect(rf->uilabel.SaveLabeledash5, SIGNAL(clicked()),
@@ -540,6 +542,7 @@ GeometryScene::h5_output_type * GeometryScene::H5_reader (char* dbfile){
 void GeometryScene::noPointReceived(){
 // 	rf->uitag.CreateTagPoint->setEnabled ( FALSE );
 // 	rf->uitag.AddTagPoint->setEnabled ( FALSE );
+// 	rf->uilabel.LabelVessels->setEnabled ( FALSE );
 	rf->uilabel.LabelVessel->setEnabled ( FALSE );	
 }
 
@@ -547,14 +550,18 @@ void GeometryScene::pickReceived(int index, int id, int x, int y, int z,SoType o
 // 	qDebug() << "Debug. >>GeometryScene::pickReceived()";
 	nodeId=index;
 	//if clicked on polygon enable Tag buttons, else if enabled, disable it:
-	if (objtype == SoFaceDetail::getClassTypeId()){
+	if (objtype == SoFaceDetail::getClassTypeId() or objtype == SoLineDetail::getClassTypeId()){
 		rf->uitag.CreateTagPoint->setEnabled ( TRUE );
 		rf->uitag.AddTagPoint->setEnabled ( FALSE );
+		rf->uitag.TagSize->setEnabled ( TRUE );
+// 		rf->uilabel.LabelVessels->setEnabled ( FALSE );
 		rf->uilabel.LabelVessel->setEnabled ( FALSE );		
 	}
 	else if (objtype == SoCylinderDetail::getClassTypeId()) {
 		rf->uitag.CreateTagPoint->setEnabled ( FALSE );
 		rf->uitag.AddTagPoint->setEnabled ( FALSE );
+		rf->uitag.TagSize->setEnabled ( FALSE );
+// 		rf->uilabel.LabelVessels->setEnabled ( TRUE );
 		rf->uilabel.LabelVessel->setEnabled ( TRUE );
 		int cyl_num;
 		for (int i=0; i<labelVect.size() ; i++){
@@ -568,6 +575,7 @@ void GeometryScene::pickReceived(int index, int id, int x, int y, int z,SoType o
 	else {		
 		rf->uitag.CreateTagPoint->setEnabled ( FALSE );
 		rf->uitag.AddTagPoint->setEnabled ( FALSE );
+		rf->uitag.TagSize->setEnabled ( FALSE );
 		rf->uilabel.LabelVessel->setEnabled ( FALSE );
 	}
 	
@@ -628,6 +636,48 @@ bool GeometryScene::updateLabelLUColor() {
 	return true;
 }
 
+// bool GeometryScene::loadLabelLU(QFile &file) {
+// 	qDebug() << "Debug. >>GeometryScene::loadLabelLU()";
+// // // 	qDebug() << "Debug. <<ResourceForm::insertLabelLUfile()";
+// 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+// 		qDebug() << "The file " << file.fileName() << " can't be opened in readonly mode";
+// 		return false;
+// 	}
+// 
+// // 	if( !file.exists() )
+// // 	{
+// // 		qDebug() << "The file " << file.fileName() << "does not exist.";
+// // 		return false;
+// // 	}
+// 	while (!file.atEnd()) {
+// 		//QByteArray line = file.readLine();
+// 		QString line = file.readLine();
+// 			//qDebug() << line;
+// 		if (line.at(0)!= QChar('#')){
+// 			QStringList list = line.split(";");
+// 			qDebug() << list[4];			
+// 			labelnums.append(list[0].toInt());
+// 			labelnames.append(list[1]);
+// 			labelred.append(list[2].toFloat());
+// 			labelgreen.append(list[3].toFloat());
+// 			labelblue.append(list[4].toFloat());
+// 
+// 		}
+// 	}
+// 	 //qDebug() << labelnums;
+// 	// qDebug() << labelnames;
+// 	// qDebug() << labelblue;
+// 
+// 	//file.close();
+// 	//cout << "\n\n\n"<< labelnames.size() << "\n\n\n";
+// // 	for (int i=0; i<labelnames.size(); i++){
+// // // 		qDebug << labelnames.at(i);
+// // 		rf->uilabel.LabelVessel->addItem(labelnames.at(i));
+// // 	}
+// 
+// 	qDebug() << "Debug. <<GeometryScene::loadLabelLU()";
+// 	return true;
+// }
 
 
 void GeometryScene::radiusCalc(QVector <float> cylradiusVect){
@@ -656,6 +706,85 @@ QString GeometryScene::label_num2Name (int label){
 	else
 		qDebug() << "GeometryScene::label_num2Name " << label << " doesn't exist in config file";
 	
+// 		if ( label == 0){ //"None":
+// 			labelName = "No label\0";}	//white
+// 			
+// 		else if ( label == 35){ //"ACA":
+// 			labelName = "Anterior Cerebral Artery\0"; }		//red
+// 		else if ( label == 191){ //"MCA right":
+// 			labelName = "R. Middle Cerebral Artry\0"; }	//yellow
+// 		else if ( label == 190){ //"MCA left":
+// 			labelName = "L. Middle Cerebral Artry\0"; }
+// 		else if ( label == 2){ //"Internal Carotid arte;ry right":	//blue
+//                         labelName = "R. Internal Carotid Artery\0"; }
+// 		else if ( label == 43){ //"Internal Carotid artery left":	
+// 			labelName = "L. Internal Carotid Artery\0"; }
+// 		else if ( label == 200){ //"Posterior Comm. artery right":	//purple
+// 			labelName = "R. Posterior Comm. Artry\0"; }
+// 		else if ( label == 9){ //"Posterior Comm. artery left":
+// 			labelName = "L. Posterior Comm. Artry\0"; }
+// 		else if ( label == 8){ //"PCA right":						//pink
+// 			labelName = "R. Posterior Cereb. Artry\0"; }
+// 		else if ( label == 5){ //"PCA left":
+// 			labelName = "L. Posterior Cereb. Artry\0"; }
+// 		else if ( label == 68){ //"SCA right":						//orange
+// 			labelName = "R. Superior Cereb. Artery\0"; }
+// 		else if ( label == 227){ //"SCA left":
+// 			labelName = "L. Superior Cereb. Artery\0"; }
+// 		else if ( label == 46){ //"AICA right":						//dark green
+// 			labelName = "R. Ant. Inf. Cereb. Artry\0"; }
+// 		else if ( label == 12){ //"AICA left":
+// 			labelName = "L. Ant. Inf. Cereb. Artry\0"; }
+// 		else if ( label == 196){ //"Basilar artery":					//light blue
+// 			labelName = "Basilar Artery\0"; }
+// 		else if ( label == 7){ //"Vertebral artery":				//light green
+// 			labelName = "Vertebral Artery\0"; }
+// 		else if ( label == 49){ //"Internal Auditory artery right":
+// 			labelName = "R. Internal Audit Artery\0"; }
+// 		else if ( label == 45){ //"Internal Auditory artery left":
+// 			labelName = "L. Internal Audit Artery\0"; }
+// 
+// 			
+// 		else if ( label == 11){ //"Superior Saggital Sinus":			//orange
+// 			labelName = "Superior Saggital Sinus\0"; }
+// 		else if ( label == 6){ //"Great Cerebral Vein of Galen":	//blue
+// 			labelName = "Great Cerebral Vein of Galen\0"; }
+// 		else if ( label == 30){ //"Transverse Sinus right":			//green
+// 			labelName = "R. Transverse Sinus\0"; }
+// 		else if ( label == 246){ //"Transverse Sinus left":
+// 			labelName = "L. Transverse Sinus\0"; }
+// 		else if ( label == 192){ //"Caudal Rhinal Vein right":		//pink purple
+// 			labelName = "R. Caudal Rhinal Vein\0"; }
+// 		else if ( label == 34){ //"Caudal Rhinal Vein left":
+// 			labelName = "L. Caudal Rhinal Vein\0"; }
+// 		else if ( label == 20){ //"Rostral Rhinal Vein right":		//red brown
+// 			labelName = "R. Rostral Rhinal Vein\0"; }
+// 		else if ( label == 21){ //"Rostral Rhinal Vein left":
+// 			labelName = "L. Rostral Rhinal Vein\0"; }
+// 		else if ( label == 101){ //"Sigmoid Sinus right":				//yellow green
+// 			labelName = "R. Sigmoid Sinus\0"; }
+// 		else if ( label == 24){ //"Sigmoid Sinus left":
+// 			labelName = "L. Sigmoid Sinus\0"; }
+// 		else if ( label == 58){ //"Longitudinal Hippocampal Vein right":	//blue grey
+// 			labelName = "R. Longitud. Hippo. Vein\0"; }
+// 		else if ( label == 57){ //"Longitudinal Hippocampal Vein left":
+// 			labelName = "L. Longitud. Hippo. Vein\0"; }
+// 		else if ( label == 56){ //"Thalamostriate Vein right":			//dark pink
+// 			labelName = "R. Thalamostriate Vein\0"; }
+// 		else if ( label == 54){ //"Thalamostriate Vein left":
+// 			labelName = "L. Thalamostriate Vein\0"; }		
+// 		else if ( label == 1){ //"Medial Collicular Vein right":
+// 			labelName = "R. Medial Colicular Vein\0"; }			
+// 		else if ( label == 16){ //"Medial Collicular Vein left":
+// 			labelName = "L. Medial Colicular Vein\0"; }
+// 		else if ( label == 170){ //#unknown sinus/vein:			//dark purple
+// 			labelName = "Unknown Sinus / Vein #01\0"; }
+// 		else if ( label == 171){ //#"Lateral collicular Vein right":      //dark purple
+// 			labelName = "R. Lateral collicular V.\0"; }		
+// 		else if ( label == 250){ //#unknown sinus/vein left":			//dark brown
+// 			labelName = "L. Unknown Sinus/Vein #2\0"; }
+// 		else if ( label == 251){ //##unknown sinues/vein right":      //dark pink-purple
+// 			labelName = "R. Unknown Sinus/Vein #2\0"; }		
 
 	return labelName;
 }
@@ -672,6 +801,85 @@ int GeometryScene::label_Name2num (QString labelName){
 	else
 		qDebug() << "GeometryScene::label_Name2num " << labelName << " doesn't exist in config file";
 	
+// 		if (labelName.compare(/*case*/ "No label\0") ==0){//:
+// 			labelnum = 0;}	//white
+// 			
+// 		else if (labelName.compare(/*case*/ "Anterior Cerebral Artery\0") ==0){//:
+// 			labelnum = 35;}		//red
+// 		else if (labelName.compare(/*case*/ "R. Middle Cerebral Artry\0") ==0){//:
+// 			labelnum = 191;}	//yellow
+// 		else if (labelName.compare(/*case*/ "L. Middle Cerebral Artry\0") ==0){//:
+// 			labelnum = 190;}
+// 		else if (labelName.compare(/*case*/ "R. Internal Carotid Artery\0") ==0){//:Internal Carotid Artery	//blue
+// 			labelnum = 2;}
+// 		else if (labelName.compare(/*case*/ "L. Internal Carotid Artery\0") ==0){//:	
+// 			labelnum = 43;}
+// 		else if (labelName.compare(/*case*/ "R. Posterior Comm. Artry\0") ==0){//:	//purple
+// 			labelnum = 200;}
+// 		else if (labelName.compare(/*case*/ "L. Posterior Comm. Artry\0") ==0){//:
+// 			labelnum = 9;}
+// 		else if (labelName.compare(/*case*/ "R. Posterior Cereb. Artry\0") ==0){//:						//pink
+// 			labelnum = 8;}
+// 		else if (labelName.compare(/*case*/ "L. Posterior Cereb. Artry\0") ==0){//:
+// 			labelnum = 5;}
+// 		else if (labelName.compare(/*case*/ "R. Superior Cereb. Artery\0") ==0){//:						//orange
+// 			labelnum = 68;}
+// 		else if (labelName.compare(/*case*/ "L. Superior Cereb. Artery\0") ==0){//:
+// 			labelnum = 227;}
+// 		else if (labelName.compare(/*case*/ "R. Ant. Inf. Cereb. Artry\0") ==0){//:						//dark green
+// 			labelnum = 46;}
+// 		else if (labelName.compare(/*case*/ "L. Ant. Inf. Cereb. Artry\0") ==0){//:L. Anterior Inferior Cerebral Artery
+// 			labelnum = 12;}
+// 		else if (labelName.compare(/*case*/ "Basilar Artery\0") ==0){//:					//light blue
+// 			labelnum = 196;}
+// 		else if (labelName.compare(/*case*/ "Vertebral Artery\0") ==0){//:				//light green
+// 			labelnum = 7;}
+// 		else if (labelName.compare(/*case*/ "R. Internal Audit Artery\0") ==0){//:
+// 			labelnum = 49;}
+// 		else if (labelName.compare(/*case*/ "L. Internal Audit Artery\0") ==0){//:Internal Auditory Artery
+// 			labelnum = 45;}
+// 
+// 			
+// 		else if (labelName.compare(/*case*/ "Superior Saggital Sinus\0") ==0){//:			//orange
+// 			labelnum = 11;}
+// 		else if (labelName.compare(/*case*/ "Great Cerebral Vein of Galen\0") ==0){//:	//blue
+// 			labelnum = 6;}
+// 		else if (labelName.compare(/*case*/ "R. Transverse Sinus\0") ==0){//:			//green
+// 			labelnum = 30;}
+// 		else if (labelName.compare(/*case*/ "L. Transverse Sinus\0") ==0){//:
+// 			labelnum = 246;}
+// 		else if (labelName.compare(/*case*/ "R. Caudal Rhinal Vein\0") ==0){//:		//pink purple
+// 			labelnum = 192;}
+// 		else if (labelName.compare(/*case*/ "L. Caudal Rhinal Vein\0") ==0){//:
+// 			labelnum = 34;}
+// 		else if (labelName.compare(/*case*/ "R. Rostral Rhinal Vein\0") ==0){//:		//red brown
+// 			labelnum = 20;}
+// 		else if (labelName.compare(/*case*/ "L. Rostral Rhinal Vein\0") ==0){//:
+// 			labelnum = 21;}
+// 		else if (labelName.compare(/*case*/ "R. Sigmoid Sinus\0") ==0){//:				//yellow green
+// 			labelnum = 101;}
+// 		else if (labelName.compare(/*case*/ "L. Sigmoid Sinus\0") ==0){//:
+// 			labelnum = 24;}
+// 		else if (labelName.compare(/*case*/ "R. Longitud. Hippo. Vein\0") ==0){//:	R. Longitudinal Hippocampal Vein// blue grey
+// 			labelnum = 58;}
+// 		else if (labelName.compare(/*case*/ "L. Longitud. Hippo. Vein\0") ==0){//:
+// 			labelnum = 57;}
+// 		else if (labelName.compare(/*case*/ "R. Thalamostriate Vein\0") ==0){//:			//dark purple
+// 			labelnum = 56; }
+// 		else if (labelName.compare(/*case*/ "L. Thalamostriate Vein\0") ==0){//:
+// 			labelnum = 54; }
+// 		else if (labelName.compare(/*case*/ "R. Medial Colicular Vein\0") ==0){//:Medial Collicular Vein
+// 			labelnum = 1;}			
+// 		else if (labelName.compare(/*case*/ "L. Medial Colicular Vein\0") ==0){//:
+// 			labelnum = 16;}	
+// 		else if (labelName.compare(/*case*/ "Unknown Sinus / Vein #01\0") ==0){ //#unknown sinus/vein:			//dark purple
+// 			labelnum = 170; }
+// 		else if (labelName.compare(/*case*/ "R. Lateral collicular V.\0") ==0){ //#"Lateral collicular Vein right":      //dark purple
+// 			labelnum = 171; }		
+// 		else if (labelName.compare(/*case*/ "L. Unknown Sinus/Vein #2\0") ==0){ //#unknown sinus/vein left":			//dark brown
+// 			labelnum = 250; }
+// 		else if (labelName.compare(/*case*/ "R. Unknown Sinus/Vein #2\0") ==0){ //##unknown sinues/vein right":      //dark pink-purple
+// 			labelnum = 251; }		
 	
 	return labelnum;
 }

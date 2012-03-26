@@ -60,10 +60,28 @@ bool tagFileItem::loadFile(QFile &file) {
 
     // iterate over tags and create tagPointItems
     for (int i=0; i < n_tag_points; i++) {
+	    
+// 	    std::cout << "\n tags1: of size " <<sizeof(tags1[i]) << " " << (sizeof(tags1[i]) / sizeof(double)) <<std::endl;
+// 	    for (int j=0; j< 6; j++){
+// 		std::cout << "\n" << tags1[i][j] << " , " << std::flush;
+// 	    }
+// // 	    std::cout << "\n tags2:" <<std::endl;
+// // 	    for (int j=0; j< 6; j++){
+// // 		std::cout << "\n" << tags2[i][j] << " , " << std::flush;
+// // 	    }
+// 	    std::cout << "\n weights: " <<std::endl;
+// 		std::cout << "\n" << weights[0] <<  std::endl;
+	   
+	    
+	    
+	    
+	   double tagsize = 0.1;
+	   if  ( (weights[0] > 0) && (weights[0] < 1.0))
+			tagsize = weights[0];
         tagPointItem *newTag = new tagPointItem(tagSeparator,
                                                 itemData,
                                                 form,
-                                                this);
+                                                this,0,255,255, tagsize);
         newTag->setLocation(tags1[i][0],
                             tags1[i][1],
                             tags1[i][2]);
@@ -88,6 +106,20 @@ bool tagFileItem::showTag(float *tagpoint, double tagsize){
 	return true;
 }
 
+// void tagFileItem::updateSize(double newsize, double tagsize){
+// 	//update the size of next tags based on QWidget
+// 	std::cout <<"tagFileItem::updateSize >> old tag size: "<< tagsize << " ,new tag size : " << newsize << std::endl;
+// 	int num= tagSeparator->getNumChildren();
+// 	std::cout <<"number of children in the tag Separator:" << num << std::endl;
+// // 	scale->scaleFactor={float(newsize/tagsize), float(newsize/tagsize), float(newsize/tagsize)};
+// // 	tagSeparator/*->getChild(num-1)*/->addChild(scale);
+// // // 	tagPointItem *newTag = new tagPointItem(tagSeparator,
+// // //                                                 itemData,
+// // //                                                 form,
+// // //                                                 this);
+// 	std::cout <<"size of newTagVect in upadate tag size: " << newTagVect.size() << std::endl;
+// 	newTagVect[newTagVect.size()-1]->updateCubeSize(newsize,tagsize);
+// }
 
 
 

@@ -48,6 +48,8 @@ ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidge
 				parentWindow, SLOT(saveTagFromDialog()));
 	connect (uitag.TagSize, SIGNAL(valueChanged(double)),
 				parent, SLOT(updateTagSize(double)));
+	connect(uitag.TagSize, SIGNAL(valueChanged(double)),
+				this, SLOT(disableAddTag()));			
 
 	// create a layout and add the new form to it.
 	tagLayout = new QVBoxLayout();
@@ -76,10 +78,13 @@ ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidge
 	uilabel.LabelVessel->addItem("R. Sigmoid Sinus\0");	uilabel.LabelVessel->addItem("L. Sigmoid Sinus\0");	uilabel.LabelVessel->addItem("R. Longitud. Hippo. Vein\0");	uilabel.LabelVessel->addItem("L. Longitud. Hippo. Vein\0");
 	uilabel.LabelVessel->addItem("R. Thalamostriate Vein\0");	uilabel.LabelVessel->addItem("L. Thalamostriate Vein\0");	uilabel.LabelVessel->addItem("R. Medial Colicular Vein\0");	uilabel.LabelVessel->addItem("L. Medial Colicular Vein\0");*/
 	
+// 	uilabel.LabelVessels->setEnabled ( FALSE );
 	uilabel.LabelVessel->setEnabled ( FALSE );
 	uilabel.SaveLabeledash5->setEnabled ( FALSE );
 	uilabel.radiusSlider->setEnabled ( FALSE );
 	uilabel.radius->setEnabled ( FALSE );
+// 	connect(uilabel.LabelVessels, SIGNAL(clicked()),
+// 			this, SLOT(enableSaveLabel()));
 	connect(uilabel.LabelVessel, SIGNAL(activated( int )),
 			this, SLOT(enableSaveLabel()));			
 /*
@@ -117,6 +122,10 @@ void ResourceForm::enableSaveTag(){
 	uitag.SaveTagFile->setEnabled ( TRUE );
 }
 
+void ResourceForm::disableAddTag(){
+	uitag.AddTagPoint->setEnabled ( FALSE );
+}
+
 void ResourceForm::enableSaveLabel(){
 	uilabel.SaveLabeledash5->setEnabled ( TRUE );
 }
@@ -143,6 +152,7 @@ void ResourceForm::geometrySelected(int childNum) {
 }
 
 void ResourceForm::setPropertyForm(const QModelIndex & index) {
+// 	qDebug() << "Debug. <<ResourceForm::setPropertyForm()";
 	// destroy the currently in use form
 	if (haveProps) {
 		currentPropItem->destroyForm();
@@ -169,6 +179,7 @@ void ResourceForm::setPropertyForm(const QModelIndex & index) {
 		ui.propertiesBox->setLayout(propLayout);
 		haveProps = true;
 	}
+// 	qDebug() << "Debug. >>ResourceForm::setPropertyForm()";
 }
 
 
@@ -270,7 +281,7 @@ bool ResourceForm::insertTagfile(QFile &filename) {
 float * ResourceForm::addTagpoint(){
 // 	qDebug() << "Debug. <<ResourceForm::addTagpoint()";
 	uitag.TagSize->setEnabled ( TRUE );
-	float *tagpoint= (float*) malloc(sizeof(float) * 3);;
+	float *tagpoint= (float*) malloc(sizeof(float) * 3);
 	tagpoint[0]= viewer->pickedtag[0];
 	tagpoint[1]= viewer->pickedtag[1];
 	tagpoint[2]= viewer->pickedtag[2];
@@ -280,6 +291,14 @@ float * ResourceForm::addTagpoint(){
 	
 // 	qDebug() << "Debug. >>ResourceForm::addTagpoint()";
 	return tagpoint;
+}
+
+double ResourceForm::returnTagsize(){
+	double tagsize= parent->currentTagSize;
+   //parent->insertTags(filename);
+	
+// 	qDebug() << "Debug. >>ResourceForm::addTagpoint()";
+	return tagsize;
 }
 
 bool ResourceForm::insertVertstats(QFile &filename) {
@@ -336,20 +355,24 @@ bool ResourceForm::insertLabelLUfile(QFile &filename) {
 				labelred.append(list[2].toFloat());
 				labelgreen.append(list[3].toFloat());
 				labelblue.append(list[4].toFloat());
+				qDebug() << list[1];
 			}
 		}
 	}
-
+	// qDebug() << labelnums;
+	qDebug() << labelnames;
+// 	qDebug() << labelblue;
 
 	filename.close();
-// 	cout << "\n\n\n"<< labelnames.size() << "\n\n\n";
+	cout << "\n\n\n"<< labelnames.size() << "\n\n\n";
 
 	for (int i=0; i<labelnames.size(); i++){
+// 		qDebug() << labelnames.at(i);
 		uilabel.LabelVessel->addItem(labelnames.at(i));
 	}
 	
 	if ( haveGeometry ) {
-		qDebug() << "have geometry=>update colors!";
+		qDebug() << "have geometry";
 		for (int cc=0; cc<h5childCount.size(); cc++){
 			lastGeometry = static_cast<GeometryScene*>(parent->child(h5childCount.at(cc)));
 			lastGeometry->updateLabelLUColor();
@@ -360,9 +383,12 @@ bool ResourceForm::insertLabelLUfile(QFile &filename) {
 }
 
 void ResourceForm::somethingChanged() {
+// 	std::cout << "Debug. >>ResourceForm::somethingChanged()" <<std::endl;
 	model->somethingChanged();
 	for (int column = 0; column < model->columnCount(); ++column)
         ui.treeView->resizeColumnToContents(column);
+// 	std::cout << "Debug. >>ResourceForm::somethingChanged()" <<std::endl;
+        
 }
 
 void ResourceForm::sampleTreeSetup(BrainQuarter *viewer) {

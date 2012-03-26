@@ -17,6 +17,8 @@ public:
                 ResourceForm *rf, TreeItem *parent = 0);
     bool loadFile(QFile &file);
 	bool showTag(float *tagpoint, double tagsize);
+// 	void updateSize(double newsize, double tagsize);
+// 	double inittagsize;  
 	virtual ~tagFileItem();
 private:
     // function to create a sphere for every tag item
@@ -37,7 +39,9 @@ private:
     SoMaterial *material;
     // pick style - whether following nodes are pickage.
     SoPickStyle *pickStyle;
-
+	
+// 	QVector <tagPointItem *> newTagVect;
+	//QVector <SoCube *> tagcubeVect;
 	
 };
 

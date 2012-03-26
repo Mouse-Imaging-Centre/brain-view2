@@ -25,6 +25,8 @@ public:
 	virtual ~MainWindow();
 
 	// opens file based on extension
+// 	QFile nullfile(".db");
+// 	bool openFile(QFile &filename, bool cylinder_flag=false, char* dbfile=NULL);
 	bool openFile(QFile &filename);
 	void saveTagFileFunc(QFile &filename);
 	
@@ -33,6 +35,7 @@ public slots:
         void openFileFromDialog();
         // exits the application
         void quitApplication();
+// 		void getTagFilename();
 		void saveTagFromDialog();
 		void createTagFunc();
 		void addTagFunc();
@@ -51,7 +54,9 @@ private:
 		QAction *saveTagAction;
         QAction *quitAction;
 		
-
+// 	QPushButton *createTagbutton;
+// 	QPushButton *saveTagFilebutton;
+	
 	// holds the main viewer application
 	BrainQuarter *viewer;
 	// holds the widget to display the colour bar
@@ -69,6 +74,7 @@ private:
 	QVector <float> tagsVect;
 	QVector <float> goodtagsVect;
 	float *Tagpoint;
+	double Tagsize;
 
 
 };

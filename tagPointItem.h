@@ -33,6 +33,8 @@ private:
 //     SoMaterialBinding *tagmaterialBinding;
 	double tagsize;
 	
-
+// 	SoScale *scale;
+// 	QVector <SoCube *> tagcubeVect;
+// 	QVector <int> nodeIdVect;
 };
 #endif // TAGPOINTITEM_H

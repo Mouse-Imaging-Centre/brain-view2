@@ -72,7 +72,8 @@ public:
     bool removeColumns(int position, int columns);
     int childNumber() const;
     bool setData(int column, const QVariant &value);
-
+//     GeometryScene * insertGeometry(QFile &file, bool cylinder_flag=false,char* dbfile=NULL);
+//     GeometryScene * insertGeometry(QFile &file);
     bool insertGeometry(QFile &file);
 	bool insertTags(QFile &file);
 	bool createTag(float *tagpoint);

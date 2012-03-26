@@ -112,16 +112,19 @@
    <item row="3" column="1">
     <widget class="QDoubleSpinBox" name="TagSize">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="decimals">
+      <number>3</number>
      </property>
      <property name="maximum">
       <double>1.000000000000000</double>
      </property>
      <property name="singleStep">
-      <double>0.010000000000000</double>
+      <double>0.001000000000000</double>
      </property>
      <property name="value">
       <double>0.050000000000000</double>

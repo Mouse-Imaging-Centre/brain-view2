@@ -154,13 +154,15 @@ bool TreeItem::setData(int column, const QVariant &value)
 //! [11]
 
 
-
+/*GeometryScene * TreeItem::insertGeometry(QFile &file, bool cylinder_flag,char* dbfile) {*/
+// GeometryScene * TreeItem::insertGeometry(QFile &file) {
 bool TreeItem::insertGeometry(QFile &file) {
 	qDebug() << "Debug. >>TreeItem::insertGeometry()";
 	QVector<QVariant> data(columnCount());
 	GeometryScene *item = new GeometryScene(data, form, this);
 	item->setViewer(viewer);
 	childItems.insert(childCount(), item);
+//     item->loadGeometry(file, data, form, this,cylinder_flag,dbfile);
     item->loadGeometry(file, data, form, this);
 
 	qDebug() << "Debug. >>TreeItem::insertGeometry()";
@@ -168,7 +170,17 @@ bool TreeItem::insertGeometry(QFile &file) {
 	return true;
 }
 
-
+// GeometryScene * TreeItem::insertGeometry(QFile &file) {
+// 	QVector<QVariant> data(columnCount());
+// 	GeometryScene *item = new GeometryScene(data, form, this);
+// 	item->setViewer(viewer);
+// 	childItems.insert(childCount(), item);
+// 	QFile nullfile;
+//     item->loadGeometry(file, data, form, this,false,nullfile);
+// 
+//     return item;
+// 
+// }
 
 bool TreeItem::insertTags(QFile &file) {
     QVector<QVariant> data(columnCount());

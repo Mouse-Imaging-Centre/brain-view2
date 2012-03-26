@@ -16,7 +16,8 @@
 #include "H5Cpp.h"		//C++ API
 #include "H5File.h"
 #include <QVector>
-
+// #include <QFile>
+// #include <QTextStream>
 
 #include "ui_labelProps.h"
 #include <QtGui>
@@ -34,6 +35,7 @@ public:
 			ResourceForm *rf, TreeItem *parent = 0);
 	bool loadVertstats(QFile &file);
 	bool updateLabelLUColor();
+//  	bool loadLabelLU(QFile &file);
 	void wasSelected();
 	QString h5_filename;
 	QString label_num2Name (int label);
@@ -100,8 +102,15 @@ private:
 	//QVector <QString> labelVect;
 	QVector <int> segmentIDVect;
 	QVector <int> cylnum_transparency0_5;
+// 	QVector <int> have_h5;
 
-
+/*
+	//for labale.config file
+	QVector <int> labelnums;
+	QVector <QString> labelnames;
+	QVector <float> labelred;
+	QVector <float> labelgreen;
+	QVector <float> labelblue;*/
 };
 
 #endif /*GEOMETRYSCENE_H_*/

@@ -101,7 +101,7 @@ MainWindow::~MainWindow() {
 bool MainWindow::openFile(QFile &filename) {
 	qDebug() << "Debug. >>MainWindow::openFile()";
 
-    QFileInfo fileInfo(filename);
+    QFileInfo fileInfo(filename);	
     QString ext = fileInfo.suffix();
 
 	bool status = false;
@@ -136,6 +136,7 @@ void MainWindow::openFileFromDialog() {
 
 
 void MainWindow::createActions() {
+// 	qDebug() << "Debug. >>MainWindow::createActions()";
 
 	openAction = new QAction(tr("&Open File"), this);
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFileFromDialog()));
@@ -146,36 +147,94 @@ void MainWindow::createActions() {
 	quitAction = new QAction(tr("&Quit"), this);
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(quitApplication()));
 
+// 	qDebug() << "Debug. <<MainWindow::createActions()";
 }
 
 
 void MainWindow::createMenus() {
+// 	qDebug() << "Debug. >>MainWindow::createMenus()";
+
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(openAction);
 	fileMenu->addAction(saveTagAction);
 	fileMenu->addAction(quitAction);
 
+// 	qDebug() << "Debug. <<MainWindow::createMenus()";
 }
 
-
+// void MainWindow::createTagbuttons(){
+// 	qDebug() << "Debug. >>MainWindow::createTagbuttons()";
+// 	QPushButton createTagbutton ("create tag");
+//     createTagbutton.resize(100, 30);
+//     createTagbutton.show();
+// 	
+// 	QPushButton saveTagFilebutton ("save as .tag");
+//     saveTagFilebutton.resize(100, 30);
+//     saveTagFilebutton.show();
+// 	
+// 	
+// 	tagDock = new QDockWidget(tr("Tags"), this);
+// 	addDockWidget(Qt::BottomDockWidgetArea, tagDock);
+// 	tagDock->setWidget(&createTagbutton);
+// 
+// 	QObject::connect(&createTagbutton, SIGNAL(clicked()), this , SLOT(createTagFunc()));
+// 	QObject::connect(&saveTagFilebutton, SIGNAL(clicked()), this , SLOT(getTagFilename()));
+// 	qDebug() << "Debug. <<MainWindow::createTagbuttons()";
+// }
 
 void MainWindow::createTagFunc(){
+// 	qDebug() << "Debug. >>MainWindow::createTagFunc()";
 	Tagpoint = (float*) malloc(sizeof(float) * 3);
 	Tagpoint = resourceForm->addTagpoint();
-	std::cout << "\nCreated tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<std::endl;
+	Tagsize = resourceForm->returnTagsize();
+	std::cout << "\nCreated tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 	tagsVect.append(Tagpoint[0]);	//Tag(x)
 	tagsVect.append(Tagpoint[1]);	//Tag(y)
 	tagsVect.append(Tagpoint[2]);	//Tag(z)
+	tagsVect.append(Tagsize);	//Tagsize
+	
+// 	qDebug() << "Debug. <<MainWindow::createTagFunc()";
 }
 
 void MainWindow::addTagFunc(){
-	std::cout << "\nAdded tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<std::endl;
+// 	qDebug() << "Debug. >>MainWindow::addTagFunc()";
+// 	Tagpoint = (float*) malloc(sizeof(float) * 3);
+// 	Tagpoint = resourceForm->addTagpoint();
+	std::cout << "\nAdded tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 	goodtagsVect.append(Tagpoint[0]);	//Tag(x)
 	goodtagsVect.append(Tagpoint[1]);	//Tag(y)
 	goodtagsVect.append(Tagpoint[2]);	//Tag(z)
+	goodtagsVect.append(Tagsize);	//Tagsize
+// 	qDebug() << "Debug. <<MainWindow::addTagFunc()";
 }
 
-
+// void MainWindow::getTagFilename(){
+// 	qDebug() << "Debug. >>MainWindow::getTagFilename()";
+// 	char answ0[100];
+// 	char answ;	
+// 	std::cout << "Please enter the name of the tag file to save the tags: " << std::endl;
+// 	std::cin >> answ0;
+// 	QFile sfilename(answ0);
+// 	if ( !sfilename.exists() ){
+// 		saveTagFileFunc(sfilename);
+// 	}
+// 	else {
+// 		std::cout << "File "<< sfilename.fileName().toLatin1().data()<<" exists. Overwrite the file? (Y, N)" << std::endl;	//overwrite will erase the file and write new tags
+// 		std::cin >> answ;
+// 		if (answ=='Y' || answ=='y')	{
+// 			saveTagFileFunc(sfilename);
+// 		}
+// 		if (answ=='N' || answ == 'n') {	
+// 			while (sfilename.exists() ){
+// 				std::cout << "File "<< sfilename.fileName().toLatin1().data()<<" exists. Please enter the new file path+fileName for saving labeled object: " << std::endl;
+// 				std::cin >> answ0;
+// 				QFile sfilename(answ0);
+// 			}
+// 		saveTagFileFunc(sfilename);
+// 		}
+// 	}
+// 	qDebug() << "Debug. <<MainWindow::getTagFilename()";
+// }
 
 void MainWindow::saveTagFromDialog() {
 	qDebug() << "Debug. >>MainWindow::saveTagFromDialog()";
@@ -189,7 +248,8 @@ void MainWindow::saveTagFromDialog() {
 }
 
 void MainWindow::saveTagFileFunc(QFile &filename){
-	//create an e,pty file filename and save all the created tags in the file in format of .tag for follow_tree.py
+	//create an empty file filename and save all the created tags in the file in format of .tag for follow_tree.py
+// 	filename.open(IO_WriteOnly, stderr );
 
 	FILE *pFile;
 	pFile = fopen (filename.fileName().toLatin1().data(), "w");
@@ -201,36 +261,38 @@ void MainWindow::saveTagFileFunc(QFile &filename){
 	else
 	{
 		fprintf (pFile, "MNI Tag Point File\nVolumes = 1;\n\nPoints =\n");
-		int tagnum= (goodtagsVect.size())/3;	//number of tags (x,y,z)
-		std::cout <<"tagnum: " << tagsVect.size() << std::endl;
+		int tagnum= (goodtagsVect.size())/4;	//number of tags (x,y,z,size)
+		std::cout <<"tagnum: " << tagnum << std::endl;
 		
 		//remove any duplication of tag points:
 		QVector <float> newtagsVect;
-		std::cout <<"newtagnum: " << newtagsVect.size() << std::endl;
 		newtagsVect.append(goodtagsVect[0]);
 		newtagsVect.append(goodtagsVect[1]);
 		newtagsVect.append(goodtagsVect[2]);
+		newtagsVect.append(goodtagsVect[3]);
 		bool tagfound;
 		for (int i=1; i<tagnum ; i++){
 			tagfound=false;
-			for (int j=0; j< (newtagsVect.size())/3; j++){
-				if (goodtagsVect[3*i]==newtagsVect[3*j] || goodtagsVect[3*i+1]==newtagsVect[3*j+1] || goodtagsVect[3*i+2]==newtagsVect[3*j+2]){
+			for (int j=0; j< (newtagsVect.size())/4; j++){
+				if (goodtagsVect[4*i]==newtagsVect[4*j] && goodtagsVect[4*i+1]==newtagsVect[4*j+1] && goodtagsVect[4*i+2]==newtagsVect[4*j+2] && goodtagsVect[4*i+3]==newtagsVect[4*j+3]){			
 					tagfound=true;
 				}
 			}
 			if (!tagfound){
-				newtagsVect.append(goodtagsVect[3*i]);
-				newtagsVect.append(goodtagsVect[3*i+1]);
-				newtagsVect.append(goodtagsVect[3*i+2]);	
+				newtagsVect.append(goodtagsVect[4*i]);
+				newtagsVect.append(goodtagsVect[4*i+1]);
+				newtagsVect.append(goodtagsVect[4*i+2]);	
+				newtagsVect.append(goodtagsVect[4*i+3]);	
 			}
 		}
 		
-		tagnum= (newtagsVect.size())/3;
-		std::cout <<"newtagnum: " << newtagsVect.size() << std::endl;
+		tagnum= (newtagsVect.size())/4;
+		std::cout <<"newtagnum: " << tagnum << std::endl;
+
 		for (int i=0; i<(tagnum-1) ; i++){
-			fprintf (pFile, "%f %f %f 0.1 1 1 \"Marker\"\n", newtagsVect[3*i], newtagsVect[3*i+1],newtagsVect[3*i+2]);
+			fprintf (pFile, "%f %f %f %f 1 1 \"Marker\"\n", newtagsVect[4*i], newtagsVect[4*i+1],newtagsVect[4*i+2],newtagsVect[4*i+3] );
 		}
-		fprintf (pFile, "%f %f %f 0.1 1 1 \"Marker\";", newtagsVect[3*(tagnum-1)], newtagsVect[3*(tagnum-1)+1],newtagsVect[3*(tagnum-1)+2]);
+		fprintf (pFile, "%f %f %f %f 1 1 \"Marker\";", newtagsVect[4*(tagnum-1)], newtagsVect[4*(tagnum-1)+1],newtagsVect[4*(tagnum-1)+2],newtagsVect[4*(tagnum-1)+3]);
 		fclose(pFile);
 	}
 }

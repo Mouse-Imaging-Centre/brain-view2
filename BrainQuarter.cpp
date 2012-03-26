@@ -133,7 +133,7 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 			// emit a signal containing the coordinate picked and ID of the bit of geometry containing
 			// this point. This ID will be used by the slots attached to this signal to decide whether
 			// to do anything or not.
-			emit pointPicked(pd->getCoordinateIndex(), path->getTail()->getNodeId(), v[0], v[1], v[2], objtype);
+			emit pointPicked(pd->getCoordinateIndex(), path->getTail()->getNodeId(), pickedtag[0], pickedtag[1], pickedtag[2], objtype);
 		}
 		
 
@@ -150,6 +150,12 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 // 			std::cout << "material Index p0: " << pd0->getMaterialIndex() << std::endl;
 // 			std::cout << "material Index p1: " << pd1->getMaterialIndex() << std::endl;
 
+			pickedtag[0]=v[0]; 
+			pickedtag[1]=v[1];
+			pickedtag[2]=v[2];
+// 			std::cout << "Found point1: " << v[0] << " " << v[1] << " "<< v[2] << std::endl;
+// 			std::cout << "Found point2: " << v2[0] << " " << v2[1] << " "<< v2[2] << std::endl;
+			std::cout << "\nFound center tag: " << pickedtag[0] << " " << pickedtag[1] << " "<< pickedtag[2] << std::endl<< std::endl;
 			// emit a signal containing the coordinate picked and ID of the bit of geometry containing
 			// this point. This ID will be used by the slots attached to this signal to decide whether
 			// to do anything or not.

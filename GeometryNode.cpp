@@ -52,6 +52,7 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 		ResourceForm *rf, TreeItem *parent)
 	: TreeItem(data, rf, parent){
 
+// 	qDebug() << "Debug. >>GeometryNode::GeometryNode()";
 	// this class has a property form
 	haveProps = true;
 	this->rf = rf;
@@ -72,12 +73,23 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 	line_set = new SoIndexedLineSet;
 	num_vrtx=-1;
 	cylinder_obj= new SoCylinder;
+// 	cylinder_tr = new SoTransform;
 	cylinder_translation = new SoTranslation;
 	cylinder_rotation = new SoRotation;
+	//&quaternion_params = new SbRotation;
+// 	cylinder_rotationX = new SoRotationXYZ;
+// 	cylinder_rotationY = new SoRotationXYZ;	
+// 	cylinder_rotationZ = new SoRotationXYZ;
+	
+	// 	GeometryScene* lastGeometry;
+// 	connect(lastGeometry, SIGNAL(pointPickedColor(int, int, int, int, int)),
+// 		this, SLOT(updatePointColor(int, int, int, int, int)));
 
+// 	qDebug() << "Debug. <<GeometryNode::GeometryNode()";
 }
 
 QWidget* GeometryNode::createForm() {
+// 	qDebug() << "Debug. >>GeometryNode::createForm()";
 	if (!formInstantiated) {
 		formWidget = new QWidget;
 		ui.setupUi(formWidget);
@@ -92,22 +104,30 @@ QWidget* GeometryNode::createForm() {
 		connect(ui.bckgrndButton, SIGNAL(clicked()),
 				this, SLOT(bckgrncolourDialog()));
 	}
+// 	qDebug() << "Debug. <<GeometryNode::createForm()";
 	return formWidget;
 }
 
 void GeometryNode::updateTransparency(double newVal) {
+// 	qDebug() << "Debug. >>GeometryNode::updateTransparency()";
 	material->transparency.set1Value(0, newVal);
 	cylmaterial->transparency.set1Value(0, newVal);
+	//QColor col(255.0,0.0,0.0);
+	//updateColour(col);
+// 	qDebug() << "Debug. <<GeometryNode::updateTransparency()";
 }
 
 void GeometryNode::updateCylTransparency(int cyl_num, QVector <SoMaterial *> cylmatVect, float transVal) {
+//  	qDebug() << "Debug. >>GeometryNode::updateCylTransparency()";
 	cylmatVect[cyl_num]->transparency.set1Value(0, transVal);
 // 	material->transparency.set1Value(0, newVal/100);
 	//QColor col(255.0,0.0,0.0);
 	//updateColour(col);
+//  	qDebug() << "Debug. <<GeometryNode::updateCylTransparency()";
 }
 
 void GeometryNode::colourDialog() {
+// 	qDebug() << "Debug. >>GeometryNode::colourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
 		ui.colourButton->setText(colour.name());
@@ -115,9 +135,11 @@ void GeometryNode::colourDialog() {
 		ui.colourButton->setAutoFillBackground(true);
 		updateColour(colour);
 	}
+// 	qDebug() << "Debug. <<GeometryNode::colourDialog()";
 }
 
 void GeometryNode::bckgrncolourDialog() {
+ 	//qDebug() << "Debug. >>GeometryNode::bckgrncolourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
 		ui.colourButton->setText(colour.name());
@@ -126,9 +148,11 @@ void GeometryNode::bckgrncolourDialog() {
 		this->rf = rf;
 		rf->updatebckgrndColour(colour);
 	}
+ 	//qDebug() << "Debug. <<GeometryNode::bckgrncolourDialog()";
 }
 
 void GeometryNode::updateColour(QColor &colour) {
+// 	qDebug() << "Debug. >>GeometryNode::updateColour()";
 	int r,g,b;
 	colour.getRgb(&r,&g,&b);
 	std::cout <<"colors rgb are: " << r << "," << g <<","<<b << std::endl;
@@ -143,9 +167,11 @@ void GeometryNode::updateColour(QColor &colour) {
 			material->diffuseColor.set1Value(v, r/255.0, g/255.0, b/255.0);
 		} 
 	}
+// 	qDebug() << "Debug. <<GeometryNode::updateColour()";
 }
 
 bool GeometryNode::updateCylinderColour (int cyl_num,QVector <SoMaterial *> cylmatVect, /*QString label*/ int label,float transpar){
+// 	qDebug() << "Debug. >>GeometryNode::updateCylinderColour";
 // 	std::cout << "cyl_num = " << cyl_num << " , nodeIDs = " << nodeIDs << " , index:getNumChildren() : " << root->getNumChildren() << std::endl;
 	struct color_rgb col = colorPicker (label);
 	
@@ -159,9 +185,12 @@ bool GeometryNode::updateCylinderColour (int cyl_num,QVector <SoMaterial *> cylm
 	
 // 	cylmaterial/*[cyl_num]*/->diffuseColor.setValue(1,0,0);
 // // 	cylmaterial->diffuseColor.set1Value(cyl_num,1,0,0);
+// 	qDebug() << "Debug. <<GeometryNode::updateCylinderColour";
 }
 
 bool GeometryNode::updatePointColour(int vrtx_indx1, int vrtx_indx2,int segmnet_num, float r, float g, float b) {
+ 	
+//   	qDebug() << "Debug. >>GeometryNode::updatePointColour";
 	bool labeled_before;
 	//check if the vessel segment has been colored before
 	const SbColor * clrvalues = material->diffuseColor.getValues(vrtx_indx1);
@@ -178,18 +207,22 @@ bool GeometryNode::updatePointColour(int vrtx_indx1, int vrtx_indx2,int segmnet_
 	for (int v=vrtx_indx1; v< vrtx_indx2; v++) {
 			material->diffuseColor.set1Value(v, 1, 0, 0);
 		} 
+//    	qDebug() << "Debug. <<GeometryNode::updatePointColour";
 	//std::cout << "labeled_before = " << labeled_before <<std::endl;
 	return labeled_before;
  }
 
 void GeometryNode::destroyForm() {
+// 	qDebug() << "Debug. >>GeometryNode::destroyForm()";
 	if (formInstantiated) {
 		delete formWidget;
 		formInstantiated = false;
 	}
+// 	qDebug() << "Debug. <<GeometryNode::destroyForm()";
 }
 
 
+// bool GeometryNode::loadObj(QFile &filebool GeometryNode::loadObj(QFile &file, int i, bool cylinder_flag,int v,float vrtx_radius,float tangentX,float tangentY,float tangentZ) {
 bool GeometryNode::loadObj(QFile &file, int i) {	
 	int object_is_line =0; 
 	// set the name of this tree item:
@@ -249,6 +282,7 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 
 
 SoSeparator* GeometryNode::loadPolygons(const polygons_struct& p) {
+// 	qDebug() << "Debug. >>GeometryNode::loadPolygons()";
 
 	SoSeparator* tmproot = new SoSeparator;
 	
@@ -299,6 +333,7 @@ SoSeparator* GeometryNode::loadPolygons(const polygons_struct& p) {
     tmproot->addChild(indexedFaceSet);
     std::cout << "ID: " << indexedFaceSet->getNodeId() << std::endl;
 
+// 	qDebug() << "Debug. <<GeometryNode::loadPolygons()";
     return tmproot;
 }
 
@@ -406,7 +441,7 @@ GeometryNode::load_Cylinder_output_type GeometryNode::loadCylinder(QFile &file,f
 	return output;
 }
 
-GeometryNode::color_rgb GeometryNode::colorPicker (int label){
+GeometryNode::color_rgb GeometryNode::colorPicker (/*QString label*/ int label){
 	float r=255.0; float g=255.0; float b=255.0;	//color white
 
 	int lindx = rf->labelnums.indexOf(label);
@@ -419,7 +454,90 @@ GeometryNode::color_rgb GeometryNode::colorPicker (int label){
 // 		qDebug() << "GeometryNode::colorPicker " << label << " doesn't exist in config file";
 
 
+// 	//switch (label) {
+// 			if ( label == 0){ //"None":
+// 			r = 255.0; g = 255.0; b = 255.0; }	//white
+// 			
+// 		else if ( label == 35){ //"ACA":
+// 			r = 255.0; g = 0.0; b = 0.0; }		//red
+// 		else if ( label == 191){ //"MCA right":
+// 			r = 255.0; g = 255.0; b = 150.0; }	//yellow
+// 		else if ( label == 190){ //"MCA left":
+// 			r = 255.0; g = 255.0; b = 0.0; }
+// 		else if ( label == 2){ //"Internal Carotid artery right":	//blue
+// 			r = 100.0; g = 170.0; b = 255.0; }
+// 		else if ( label == 43){ //"Internal Carotid artery left":	
+// 			r = 0.0; g = 170.0; b = 255.0; }
+// 		else if ( label == 200){ //"Posterior Comm. artery right":	//purple
+// 			r = 170.0; g = 0.0; b = 255.0; }
+// 		else if ( label == 9){ //"Posterior Comm. artery left":
+// 			r = 140.0; g = 0.0; b = 255.0; }
+// 		else if ( label == 8){ //"PCA right":						//pink
+// 			r = 255.0; g = 170.0; b = 255.0; }
+// 		else if ( label == 5){ //"PCA left":
+// 			r = 255.0; g = 85.0; b = 127.0; }
+// 		else if ( label == 68){ //"SCA right":						//orange
+// 			r = 255.0; g = 170.0; b = 127.0; }
+// 		else if ( label == 227){ //"SCA left":
+// 			r = 255.0; g = 100.0; b = 0.0; }
+// 		else if ( label == 46){ //"AICA right":						//dark green
+// 			r = 0.0; g = 85.0; b = 0.0; }
+// 		else if ( label == 12){ //"AICA left":
+// 			r = 0.0; g = 85.0; b = 170.0; }
+// 		else if ( label == 196){ //"Basilar artery":					//light blue
+// 			r = 85.0; g = 255.0; b = 255.0; }
+// 		else if ( label == 7){ //"Vertebral artery":				//light green
+// 			r = 85.0; g = 255.0; b = 0.0; }
+// 		else if ( label == 49){ //"Internal Auditory artery right":
+// 			r = 100.0; g = 100.0; b = 150.0; }
+// 		else if ( label == 45){ //"Internal Auditory artery left":
+// 			r = 120.0; g = 120.0; b = 180.0; }
+// 
+// 			
+// 		else if ( label == 11){ //"Superior Saggital Sinus":			//orange
+// 			r = 255.0; g = 85.0; b = 0.0; }
+// 		else if ( label == 6){ //"Great Cerebral Vein of Galen":	//blue
+// 			r = 0.0; g = 0.0; b = 255.0; }
+// 		else if ( label == 30){ //"Transverse Sinus right":			//green
+// 			r = 0.0; g = 170.0; b = 0.0; }
+// 		else if ( label == 246){ //"Transverse Sinus left":
+// 			r = 0.0; g = 255.0; b = 0.0; }
+// 		else if ( label == 192){ //"Caudal Rhinal Vein right":		//pink purple
+// 			r = 255.0; g = 170.0; b = 255.0; }
+// 		else if ( label == 34){ //"Caudal Rhinal Vein left":
+// 			r = 255.0; g = 85.0; b = 255.0; }
+// 		else if ( label == 20){ //"Rostral Rhinal Vein right":		//red brown
+// 			r = 170.0; g = 0.0; b = 0.0; }
+// 		else if ( label == 21){ //"Rostral Rhinal Vein left":
+// 			r = 170.; g = 85.0; b = 0.0; }
+// 		else if ( label == 101){ //"Sigmoid Sinus right":				//yellow green
+// 			r = 170.0; g = 170.0; b = 0.0; }
+// 		else if ( label == 24){ //"Sigmoid Sinus left":
+// 			r = 170.0; g = 170.0; b = 100.0; }
+// 		else if ( label == 58){ //"Longitudinal Hippocampal Vein right":	//blue grey
+// 			r = 170.0; g = 170.0; b = 255.0; }
+// 		else if ( label == 57){ //"Longitudinal Hippocampal Vein left":
+// 			r = 111.0; g = 127.0; b = 150.0; }
+// 		else if ( label == 56){ //"Thalamostriate Vein right":			//dark pink
+// 			r = 255.0; g = 0.0; b = 191.0; }
+// 		else if ( label == 54){ //"Thalamostriate Vein left":
+// 			r = 170.0; g = 85.0; b = 127.0; }		
+// 		else if ( label == 1){ //"Medial Collicular Vein right":
+// 			r = 85.0; g = 85.0; b = 0.0; }			
+// 		else if ( label == 16){ //"Medial Collicular Vein left":
+// 			r = 145.0; g = 145.0; b = 0.0;}
+// 		else if ( label == 170){ //#unknown sinus/vein:			//dark purple
+// 			r = 85.0; g = 0.0; b = 127.0; }
+// 		else if ( label == 171){ //#"Lateral collicular Vein right":      //dark purple
+// 			r = 85.0; g = 0.0; b = 170.0; }		
+// 		else if ( label == 250){ //#unknown sinus/vein left":			//dark brown
+// 			r = 85.0; g = 0.0; b = 0.0; }
+// 		else if ( label == 251){ //##unknown sinues/vein right":      //dark pink-purple
+// 			r = 170.0; g = 0.0; b = 127.0; }		
 
+		
+		
+	//}
 	
 
 	
