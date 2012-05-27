@@ -1,7 +1,10 @@
-The option to set the background color is added. Loading line objects, polygon objects and cylindrical hdf5 files are possible. The option to tag objects and label cylindrical hdf5 files are added. 
+The option to set the background color is added. Loading line objects, polygon objects and cylindrical hdf5 files are possible. The option to tag (line/polygon) objects and label cylindrical hdf5 files are added. 
 
 MainWindow::openFile function has been changed to load cylindrical objects in the format of hdf5 (usefull for loading and labelling segmented vascular trees preprocessed to be represented as connected cylindrical objects), and labelling configuration file (*.config containing the label names, numbers and color codes). GeometryScene and GeometryNode files have been modified to load the line object, polygon object,cylindrical hdf5 and label configuration files.
 
 MainWindow::createTagFunc(), MainWindow::addTagFunc(), MainWindow::saveTagFileFunc and MainWindow::saveTagFromDialog() are added and save tag file is added to the File menu. 
 
 ResourceForm has been modified and Background Color is added to Properties widget, a widget for tagging is added and a widget for labelling hdf5 is added. GeometryScene and GeometryNode files have been modified for labelling hdf5 cylindrical obejcts and saving the labels. 
+
+The option to connect 2 edges in the cylinder object has been added. 
+Also the option to "save" the file (over-write) or "save as" a new file has been added.

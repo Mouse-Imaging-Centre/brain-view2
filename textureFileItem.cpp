@@ -5,7 +5,7 @@
 textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &data,
 		ResourceForm *rf, TreeItem *parent) : TreeItem(data, rf, parent) {
 
-	qDebug() << "Debug. >>textureFileItem::textureFileItem()";
+	//qDebug() << "Debug. >>textureFileItem::textureFileItem()";
 
 	this->root = root;
 
@@ -20,7 +20,7 @@ textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &da
 	// create the vertstats file
 	vertstatsFile = new mniVertstatsFile;
 
-	qDebug() << "Debug. <<textureFileItem::textureFileItem()";
+	//qDebug() << "Debug. <<textureFileItem::textureFileItem()";
 }
 
 
@@ -28,14 +28,14 @@ textureFileItem::~textureFileItem() {}
 
 
 void textureFileItem::loadFile(QFile &file) {
-	qDebug() << "Debug. >>textureFileItem::loadFile()";
+	//qDebug() << "Debug. >>textureFileItem::loadFile()";
 	
 	// the name within the TreeItem hierarchy
 	setData(0, QFileInfo(file).baseName());
 
 	vertstatsFile->loadFile( (char *) file.fileName().toLatin1().data());
 	getAllColumns();
-	qDebug() << "Debug. <<textureFileItem::loadFile()";
+	//qDebug() << "Debug. <<textureFileItem::loadFile()";
 }
 
 
@@ -43,7 +43,7 @@ void textureFileItem::loadFile(QFile &file) {
     \fn textureFileItem::getAllColumns()
  */
 void textureFileItem::getAllColumns() {
-	qDebug() << "Debug. >>textureFileItem::getAllColumns()";
+	//qDebug() << "Debug. >>textureFileItem::getAllColumns()";
 
 	vector <string> headers = vertstatsFile->getDataHeader();
 	vector <string>::iterator it;
@@ -54,7 +54,7 @@ void textureFileItem::getAllColumns() {
 
 		connect(this, SIGNAL(setPickedPoint(int)), newColumn, SLOT(setPickInfo(int)));
 	}
-	qDebug() << "Debug. <<textureFileItem::getAllColumns()";
+	//qDebug() << "Debug. <<textureFileItem::getAllColumns()";
 }
 
 

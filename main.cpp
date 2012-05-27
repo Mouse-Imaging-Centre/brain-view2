@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
     // command line arguments treated as files to be loaded
     for (int i=1; i < argc; ++i) {
-        qDebug() << "main: Loading ... " << argv[i];
+        qDebug() << "\nDebug. [ main ] Loading ... " << argv[i];
         QFile file(argv[i]);
 
 		mainWin.openFile(file);
@@ -27,17 +27,18 @@ int main(int argc, char *argv[]) {
 
     
 	// show main window and start the event loop
-	qDebug() << "Debug: Showing the window ... " ;
+	qDebug() << "\nDebug. [ main ]  Showing the window ... " ;
     mainWin.show();
-    qDebug() << "Debug: Going to event loop ... " ;
+    qDebug() << "Debug. [ main ]  Going to event loop ... " ;
 	app.exec();
 
 	// detach  the Coin3d libraries
-	qDebug() << "Debug: Cleaning detach the Coined library ... " ;
+	qDebug() << "\nDebug. [ main ]  Cleaning detach the Coined library ... " ;
     Quarter::clean();
 
 	// sleep young prince
-	qDebug() << "Debug: Closing ... " ;
+	qDebug() << "\nDebug. [ main ]  Closing ... " ;
+	mainWin.quitApplication();
 	return 0;
 
 }

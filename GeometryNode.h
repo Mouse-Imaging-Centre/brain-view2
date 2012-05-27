@@ -48,7 +48,7 @@ public:
 // 		load_Cylinder_output_type : nodematerial(new SoMaterial) {}
 	};	
 	
-	struct load_Cylinder_output_type loadCylinder( QFile &file,float vrtxX,float vrtxY,float vrtxZ, float vrtx_radius,float tangentX,float tangentY,float tangentZ, float height, int num, /*QString label*/int label);
+	struct load_Cylinder_output_type loadCylinder( QFile &file,float vrtxX,float vrtxY,float vrtxZ, float vrtx_radius,float tangentX,float tangentY,float tangentZ, float height, int label);
 
 public slots:
 	void updateTransparency(double newVal);

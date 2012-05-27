@@ -60,9 +60,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="Labels">
+    <widget class="QGroupBox" name="Vessels">
      <property name="title">
-      <string>Labels</string>
+      <string>Vessels</string>
      </property>
     </widget>
    </item>

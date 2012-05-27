@@ -40,9 +40,6 @@ private:
     // pick style - whether following nodes are pickage.
     SoPickStyle *pickStyle;
 	
-// 	QVector <tagPointItem *> newTagVect;
-	//QVector <SoCube *> tagcubeVect;
-	
 };
 
 #endif // TAGFILEITEM_H

@@ -40,7 +40,7 @@ public:
         virtual QSize minimumSizeHint(void) const;
         void getPickedPoint(SoPickedPoint *point,SoPickedPoint *point2);
 signals:
-        void pointPicked(int index, int id, int x, int y, int z,SoType objtype);
+        void pointPicked(int index, int id, float x, float y, float z,SoType objtype);
 		void pointNotPicked();
 
 private:

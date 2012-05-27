@@ -72,7 +72,6 @@ private:
 // 	QDockWidget *tagDock;
 	//void sampleTreeSetup();
 	QVector <float> tagsVect;
-	QVector <float> goodtagsVect;
 	float *Tagpoint;
 	double Tagsize;
 

@@ -13,3 +13,16 @@ You need to "Add Tag" right after "Create Tag" if you want to save it. Once a ne
 Don't worry about adding a single tag more than once, it will not be saved in the output file more than once!
 
 When you are "Saving Tag file", tag file will be erased and all the tags you added to the list in the current run of the program will be copied to the file. So you can save your file anytime and as many times as you want during one run of the program and have all of the tags you have picked so far saved. This is for the convenience to not loose your work, after say 10 minutes of tagging, if the program crashes.
+
+
+***************************************************************************
+****Note for Adding Edges in brain-view2:
+***************************************************************************
+
+Load the cylinder object.
+
+Click "Connect" in "Vessels" form. click on the end-point of 2 edges that you want to connect.
+
+Click on "Add edge".
+
+In order to label a given edge, click on it and then select the label from "label:" drop box in "Vessels" form.

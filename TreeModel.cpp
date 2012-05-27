@@ -219,7 +219,7 @@ int TreeModel::rowCount(const QModelIndex &parent) const
 bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
                         int role)
 {
-	qDebug() << "Debug. >>TreeModel::setData()";
+	//qDebug() << "Debug. >>TreeModel::setData()";
     if (role != Qt::EditRole)
         return false;
 
@@ -232,7 +232,7 @@ bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
 	//reset();
 	//std::cout << "hello?" << std::endl;
 
-	qDebug() << "Debug. <<TreeModel::setData()";
+	//qDebug() << "Debug. <<TreeModel::setData()";
 	return rv;
 }
 

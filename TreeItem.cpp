@@ -157,7 +157,7 @@ bool TreeItem::setData(int column, const QVariant &value)
 /*GeometryScene * TreeItem::insertGeometry(QFile &file, bool cylinder_flag,char* dbfile) {*/
 // GeometryScene * TreeItem::insertGeometry(QFile &file) {
 bool TreeItem::insertGeometry(QFile &file) {
-	qDebug() << "Debug. >>TreeItem::insertGeometry()";
+	//qDebug() << "Debug. >>TreeItem::insertGeometry()";
 	QVector<QVariant> data(columnCount());
 	GeometryScene *item = new GeometryScene(data, form, this);
 	item->setViewer(viewer);
@@ -165,7 +165,7 @@ bool TreeItem::insertGeometry(QFile &file) {
 //     item->loadGeometry(file, data, form, this,cylinder_flag,dbfile);
     item->loadGeometry(file, data, form, this);
 
-	qDebug() << "Debug. >>TreeItem::insertGeometry()";
+	//qDebug() << "Debug. >>TreeItem::insertGeometry()";
 //     return item;
 	return true;
 }
@@ -195,7 +195,7 @@ bool TreeItem::createTag(float *tagpoint){
     tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
                                         data, form, this);
     childItems.insert(childCount(), item);
-	std::cout<<"current tag size : " << currentTagSize << std::endl;
+	//std::cout<<"current tag size : " << currentTagSize << std::endl;
 	item->showTag(tagpoint,currentTagSize);	
 }
 
@@ -224,7 +224,7 @@ bool TreeItem::insertCone() {
 }
 
 QWidget* TreeItem::createForm() {
-	qDebug() << "Debug. >>TreeItem::createForm()";
+	//qDebug() << "Debug. >>TreeItem::createForm()";
 
 }
 

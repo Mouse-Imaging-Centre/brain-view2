@@ -97,11 +97,14 @@ public:
         void localPointPicked(int);
 public slots:
         // only used by geometryScene, but QT appears to need it in the superclass too for some oddreason
-        virtual void pickReceived(int index, int id, int x, int y, int z, SoType objtype) { /* nothing */ };
+        virtual void pickReceived(int index, int id, float x, float y, float z, SoType objtype) { /* nothing */ };
 		virtual void noPointReceived() { /* nothing */ };
         virtual void pickedPointReceived(int) { /* do nothing */ };
 		virtual void getUserLabel() { /* do nothing */ };
 		virtual void saveLabel() { /* do nothing */ };
+		virtual void saveasLabel() { /* do nothing */ };
+		virtual void createNewEdge() { /* do nothing */ };
+		virtual void addNewEdge() { /* do nothing */ };
 		virtual void updateRadiusTransparency(int newVal){/* do nothing */};
 		//virtual void bckgrncolourDialog(){/* do nothing */};
 		void updateTagSize(double newsize);
