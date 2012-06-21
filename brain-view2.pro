@@ -8,14 +8,12 @@ VERSION = 0.1.1
 #      >make                       [ build ]
 
 
-# set where to get the Minc libs and includes
+# set where to get the Minc libs and includes, bicInventor, Quarter, hdf5
 # ... there really *must* be a better way of doing this
-#MINCDIR = /projects/mice/share/arch/linux64
-#MINCDIR = /usr/local/minc2
-#MINCDIR = /usr/local/bic
-MINCDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
-
-QUARTERDIR = /usr/local
+#Example:
+#MINCDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
+#QUARTERDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
+#qmake-qt4 MINCDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ QUARTERDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ brain-view2.pro
 
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
@@ -24,16 +22,15 @@ CONFIG += debug
 QT += opengl
 INCLUDEPATH += $${QUARTERDIR}/include
 INCLUDEPATH += $${MINCDIR}/include
+#INCLUDEPATH += $${MINCDIR}/Inventor
 INCLUDEPATH += $$COININCLUDE
 LIBS += $$COINLIBS
-LIBS += -L/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/lib
+LIBS += -L$${MINCDIR}/lib
 !macx { 
     LIBS += -lCoin
     LIBS += -L$${QUARTERDIR}/lib/ \
         -lQuarter \
         -lbicInventor
-#    INCLUDEPATH += $${QUARTERDIR}/include
- #   INCLUDEPATH += $${MINCDIR}/include
 
     LIBS += -L$${MINCDIR}/lib/ \
         -loobicpl \
@@ -59,12 +56,7 @@ macx {
         -lhdf5 \
         -lhdf5_cpp \
         -lnetcdf
-#   INCLUDEPATH += $${MINCDIR}/include
 }
-INCLUDEPATH += /usr/local/include
-#INCLUDEPATH += /usr/include
-INCLUDEPATH += /usr/include/Inventor
-INCLUDEPATH += /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/include
 FORMS = textureColumnForm.ui \
     resourceForm.ui \
     geometryProps.ui \
