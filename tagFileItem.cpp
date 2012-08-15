@@ -13,8 +13,8 @@ tagFileItem::tagFileItem(SoSeparator *root,
     // the root separator from calling function onto which
     // all new bits will be attached.
     this->root = root;
-// 	this->root=viewer->getRootSeparator();
-// std::cout << "Woohooo!" << std::endl;
+	//this->root=viewer->getRootSeparator();
+	//std::cout << "Woohooo!" << std::endl;
     // create all the necessary nodes
     tagSeparator = new SoSeparator;
     scale = new SoScale;
@@ -24,8 +24,8 @@ tagFileItem::tagFileItem(SoSeparator *root,
     // set the tags to be unpickable for the moment.
     pickStyle->style = SoPickStyle::UNPICKABLE;
 
-//     // initialize some properties - make tags red for the moment
-//     material->diffuseColor.setValue(1.0, 0.0, 0.0);
+    // // initialize some properties - make tags red for the moment
+    //material->diffuseColor.setValue(1.0, 0.0, 0.0);
 
     // attach bits to the scenegraph.
     tagSeparator->addChild(pickStyle);
@@ -33,13 +33,13 @@ tagFileItem::tagFileItem(SoSeparator *root,
     tagSeparator->addChild(scale);
 
     root->addChild(tagSeparator);
-//   	inittagsize=0.05;	//initialize to the initial value of the tagSize QWidget
+  	// inittagsize=0.05;	//initialize to the initial value of the tagSize QWidget
 }
 
 tagFileItem::~tagFileItem() {
 }
 
-bool tagFileItem::loadFile(QFile &file) {
+bool tagFileItem::loadFile(QFile &file, double tagsize, float r, float g, float b) {
     int n_volumes, n_tag_points;
     double *weights;
     int *structure_ids;
@@ -60,49 +60,34 @@ bool tagFileItem::loadFile(QFile &file) {
 
     // iterate over tags and create tagPointItems
     for (int i=0; i < n_tag_points; i++) {
-	    
-// 	    std::cout << "\n tags1: of size " <<sizeof(tags1[i]) << " " << (sizeof(tags1[i]) / sizeof(double)) <<std::endl;
-// 	    for (int j=0; j< 6; j++){
-// 		std::cout << "\n" << tags1[i][j] << " , " << std::flush;
-// 	    }
-// // 	    std::cout << "\n tags2:" <<std::endl;
-// // 	    for (int j=0; j< 6; j++){
-// // 		std::cout << "\n" << tags2[i][j] << " , " << std::flush;
-// // 	    }
-// 	    std::cout << "\n weights: " <<std::endl;
-// 		std::cout << "\n" << weights[0] <<  std::endl;
-	   
-	    
-	    
-	    
-	   double tagsize = 0.1;
-	   if  ( (weights[0] > 0) && (weights[0] < 1.0))
-			tagsize = weights[0];
-        tagPointItem *newTag = new tagPointItem(tagSeparator,
-                                                itemData,
-                                                form,
-                                                this,0,255,255, tagsize);
-        newTag->setLocation(tags1[i][0],
-                            tags1[i][1],
-                            tags1[i][2]);
-        childItems.insert(childCount(), newTag);
+		//double tagsize = 0.1;
+		if  ( (weights[0] > 0) && (weights[0] < 1.0))
+				tagsize = weights[0];
+		tagPointItem *newTag = new tagPointItem(tagSeparator,
+										itemData,
+										form,
+										this, tagsize,/*0.0,255.0,255.0*/r,g,b);
+		newTag->setLocation(tags1[i][0],
+						tags1[i][1],
+						tags1[i][2]);
+		childItems.insert(childCount(), newTag);
     }
     return true;
 }
 
-bool tagFileItem::showTag(float *tagpoint, double tagsize){
+bool tagFileItem::showTag(float *tagpoint, double tagsize, float r, float g, float b){
 	tagPointItem *newTag = new tagPointItem(tagSeparator,
                                                 itemData,
                                                 form,
-                                                this,0,255,0, tagsize);
+                                                this, tagsize,/*0.0,255.0,0.0*/r,g,b);
 										
         newTag->setLocation(tagpoint[0],
                             tagpoint[1],
                             tagpoint[2]);
 		
-/*		newTagVect.append(newTag);			
-		std::cout <<"size of newTagVect in create tag: " << newTagVect.size() << std::endl;*/
-//         childItems.insert(childCount(), newTag);
+	/*		newTagVect.append(newTag);			
+			std::cout <<"size of newTagVect in create tag: " << newTagVect.size() << std::endl;*/
+	//         childItems.insert(childCount(), newTag);
 	return true;
 }
 

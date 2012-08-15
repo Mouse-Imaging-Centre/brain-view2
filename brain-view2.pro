@@ -11,7 +11,11 @@ VERSION = 0.1.1
 # set where to get the Minc libs and includes, bicInventor, Quarter, hdf5
 # ... there really *must* be a better way of doing this
 #Example:
-#qmake-qt4 MINCDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ QUARTERDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ HDF5DIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ INVENTORDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ brain-view2.pro
+#QUARTERDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
+#MINCDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
+#INVENTORDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
+#HDF5DIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
+#qmake-qt4 MINCDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ INVENTORDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ QUARTERDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ HDF5DIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ brain-view2.pro
 
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
@@ -21,21 +25,25 @@ QT += opengl
 
 INCLUDEPATH += $${QUARTERDIR}/include
 INCLUDEPATH += $${MINCDIR}/include
+INCLUDEPATH += $${INVENTORDIR}/Inventor
 INCLUDEPATH += $$COININCLUDE
 
 LIBS += $$COINLIBS
+LIBS += -L$${MINCDIR}/lib
 !macx { 
     LIBS += -lCoin
     LIBS += -L$${QUARTERDIR}/lib/ \
-        -lQuarter
+        -lQuarter 
 }
 macx { 
     LIBS += -Wl,-framework \
         -Wl,Quarter
 }
+
 LIBS += -L$${MINCDIR}/lib \
         -loobicpl \
         -lpcre++ \
+        -lpcre \
         -lbicpl \
         -lvolume_io2 \
         -lminc2
@@ -45,7 +53,10 @@ LIBS += -L$${INVENTORDIR}/lib \
 
 LIBS += -L$${HDF5DIR}/lib/ \
         -lhdf5 \
-        -lhdf5_cpp
+        -lhdf5_cpp \
+        -lnetcdf
+
+
 
 FORMS = textureColumnForm.ui \
     resourceForm.ui \

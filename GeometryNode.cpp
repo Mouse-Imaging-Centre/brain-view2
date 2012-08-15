@@ -52,7 +52,6 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 		ResourceForm *rf, TreeItem *parent)
 	: TreeItem(data, rf, parent){
 
-// 	qDebug() << "Debug. >>GeometryNode::GeometryNode()";
 	// this class has a property form
 	haveProps = true;
 	this->rf = rf;
@@ -65,7 +64,7 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 	normals = new SoNormal;
 	normalBinding = new SoNormalBinding;
 	material = new SoMaterial;
-// 	material->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_ADD);
+	//material->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_ADD);
 	materialBinding = new SoMaterialBinding;
 	cylmaterial = new SoMaterial;
 	cylmaterialBinding = new SoMaterialBinding;
@@ -73,23 +72,21 @@ GeometryNode::GeometryNode(SoSeparator *root, const QVector<QVariant> &data,
 	line_set = new SoIndexedLineSet;
 	num_vrtx=-1;
 	cylinder_obj= new SoCylinder;
-// 	cylinder_tr = new SoTransform;
+	//cylinder_tr = new SoTransform;
 	cylinder_translation = new SoTranslation;
 	cylinder_rotation = new SoRotation;
 	//&quaternion_params = new SbRotation;
-// 	cylinder_rotationX = new SoRotationXYZ;
-// 	cylinder_rotationY = new SoRotationXYZ;	
-// 	cylinder_rotationZ = new SoRotationXYZ;
+	//cylinder_rotationX = new SoRotationXYZ;
+	//cylinder_rotationY = new SoRotationXYZ;	
+	//cylinder_rotationZ = new SoRotationXYZ;
 	
 	// 	GeometryScene* lastGeometry;
-// 	connect(lastGeometry, SIGNAL(pointPickedColor(int, int, int, int, int)),
-// 		this, SLOT(updatePointColor(int, int, int, int, int)));
+	/*connect(lastGeometry, SIGNAL(pointPickedColor(int, int, int, int, int)),
+		this, SLOT(updatePointColor(int, int, int, int, int)));*/
 
-// 	qDebug() << "Debug. <<GeometryNode::GeometryNode()";
 }
 
 QWidget* GeometryNode::createForm() {
-// 	qDebug() << "Debug. >>GeometryNode::createForm()";
 	if (!formInstantiated) {
 		formWidget = new QWidget;
 		ui.setupUi(formWidget);
@@ -104,32 +101,26 @@ QWidget* GeometryNode::createForm() {
 		connect(ui.bckgrndButton, SIGNAL(clicked()),
 				this, SLOT(bckgrncolourDialog()));
 	}
-// 	qDebug() << "Debug. <<GeometryNode::createForm()";
 	return formWidget;
 }
 
 void GeometryNode::updateTransparency(double newVal) {
-// 	qDebug() << "Debug. >>GeometryNode::updateTransparency()";
 	material->transparency.set1Value(0, newVal);
 	cylmaterial->transparency.set1Value(0, newVal);
 	//QColor col(255.0,0.0,0.0);
 	//updateColour(col);
-// 	qDebug() << "Debug. <<GeometryNode::updateTransparency()";
 }
 
 void GeometryNode::updateCylTransparency(int cyl_num, QVector <SoMaterial *> cylmatVect, float transVal) {
-//  	qDebug() << "Debug. >>GeometryNode::updateCylTransparency()";
 	for (int i=0; i < cyl_num; i++){
 		cylmatVect[i]->transparency.set1Value(0, transVal);
 	}
-// 	material->transparency.set1Value(0, newVal/100);
+	//material->transparency.set1Value(0, newVal/100);
 	//QColor col(255.0,0.0,0.0);
 	//updateColour(col);
-//  	qDebug() << "Debug. <<GeometryNode::updateCylTransparency()";
 }
 
 void GeometryNode::colourDialog() {
-// 	qDebug() << "Debug. >>GeometryNode::colourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
 		ui.colourButton->setText(colour.name());
@@ -137,63 +128,55 @@ void GeometryNode::colourDialog() {
 		ui.colourButton->setAutoFillBackground(true);
 		updateColour(colour);
 	}
-// 	qDebug() << "Debug. <<GeometryNode::colourDialog()";
 }
 
 void GeometryNode::bckgrncolourDialog() {
- 	//qDebug() << "Debug. >>GeometryNode::bckgrncolourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
-		ui.colourButton->setText(colour.name());
-		ui.colourButton->setPalette(QPalette(colour));
-		ui.colourButton->setAutoFillBackground(true);
+		ui.bckgrndButton->setText(colour.name());
+		ui.bckgrndButton->setPalette(QPalette(colour));
+		ui.bckgrndButton->setAutoFillBackground(true);
 		this->rf = rf;
 		rf->updatebckgrndColour(colour);
 	}
- 	//qDebug() << "Debug. <<GeometryNode::bckgrncolourDialog()";
 }
 
 void GeometryNode::updateColour(QColor &colour) {
-// 	qDebug() << "Debug. >>GeometryNode::updateColour()";
 	int r,g,b;
 	colour.getRgb(&r,&g,&b);
 	//std::cout <<"colors rgb are: " << r << "," << g <<","<<b << std::endl;
-// 	if (num_vrtx==-1)		//object is polygon with materialBinding=OVERALL
-// 	{
+	//if (num_vrtx==-1)		//object is polygon with materialBinding=OVERALL
+	//{
 		material->diffuseColor.setValue(r/255.0, g/255.0, b/255.0);
 		cylmaterial->diffuseColor.setValue(r/255.0, g/255.0, b/255.0);
-// 	}
+	//}
 	/*else*/ if (num_vrtx>0)	//object is line with materialBinding=PER_VERTEX_INDEXED
 	{
 		for (int v=0; v< num_vrtx; v++) {
 			material->diffuseColor.set1Value(v, r/255.0, g/255.0, b/255.0);
 		} 
 	}
-// 	qDebug() << "Debug. <<GeometryNode::updateColour()";
 }
 
 bool GeometryNode::updateCylinderColour (int cyl_num,QVector <SoMaterial *> cylmatVect, /*QString label*/ int label,float transpar){
-// 	qDebug() << "Debug. >>GeometryNode::updateCylinderColour";
 // 	std::cout << "cyl_num = " << cyl_num /*<< " , nodeIDs = " << nodeIDs */<< " , index:getNumChildren() : " << root->getNumChildren() << std::endl;
 	struct color_rgb col = colorPicker (label);
 	for (int i=0; i<cyl_num; i++){
 		cylmatVect[i]->diffuseColor.setValue(col.r/255.0,col.g/255.0,col.b/255.0);
 		cylmatVect[i]->transparency.set1Value(0, transpar);
 	}
-// 	std::cout << "cylmatVect size : " << cylmatVect.size() <<std::endl;
-// 	cylmatVect.at(0/*cyl_num*/)->diffuseColor.setValue(1,0,0);
-// 	SoNode *currentNode = root->getChild(0);	//root->getChild(cyl_num)//root->getChild(nodeIDs)
-// 	std::cout << "currentNode->getNumChildren() : " << currentNode->getNumChildren()<< std::endl;;
-// 	SoChildList * children = currentNode->getChildren();
-	
-// 	cylmaterial/*[cyl_num]*/->diffuseColor.setValue(1,0,0);
-// // 	cylmaterial->diffuseColor.set1Value(cyl_num,1,0,0);
- //	qDebug() << "Debug. <<GeometryNode::updateCylinderColour";
+	// 	std::cout << "cylmatVect size : " << cylmatVect.size() <<std::endl;
+	// 	cylmatVect.at(0/*cyl_num*/)->diffuseColor.setValue(1,0,0);
+	// 	SoNode *currentNode = root->getChild(0);	//root->getChild(cyl_num)//root->getChild(nodeIDs)
+	// 	std::cout << "currentNode->getNumChildren() : " << currentNode->getNumChildren()<< std::endl;;
+	// 	SoChildList * children = currentNode->getChildren();
+		
+	// 	cylmaterial/*[cyl_num]*/->diffuseColor.setValue(1,0,0);
+	// // 	cylmaterial->diffuseColor.set1Value(cyl_num,1,0,0);
 }
 
 bool GeometryNode::updatePointColour(int vrtx_indx1, int vrtx_indx2,int segmnet_num, float r, float g, float b) {
  	
-//   	qDebug() << "Debug. >>GeometryNode::updatePointColour";
 	bool labeled_before;
 	//check if the vessel segment has been colored before
 	const SbColor * clrvalues = material->diffuseColor.getValues(vrtx_indx1);
@@ -210,22 +193,18 @@ bool GeometryNode::updatePointColour(int vrtx_indx1, int vrtx_indx2,int segmnet_
 	for (int v=vrtx_indx1; v< vrtx_indx2; v++) {
 			material->diffuseColor.set1Value(v, 1, 0, 0);
 		} 
-//    	qDebug() << "Debug. <<GeometryNode::updatePointColour";
 	//std::cout << "labeled_before = " << labeled_before <<std::endl;
 	return labeled_before;
  }
 
 void GeometryNode::destroyForm() {
-// 	qDebug() << "Debug. >>GeometryNode::destroyForm()";
 	if (formInstantiated) {
 		delete formWidget;
 		formInstantiated = false;
 	}
-// 	qDebug() << "Debug. <<GeometryNode::destroyForm()";
 }
 
 
-// bool GeometryNode::loadObj(QFile &filebool GeometryNode::loadObj(QFile &file, int i, bool cylinder_flag,int v,float vrtx_radius,float tangentX,float tangentY,float tangentZ) {
 bool GeometryNode::loadObj(QFile &file, int i) {	
 	int object_is_line =0; 
 	// set the name of this tree item:
@@ -246,23 +225,19 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 	
 		
 	if (object_list[i]->object_type == POLYGONS) {
-// 		qDebug() << "Debug. >>GeometryNode::loadObj()";
 		//std::cout <<"object_is_line =" << object_is_line <<std::endl;
 		std::cout << "Loading Polygon object number: " << i <<std::endl;
-	// go ahead and load the polygons.
+		// go ahead and load the polygons.
 		obj = loadPolygons(object_list[i]->specific.polygons);
-// 		qDebug() << "Debug. <<GeometryNode::loadObj()";
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	else if (object_list[i]->object_type ==LINES ) {
-		//qDebug() << "Debug. >>GeometryNode::loadObj()";
 		object_is_line=1;
 		//std::cout <<"object_is_line =" << object_is_line <<std::endl;
 		//go ahead and load the line object.
 		std::cout << "Loading Line object number: " << i <<std::endl;
 		obj = loadLines( (object_list[i])->specific.lines );
-		//qDebug() << "Debug. <<GeometryNode::loadObj()";
 	}
 		
 
@@ -276,8 +251,8 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 	}
 	
 	if (obj) {
-			// light
- 	//root->addChild(new SoDirectionalLight);
+		// light
+		//root->addChild(new SoDirectionalLight);
 		root->addChild(obj);
 	}
 	return true;
@@ -285,11 +260,10 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 
 
 SoSeparator* GeometryNode::loadPolygons(const polygons_struct& p) {
-// 	qDebug() << "Debug. >>GeometryNode::loadPolygons()";
 
 	SoSeparator* tmproot = new SoSeparator;
 	
-		// light
+	// light
  	//tmproot->addChild(new SoDirectionalLight);
 
 	material->transparency.set1Value(0, 0.0);
@@ -336,16 +310,14 @@ SoSeparator* GeometryNode::loadPolygons(const polygons_struct& p) {
     tmproot->addChild(indexedFaceSet);
     //std::cout << "ID: " << indexedFaceSet->getNodeId() << std::endl;
 
-// 	qDebug() << "Debug. <<GeometryNode::loadPolygons()";
     return tmproot;
 }
 
 SoSeparator* GeometryNode::loadLines( const lines_struct& l){
-//     qDebug() << "Debug. >>GeometryNode::loadLines";
 	num_vrtx=l.n_points;
     SoSeparator* tmproot = new SoSeparator;
 	
-		// light
+	// light
  	//tmproot->addChild(new SoDirectionalLight);
 
     material->transparency.set1Value(0, 0.0);
@@ -386,7 +358,6 @@ SoSeparator* GeometryNode::loadLines( const lines_struct& l){
     tmproot->addChild(line_set);
     //std::cout << "ID: " << line_set->getNodeId() << std::endl;
 
-// 	qDebug() << "Debug. <<GeometryNode::loadLines()";
     return tmproot;
 }
 
@@ -396,7 +367,7 @@ GeometryNode::load_Cylinder_output_type GeometryNode::loadCylinder(QFile &file,f
 
 	SoSeparator* cylroot = new SoSeparator;
 	
-			// light
+	// light
  	//cylroot->addChild(new SoDirectionalLight);
 
 
@@ -428,13 +399,13 @@ GeometryNode::load_Cylinder_output_type GeometryNode::loadCylinder(QFile &file,f
 	cylinder_obj->SIDES;
 
 	cylroot->addChild(cylinder_obj);
-// 		std::cout << "cylinder ID: " << cylinder_obj->getNodeId() <<std::endl; //returns the node's current unique identification number. 
+	//std::cout << "cylinder ID: " << cylinder_obj->getNodeId() <<std::endl; //returns the node's current unique identification number. 
 
 	
 
 	root->addChild(cylroot);//cylobj
-// 	std::cout << "root children : " << root->getNumChildren() << std::endl;
-// 	std::cout << "cylroot children : " << cylroot->getNumChildren() << std::endl;
+	//std::cout << "root children : " << root->getNumChildren() << std::endl;
+	//std::cout << "cylroot children : " << cylroot->getNumChildren() << std::endl;
 	//std::cout << "parent's children : " << root->getParent()->getNumChildren() << std::endl;
 
 	struct load_Cylinder_output_type output;
@@ -443,6 +414,13 @@ GeometryNode::load_Cylinder_output_type GeometryNode::loadCylinder(QFile &file,f
 	output.noderadius = vrtx_radius;
 	return output;
 }
+
+/* void GeometryNode::removeCylinder (int nodeid){
+	//root->getChild(0)->removeChild(nodeid); 
+// 	std::cout << "root children : " << root->getNumChildren() << std::endl;
+//std::cout << "cylroot children : " << cylroot->getNumChildren() << std::endl;
+	//std::cout << "parent's children : " << root->getChild(0) << std::endl;// 	
+}*/
 
 GeometryNode::color_rgb GeometryNode::colorPicker (/*QString label*/ int label){
 	float r=255.0; float g=255.0; float b=255.0;	//color white

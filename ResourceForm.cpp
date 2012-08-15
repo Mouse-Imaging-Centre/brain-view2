@@ -5,11 +5,8 @@
 
 #include <iostream>
 
-// //global flag for labeling the object file?
-// int flag_label = 0;
 
 ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidget(parentWindow){
-// 	qDebug() << "Debug. <<ResourceForm::ResourceForm()";
 	ui.setupUi(this);
 	
 	this->viewer = viewer;
@@ -27,14 +24,14 @@ ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidge
 	haveGeometry = false;
 	ui.treeView->setModel(model);
 	
-// 	tagWidget = new TagForm(parentWindow, viewer);
-// 	qDebug() << "Debug. <<ResourceForm::TagForm()";
+	// 	tagWidget = new TagForm(parentWindow, viewer);
 	tagWidget = new QWidget;
 	uitag.setupUi(tagWidget);
 	uitag.CreateTagPoint->setEnabled ( FALSE );
 	uitag.AddTagPoint->setEnabled ( FALSE );
 	uitag.SaveTagFile->setEnabled ( FALSE );
 	uitag.TagSize->setEnabled ( FALSE );
+	uitag.TagColour->setEnabled ( FALSE );
 
 	connect(uitag.CreateTagPoint, SIGNAL(clicked()),
 				parentWindow, SLOT(createTagFunc()));
@@ -50,57 +47,29 @@ ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidge
 				parent, SLOT(updateTagSize(double)));
 	connect(uitag.TagSize, SIGNAL(valueChanged(double)),
 				this, SLOT(disableAddTag()));			
+	connect(uitag.TagColour, SIGNAL(clicked()),
+				parent, SLOT(TagcolourDialog()));			
 
 	// create a layout and add the new form to it.
 	tagLayout = new QVBoxLayout();
 	tagLayout->addWidget(tagWidget);
 	ui.Tags->setLayout(tagLayout);
-// 	qDebug() << "Debug. >>ResourceForm::TagForm()";	
-	
-// 	qDebug() << "Debug. >>ResourceForm::createLabelForm()";
+
 	labelWidget = new QWidget;
 	uilabel.setupUi(labelWidget);
 	
-/*	cout << "\n\n\n"<< labelnames.size() << "\n\n\n";
-	for (int i=0; i<labelnames.size(); i++){
-		qDebug << labelnames.at(i);
-		uilabel.LabelVessel->addItem(labelnames.at(i));
-	}*/
-/*	uilabel.LabelVessel->addItem("No label\0");	
-	uilabel.LabelVessel->addItem("Anterior Cerebral Artery\0");	uilabel.LabelVessel->addItem("R. Middle Cerebral Artry\0");	uilabel.LabelVessel->addItem("L. Middle Cerebral Artry\0");	
-	uilabel.LabelVessel->addItem("R. Internal Carotid Artery\0");	uilabel.LabelVessel->addItem("L. Internal Carotid Artery\0");	uilabel.LabelVessel->addItem("R. Posterior Comm. Artry\0");	uilabel.LabelVessel->addItem("L. Posterior Comm. Artry\0");	
-	uilabel.LabelVessel->addItem("R. Posterior Cereb. Artry\0");	uilabel.LabelVessel->addItem("L. Posterior Cereb. Artry\0");	uilabel.LabelVessel->addItem("R. Superior Cereb. Artery\0");	uilabel.LabelVessel->addItem("L. Superior Cereb. Artery\0");	
-	uilabel.LabelVessel->addItem("R. Ant. Inf. Cereb. Artry\0");	uilabel.LabelVessel->addItem("L. Ant. Inf. Cereb. Artry\0");	uilabel.LabelVessel->addItem("Basilar Artery\0");	uilabel.LabelVessel->addItem("Vertebral Artery\0");	
-	uilabel.LabelVessel->addItem("R. Internal Audit Artery\0");	uilabel.LabelVessel->addItem("L. Internal Audit Artery\0");
-	
-	uilabel.LabelVessel->addItem("Superior Saggital Sinus\0");	uilabel.LabelVessel->addItem("Great Cerebral Vein of Galen\0");	uilabel.LabelVessel->addItem("R. Transverse Sinus\0");	uilabel.LabelVessel->addItem("L. Transverse Sinus\0");
-	uilabel.LabelVessel->addItem("R. Caudal Rhinal Vein\0");	uilabel.LabelVessel->addItem("L. Caudal Rhinal Vein\0");	uilabel.LabelVessel->addItem("R. Rostral Rhinal Vein\0");	uilabel.LabelVessel->addItem("L. Rostral Rhinal Vein\0");
-	uilabel.LabelVessel->addItem("R. Sigmoid Sinus\0");	uilabel.LabelVessel->addItem("L. Sigmoid Sinus\0");	uilabel.LabelVessel->addItem("R. Longitud. Hippo. Vein\0");	uilabel.LabelVessel->addItem("L. Longitud. Hippo. Vein\0");
-	uilabel.LabelVessel->addItem("R. Thalamostriate Vein\0");	uilabel.LabelVessel->addItem("L. Thalamostriate Vein\0");	uilabel.LabelVessel->addItem("R. Medial Colicular Vein\0");	uilabel.LabelVessel->addItem("L. Medial Colicular Vein\0");*/
-	
- 	uilabel.ConnectEdges->setEnabled ( FALSE );
+ 	uilabel.DeleteEdge->setEnabled ( FALSE );
  	uilabel.AddEdge->setEnabled ( FALSE );
+	uilabel.label->setEnabled ( FALSE );
 	uilabel.LabelVessel->setEnabled ( FALSE );
-	uilabel.SaveLabeledh5->setEnabled ( FALSE );
+	uilabel.Saveh5->setEnabled ( FALSE );
 	uilabel.Saveash5->setEnabled ( FALSE );
 	uilabel.radiusSlider->setEnabled ( FALSE );
 	uilabel.radius->setEnabled ( FALSE );
-// 	connect(uilabel.LabelVessels, SIGNAL(clicked()),
-// 			this, SLOT(enableSaveLabel()));
-	connect(uilabel.LabelVessel, SIGNAL(activated( int )),
-			this, SLOT(enableSaveLabel()));			
-/*
-	connect(uilabel.radiusSlider, SIGNAL(valueChanged(int)),
-			lastGeometry, SLOT(updateRadiusTransparency(int)));
-	connect(uilabel.LabelVessels, SIGNAL(clicked()),
-			lastGeometry, SLOT(userLable()));
-	connect(uilabel.SaveLabeledh5, SIGNAL(clicked()),
-			lastGeometry, SLOT(saveLabel()));*/
 			
 	labelLayout = new QVBoxLayout();
 	labelLayout->addWidget(labelWidget);
 	ui.Vessels->setLayout(labelLayout);		
-// 	qDebug() << "Debug. <<ResourceForm::createLabelForm()";
 	
 	connect(ui.treeView, SIGNAL(clicked(const QModelIndex&)),
 			this, SLOT(setPropertyForm(const QModelIndex&)));
@@ -110,7 +79,6 @@ ResourceForm::ResourceForm(QWidget *parentWindow, BrainQuarter *viewer) : QWidge
 			ui.treeView, SLOT(update(const QModelIndex&)));
 	
 	//sampleTreeSetup(viewer);
-// 	qDebug() << "Debug. >>ResourceForm::ResourceForm()";
 }
 
 ResourceForm::~ResourceForm() {
@@ -128,35 +96,26 @@ void ResourceForm::disableAddTag(){
 	uitag.AddTagPoint->setEnabled ( FALSE );
 }
 
-void ResourceForm::enableSaveLabel(){
-	uilabel.SaveLabeledh5->setEnabled ( TRUE );
-	uilabel.Saveash5->setEnabled ( TRUE );
-}
 
 void ResourceForm::selectedItem(const QModelIndex &index) {
-	//qDebug() << "Debug. <<ResourceForm::selectedItem()";
 	TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
         item->wasSelected();
 		//viewer->setBackgroundColor 	( QColor(170,85,255.0));
-// 		qDebug() << "Debug. >>ResourceForm::selectedItem()";
 }
 
 void ResourceForm::updatebckgrndColour(QColor &colour){
 	//this->viewer = viewer;
 	int r,g,b;
 	colour.getRgb(&r,&g,&b);
-	//std::cout <<"colors rgb are: " << r << "," << g <<","<<b << std::endl;
-		viewer->setBackgroundColor 	( QColor(r, g, b));
-}		
-void ResourceForm::geometrySelected(int childNum) {
-	//qDebug() << "Debug. <<ResourceForm::geometrySelected()";
-	lastGeometry = static_cast<GeometryScene*>(parent->child(childNum));
-// 	qDebug() << "Debug. >>ResourceForm::geometrySelected()";
+	viewer->setBackgroundColor 	( QColor(r, g, b));
 }
 
+void ResourceForm::geometrySelected(int childNum) {
+	lastGeometry = static_cast<GeometryScene*>(parent->child(childNum));
+}
+
+/** destroy the currently in use form */
 void ResourceForm::setPropertyForm(const QModelIndex & index) {
-// 	qDebug() << "Debug. <<ResourceForm::setPropertyForm()";
-	// destroy the currently in use form
 	if (haveProps) {
 		currentPropItem->destroyForm();
 	}
@@ -182,15 +141,12 @@ void ResourceForm::setPropertyForm(const QModelIndex & index) {
 		ui.propertiesBox->setLayout(propLayout);
 		haveProps = true;
 	}
-// 	qDebug() << "Debug. >>ResourceForm::setPropertyForm()";
 }
 
 
 bool ResourceForm::insertGeometry(QFile &filename) {
-	//std::cout << "Debug. >>ResourceForm::insertGeometry()" <<std::endl;
-// 	GeometryScene* lastGeometry = parent->insertGeometry(filename);
+	// 	GeometryScene* lastGeometry = parent->insertGeometry(filename);
 	parent->insertGeometry(filename);
-// 	std::cout << "Debug. >>ResourceForm::insertGeometry():lastGeometry" <<std::endl;
 	lastGeometry = static_cast<GeometryScene*>(parent->child(parent->childCount()-1));
 	
 	QFileInfo fileInfo(filename);
@@ -199,101 +155,61 @@ bool ResourceForm::insertGeometry(QFile &filename) {
     if (ext == "h5") {
 	    h5childCount.append(parent->childCount()-1);
     }
-// 		labelWidget = new QWidget;
-// 		uilabel.setupUi(labelWidget);
-// 
-// 	// 	ui.transparencySpinBox->setValue(*trans);
-// 		//emit propertyFormInstantiated(formWidget);
-// 	// 	connect(uilabel.radiusSlider, SIGNAL(/*valueChanged*/sliderMoved(double)),
-// 	// 			geometry, SLOT(updateRadiusTransparency(double)));
-// 		connect(uilabel.LabelVessels, SIGNAL(clicked()),
-// 				lastGeometry, SLOT(LabelFlagActivate()));
-// 		connect(uilabel.SaveLabeledh5, SIGNAL(clicked()),
-// 				lastGeometry, SLOT(SaveLabel()));
-// 				
-// 		labelLayout = new QVBoxLayout();
-// 		labelLayout->addWidget(labelWidget);
-// 		ui.Labels->setLayout(labelLayout);
-// 	}
+	// 		labelWidget = new QWidget;
+	// 		uilabel.setupUi(labelWidget);
+	// 
+	// 	// 	ui.transparencySpinBox->setValue(*trans);
+	// 		//emit propertyFormInstantiated(formWidget);
+	// 	// 	connect(uilabel.radiusSlider, SIGNAL(/*valueChanged*/sliderMoved(double)),
+	// 	// 			geometry, SLOT(updateRadiusTransparency(double)));
+	// 		connect(uilabel.LabelVessels, SIGNAL(clicked()),
+	// 				lastGeometry, SLOT(LabelFlagActivate()));
+	// 		connect(uilabel.Saveh5, SIGNAL(clicked()),
+	// 				lastGeometry, SLOT(SaveLabel()));
+	// 				
+	// 		labelLayout = new QVBoxLayout();
+	// 		labelLayout->addWidget(labelWidget);
+	// 		ui.Labels->setLayout(labelLayout);
+	// 	}
 
-
-// 	connect(uilabel.radiusSlider, SIGNAL(valueChanged(int)),
-// 			lastGeometry, SLOT(updateRadiusTransparency(int)));
-// 	connect(uilabel.LabelVessels, SIGNAL(clicked()),
-// 			lastGeometry, SLOT(userLable()));
-// 	connect(uilabel.LabelVessels, SIGNAL(clicked()),
-// 			this, SLOT(enableSaveLabel()));		
-// 	connect(uilabel.SaveLabeledh5, SIGNAL(clicked()),
-// 			lastGeometry, SLOT(saveLabel()));
-			
-// 	std::cout << "Debug. <<ResourceForm::insertGeometry():lastGeometry" <<std::endl;
 
 	connect(viewer, SIGNAL(pointPicked(int, int, float, float, float,SoType)),
 		lastGeometry, SLOT(pickReceived(int, int, float, float, float,SoType )));
 	connect (viewer, SIGNAL (pointNotPicked()), lastGeometry, SLOT(noPointReceived()));	
-// 	std::cout << "Debug. <<ResourceForm::insertGeometry():connect pointPicked viewer" <<std::endl;
 
 	haveGeometry = true;
-// 	std::cout << "Debug. >>ResourceForm::viewAll()" <<std::endl;
 	
   
 	viewer->viewAll();   ////it goes into QuarterWidget.cpp line 571 QuarterWidget::viewAll(void) and error on line 579 sostatemachine->processEventQueue();
-// 	std::cout << "Debug. <<ResourceForm::viewAll()" <<std::endl;
 	
 	somethingChanged();
-// 	std::cout << "Debug. <<ResourceForm::insertGeometry()" <<std::endl;
 	
 	return true;
 }	
 
-// bool ResourceForm::insertH5Geometry(QFile &filename) {
-// 	
-// 	std::cout << "Debug. >>ResourceForm::insertH5Geometry()" <<std::endl;
-// 	GeometryScene* lastGeometry = parent->insertGeometry(filename);
-// 	std::cout << "Debug. >>ResourceForm::insertGeometry():lastGeometry" <<std::endl;
-// 	//lastGeometry = static_cast<GeometryScene*>(parent->child(parent->childCount()-1));
-// 	std::cout << "Debug. <<ResourceForm::insertGeometry():lastGeometry" <<std::endl;
-// 
-// 	connect(viewer, SIGNAL(pointPicked(int, int, int, int, int)),
-// 		lastGeometry, SLOT(pickReceived(int, int, int, int, int)));
-// 	std::cout << "Debug. <<ResourceForm::insertGeometry():connect pointPicked viewer" <<std::endl;
-// 
-// 	haveGeometry = true;
-// 	std::cout << "Debug. >>ResourceForm::viewAll()" <<std::endl;
-// 	
-//   
-// 	viewer->viewAll();   ////it goes into QuarterWidget.cpp line 571 QuarterWidget::viewAll(void) and error on line 579 sostatemachine->processEventQueue();
-// 	std::cout << "Debug. <<ResourceForm::viewAll()" <<std::endl;
-// 	
-// 	somethingChanged();
-// 	std::cout << "Debug. <<ResourceForm::insertH5Geometry()" <<std::endl;
-// 	
-// 	return true;
-// }
+
 
 
 bool ResourceForm::insertTagfile(QFile &filename) {
-// 	qDebug() << "Debug. <<ResourceForm::insertTagfile()";
 	uitag.TagSize->setEnabled ( TRUE );
-    parent->insertTags(filename);
-// 	qDebug() << "Debug. >>ResourceForm::insertTagfile()";
+	uitag.TagColour->setEnabled (TRUE);
+	parent->insertTags(filename);
 
 	return true;
 }
 
 float * ResourceForm::addTagpoint(){
-// 	qDebug() << "Debug. <<ResourceForm::addTagpoint()";
 	uitag.TagSize->setEnabled ( TRUE );
+	uitag.TagColour->setEnabled ( TRUE );
 	float *tagpoint= (float*) malloc(sizeof(float) * 3);
 	tagpoint[0]= viewer->pickedtag[0];
 	tagpoint[1]= viewer->pickedtag[1];
 	tagpoint[2]= viewer->pickedtag[2];
  	//std::cout << "\nResourceForm::addTagpoint() Created tag point is : " << tagpoint[0] <<" , " <<tagpoint[1] << " , " << tagpoint[2] <<std::endl;
 	parent->createTag(tagpoint);
-// 	free(tagpoint);
+	// 	free(tagpoint);
    //parent->insertTags(filename);
 	
-// 	qDebug() << "Debug. >>ResourceForm::addTagpoint()";
 	return tagpoint;
 }
 
@@ -301,12 +217,10 @@ double ResourceForm::returnTagsize(){
 	double tagsize= parent->currentTagSize;
    //parent->insertTags(filename);
 	
-// 	qDebug() << "Debug. >>ResourceForm::addTagpoint()";
 	return tagsize;
 }
 
 bool ResourceForm::insertVertstats(QFile &filename) {
-// 	qDebug() << "Debug. <<ResourceForm::insertVertstats()";
 	if( !filename.exists() )
 	{
 		qDebug() << "The file" << filename.fileName() << "does not exist.";
@@ -315,7 +229,6 @@ bool ResourceForm::insertVertstats(QFile &filename) {
 	if ( haveGeometry ) {
 		lastGeometry->loadVertstats(filename);
 		somethingChanged();
-// 		qDebug() << "Debug. >>ResourceForm::insertVertstats()";
 		return true;
 	}
 	else {
@@ -324,16 +237,15 @@ bool ResourceForm::insertVertstats(QFile &filename) {
 }
 
 bool ResourceForm::insertLabelLUfile(QFile &filename) {
-	//qDebug() << "Debug. <<ResourceForm::insertLabelLUfile()";
 	if (!filename.open(QIODevice::ReadOnly | QIODevice::Text)){
 		qDebug() << "The file " << filename.fileName() << " can't be opened in readonly mode";
 		return false;
 	}
 	
 	//empty the current uilable
-// 	for (int i=0; i<uilabel.LabelVessel->count(); i++){
-// 		uilabel.LabelVessel->removeItem(i);
-// 	}
+	/* 	for (int i=0; i<uilabel.LabelVessel->count(); i++){
+			uilabel.LabelVessel->removeItem(i);
+		}*/
 	uilabel.LabelVessel->clear();
 	labelnums.clear();
 	labelnames.clear();
@@ -342,15 +254,15 @@ bool ResourceForm::insertLabelLUfile(QFile &filename) {
 	labelblue.clear();
 	
 	
-// 	if( !filename.exists() )
-// 	{
-// 		qDebug() << "The file " << filename.fileName() << "does not exist.";
-// 		return false;
-// 	}
+	/*if( !filename.exists() )
+	{
+		qDebug() << "The file " << filename.fileName() << "does not exist.";
+		return false;
+	}*/
 	while (!filename.atEnd()) {
 		QString line = filename.readLine();
 		if (line.at(0)!= QChar('#')){
-// 			qDebug() << line;
+			//qDebug() << line;
 			QStringList list = line.split(";");
 			
 			if (list.size()>4){
@@ -365,13 +277,13 @@ bool ResourceForm::insertLabelLUfile(QFile &filename) {
 	}
 	//qDebug() << labelnums;
 	//qDebug() << labelnames;
-// 	qDebug() << labelblue;
+	//qDebug() << labelblue;
 
 	filename.close();
 	//cout << "\n\n\n"<< labelnames.size() << "\n\n\n";
 
 	for (int i=0; i<labelnames.size(); i++){
-// 		qDebug() << labelnames.at(i);
+		//qDebug() << labelnames.at(i);
 		uilabel.LabelVessel->addItem(labelnames.at(i));
 	}
 	
@@ -383,28 +295,24 @@ bool ResourceForm::insertLabelLUfile(QFile &filename) {
 		}
 	}
 	
-// 	labelnums.clear();
-// 	labelnames.clear();
-// 	labelred.clear();
-// 	labelgreen.clear();
-// 	labelblue.clear();
+	// 	labelnums.clear();
+	// 	labelnames.clear();
+	// 	labelred.clear();
+	// 	labelgreen.clear();
+	// 	labelblue.clear();
 
  	return true;
 
 }
 
 void ResourceForm::somethingChanged() {
-// 	std::cout << "Debug. >>ResourceForm::somethingChanged()" <<std::endl;
 	model->somethingChanged();
 	for (int column = 0; column < model->columnCount(); ++column)
         ui.treeView->resizeColumnToContents(column);
-// 	std::cout << "Debug. >>ResourceForm::somethingChanged()" <<std::endl;
-        
+       
 }
 
 void ResourceForm::sampleTreeSetup(BrainQuarter *viewer) {
-	//qDebug() << "Debug. <<ResourceForm::sampleTreeSetup()";
-
 	//parent->insertCone();
 	QFile f1("/tmp/mni_icbm_00101_gray_surface_left_81920.obj");
 	QFile f2("/tmp/mni_icbm_00101_white_surface_right_81920.obj");
@@ -424,5 +332,4 @@ void ResourceForm::sampleTreeSetup(BrainQuarter *viewer) {
 
 	
 	//viewer->viewAll();
-	//qDebug() << "Debug. >>ResourceForm::sampleTreeSetup()";
 }

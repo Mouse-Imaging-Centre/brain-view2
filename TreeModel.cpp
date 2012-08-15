@@ -219,7 +219,6 @@ int TreeModel::rowCount(const QModelIndex &parent) const
 bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
                         int role)
 {
-	//qDebug() << "Debug. >>TreeModel::setData()";
     if (role != Qt::EditRole)
         return false;
 
@@ -232,15 +231,12 @@ bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
 	//reset();
 	//std::cout << "hello?" << std::endl;
 
-	//qDebug() << "Debug. <<TreeModel::setData()";
 	return rv;
 }
 
 void TreeModel::somethingChanged() {
-// 	qDebug() << "Debug. >>TreeModel::somethingChanged()";
 	emit layoutChanged();
 	qDebug() << "Debug. [ somethingChanged() ]  GRUNKLE";
-// 	qDebug() << "Debug. <<TreeModel::somethingChanged()";
 }
 
 bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
@@ -281,7 +277,6 @@ void TreeModel::setupModelData(const QStringList &lines, TreeItem *parent)
             if (position > indentations.last()) {
                 // The last child of the current parent is now the new parent
                 // unless the current parent has no children.
-
                 if (parents.last()->childCount() > 0) {
                     parents << parents.last()->child(parents.last()->childCount()-1);
                     indentations << position;

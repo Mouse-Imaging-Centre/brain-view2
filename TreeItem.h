@@ -44,9 +44,6 @@
 #ifndef TREEITEM_H
 #define TREEITEM_H
 
-//#include <QList>
-//#include <QVariant>
-//#include <QVector>
 #include <QtGui>
 
 #include "BrainQuarter.h"
@@ -72,8 +69,6 @@ public:
     bool removeColumns(int position, int columns);
     int childNumber() const;
     bool setData(int column, const QVariant &value);
-//     GeometryScene * insertGeometry(QFile &file, bool cylinder_flag=false,char* dbfile=NULL);
-//     GeometryScene * insertGeometry(QFile &file);
     bool insertGeometry(QFile &file);
 	bool insertTags(QFile &file);
 	bool createTag(float *tagpoint);
@@ -81,22 +76,22 @@ public:
     bool insertCone();
     void setViewer(BrainQuarter *quarterViewer); 
 	double currentTagSize;
+	float currTagR;float currTagG;float currTagB;
     virtual QWidget* createForm();
     virtual void destroyForm();
     virtual bool havePropForm() { return haveProps; };
 
     // this method is called every time the user selectes the particular item in the GUI.
     // subclasses can reimplement to do something useful here
-    virtual void wasSelected() { std::cout << "Eeeek " << parent()->childNumber() << std::endl; };
+    virtual void wasSelected() { /*std::cout << "Eeeek " << parent()->childNumber() << std::endl;*/ };
 
     signals:
         void propertyFormInstantiated(QWidget *widget);
         void setPickedItem(int);
         void setPickedPoint(int);
-// 		void valueChanged(int);
         void localPointPicked(int);
 public slots:
-        // only used by geometryScene, but QT appears to need it in the superclass too for some oddreason
+        // only used by geometryScene, but QT appears to need it in the superclass too for some odd reason
         virtual void pickReceived(int index, int id, float x, float y, float z, SoType objtype) { /* nothing */ };
 		virtual void noPointReceived() { /* nothing */ };
         virtual void pickedPointReceived(int) { /* do nothing */ };
@@ -105,9 +100,10 @@ public slots:
 		virtual void saveasLabel() { /* do nothing */ };
 		virtual void createNewEdge() { /* do nothing */ };
 		virtual void addNewEdge() { /* do nothing */ };
+		virtual void deleteThisEdge(){ /* do nothing */};
 		virtual void updateRadiusTransparency(int newVal){/* do nothing */};
-		//virtual void bckgrncolourDialog(){/* do nothing */};
 		void updateTagSize(double newsize);
+		void TagcolourDialog();
         // ditto
         //virtual void localPointPicked(int index);
 

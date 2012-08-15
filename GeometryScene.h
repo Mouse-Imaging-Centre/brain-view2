@@ -6,18 +6,17 @@
 #include "textureFileItem.h"
 #include "Inventor/nodes/SoSeparator.h"
 //#include <bicpl.h>
-#include <stdio.h>    //FILE, fopen(), fclose()
+#include <stdio.h>    
 #include <stdlib.h>
-#include <sys/stat.h> //stat, stat()
-#include <string>     //string
-#include <fstream>    //fstream 
-#include <iostream>   //cout
-// #include "hdf5.h"		//C API
-#include "H5Cpp.h"		//C++ API
+#include <sys/stat.h> 
+#include <string>     
+#include <fstream>    
+#include <iostream>   
+// #include "hdf5.h"		/* C API */
+#include "H5Cpp.h"		/* C++ API */
 #include "H5File.h"
 #include <QVector>
-// #include <QFile>
-// #include <QTextStream>
+
 
 #include "ui_labelProps.h"
 #include <QtGui>
@@ -37,7 +36,7 @@ public:
 	bool loadVertstats(QFile &file);
 	bool updateLabelLUColor();
 	int whichEdgeIndx (int edge_ind1,int edge_ind2,int x, int y,int z);
-//  	bool loadLabelLU(QFile &file);
+
 	void wasSelected();
 	QString h5_filename;
 	QString label_num2Name (int label);
@@ -53,11 +52,7 @@ public:
       size_t len; /* Length of VL data (in base type units) */      
       int *p;    /* Pointer to VL data */        
 	} hvl_ti;
-	
-// 	typedef struct  {
-//       size_t len; /* Length of VL data (in base type units) */      
-//       QVector <SoMaterial *> p;    /* Pointer to VL data */        
-// 	} hvl_tSoMat;
+
 
 	struct h5_output_type {
 		int num_edge;
@@ -67,10 +62,9 @@ public:
 		hvl_t *radius;
 		hvl_t *heights;
 		int *label;
-		//int *id;
 		int *edges;
 		float *vertices;
-// 		h5_output_type() : height({0.0}) {}		//initializing height to default value*/
+		//h5_output_type() : height({0.0}) {}		/*initializing height to default value */
 	};
 	
 	//struct h5_output_type * H5_reader (char* dbfile);
@@ -79,11 +73,7 @@ public:
 	int num_edge_total;
 	
 	
-// 	struct load_Cylinder_output_type {
-// 		int nodeid;
-// 		SoMaterial *nodematerial;
-// // 		load_Cylinder_output_type : nodematerial(new SoMaterial) {}
-// 	};
+
 //signals:
         // signal emitted if the picked point in the scene belongs to this scenegraph
         //void localPointPicked(int index);
@@ -95,41 +85,44 @@ public slots:
 		void saveasLabel();
 		void createNewEdge();
 		void addNewEdge();
+		void deleteThisEdge();
 		void getUserLabel();
 		void updateRadiusTransparency(int newVal);
 		
-// 		 // called when an object (not necessarily in this geometryScene) was picked to be labeled
-//         void assignLabel(int index, int id, int x, int y, int z);
-signals:
-         void pointPickedColor(int indx1, int indx2, float r, float g, float b);
+// signals:
+//          //void pointPickedColor(int indx1, int indx2, float r, float g, float b);
+// 	    void createEdgeSignal();
 private:
 	
-	void radiusCalc(hvl_t *cylradiusVect);
+	void radiusCalc(QVector <QVector <float> > cylradiusVect);
 	ResourceForm *rf;
-	// the root separator from the viewer
+	/* the root separator from the viewer */
 	SoSeparator *root;
-	// the separator which will hold all the geometry bits
+	/* the separator which will hold all the geometry bits */
 	SoSeparator *scene;
-	// the actual geometry bits
+	/* the actual geometry bits */
 	GeometryNode *geometry;
 	
 	QVector<QVariant> data;
 
-	hvl_ti * nodeIDs;
+	QVector< QVector <int> > nodeIDs;
+	QVector< QVector <int> > childIDs;
 	int nodeId;
-	SoMaterial *nodematerial;
-	/*hvl_tSoMat *cylmatVect;*/ 	
+	int e_num;
 	QVector <QVector <SoMaterial *> > cylmatVect;
-	hvl_t *cylradiusVect;  	//QVector <float> cylradiusVect;
+	QVector <QVector <float> > cylradiusVect;	//hvl_t *cylradiusVect;  	
+	
 	QVector <int> labelVect;
 	QVector <int> edgesVect;
 	QVector <int> new_edgesVect;
 	QVector <float> new_radius;
 	QVector <float> new_heights;
-	QVector <float> new_tangx; QVector <float> new_tangy; QVector <float> new_tangz;
 	QVector <float> new_cntrx; QVector <float> new_cntry; QVector <float> new_cntrz;
+	QVector <float> new_tangx; QVector <float> new_tangy; QVector <float> new_tangz;
 	QVector <float> vertices_centreVect;
 	
+	QVector <int> del_edgesVect;
+
 	QVector <int> connectingVect;
 	bool flag_new_edge;
 	int num_clicked;
@@ -142,9 +135,12 @@ private:
 	QWidget *labelWidget;
 	QVBoxLayout *labelLayout;
 
-	//QVector <int> segmentIDVect;
 	QVector <int> cylnum_transparency0_5;
 
+	QVector <SoMaterial *> tmp_cylmatVect;
+	QVector <float> tmp_cylradiusVect;
+	QVector <int> tmp_nodeid;
+	QVector <int> tmp_childid;
 
 
 };

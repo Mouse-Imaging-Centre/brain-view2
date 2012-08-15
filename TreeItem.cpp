@@ -2,10 +2,10 @@
 ** Part of this file was copied from the Qt4 examples, and so is still ...
 ** Copyright (C) 2005-2008 Trolltech ASA. All rights reserved.
 **
-
-    treeitem.cpp
-    A container for items of data supplied by the simple tree model.
-*/
+**
+**    treeitem.cpp
+**    A container for items of data supplied by the simple tree model.
+**/
 
 #include <QStringList>
 
@@ -24,8 +24,8 @@ TreeItem::TreeItem(const QVector<QVariant> &data,
     itemData = data;
     haveProps = false;
     formInstantiated = false;
-	currentTagSize=0.05; 	//initialize tag size to defult of SpinBox in Widget
-
+	currentTagSize=0.1; 	//initialize tag size to defult of SpinBox in Widget
+	currTagR= 0.0 ; currTagG= 255.0; currTagB= 255.0;
 }
 //! [0]
 
@@ -154,40 +154,24 @@ bool TreeItem::setData(int column, const QVariant &value)
 //! [11]
 
 
-/*GeometryScene * TreeItem::insertGeometry(QFile &file, bool cylinder_flag,char* dbfile) {*/
-// GeometryScene * TreeItem::insertGeometry(QFile &file) {
 bool TreeItem::insertGeometry(QFile &file) {
-	//qDebug() << "Debug. >>TreeItem::insertGeometry()";
 	QVector<QVariant> data(columnCount());
 	GeometryScene *item = new GeometryScene(data, form, this);
 	item->setViewer(viewer);
 	childItems.insert(childCount(), item);
-//     item->loadGeometry(file, data, form, this,cylinder_flag,dbfile);
     item->loadGeometry(file, data, form, this);
 
-	//qDebug() << "Debug. >>TreeItem::insertGeometry()";
-//     return item;
 	return true;
 }
 
-// GeometryScene * TreeItem::insertGeometry(QFile &file) {
-// 	QVector<QVariant> data(columnCount());
-// 	GeometryScene *item = new GeometryScene(data, form, this);
-// 	item->setViewer(viewer);
-// 	childItems.insert(childCount(), item);
-// 	QFile nullfile;
-//     item->loadGeometry(file, data, form, this,false,nullfile);
-// 
-//     return item;
-// 
-// }
+
 
 bool TreeItem::insertTags(QFile &file) {
     QVector<QVariant> data(columnCount());
     tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
                                         data, form, this);
     childItems.insert(childCount(), item);
-    item->loadFile(file);
+    item->loadFile(file,currentTagSize,currTagR,currTagG,currTagB);
 }
 
 bool TreeItem::createTag(float *tagpoint){
@@ -195,20 +179,30 @@ bool TreeItem::createTag(float *tagpoint){
     tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
                                         data, form, this);
     childItems.insert(childCount(), item);
-	//std::cout<<"current tag size : " << currentTagSize << std::endl;
-	item->showTag(tagpoint,currentTagSize);	
+	item->showTag(tagpoint,currentTagSize,currTagR,currTagG,currTagB);	
 }
 
 void TreeItem::updateTagSize(double newsize){
-//	qDebug() << "Debug. >>TreeItem::updateTagSize()";
 	QVector<QVariant> data(columnCount());
     tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
                                         data, form, this);
-//	std::cout << "viewer root number of children: " << 	viewer->getRootSeparator()->getNumChildren() << std::endl;								
-//     childItems.insert(childCount(), item);
-// 	item->updateSize(newsize,currentTagSize);
 	currentTagSize= newsize;		//update the tagsize for next tags
-//	qDebug() << "Debug. <<TreeItem::updateTagSize()";
+}
+
+void TreeItem::TagcolourDialog(){
+	qDebug() << "Debug. >>TreeItem::TagcolourDialog()";
+	QColor tagcolour = QColorDialog::getColor();
+	if (tagcolour.isValid()) {
+		form->uitag.TagColour->setText(tagcolour.name());
+		form->uitag.TagColour->setPalette(QPalette(tagcolour));
+		form->uitag.TagColour->setAutoFillBackground(true);
+		int tr,tg,tb;
+		tagcolour.getRgb(&tr,&tg,&tb);
+		currTagR = float(tr); currTagG = float(tg); currTagB = float(tb); 
+
+	}	
+	qDebug() << "Debug. <<TreeItem::TagcolourDialog()";
+	
 }
 
 bool TreeItem::insertCone() {
@@ -224,7 +218,6 @@ bool TreeItem::insertCone() {
 }
 
 QWidget* TreeItem::createForm() {
-	//qDebug() << "Debug. >>TreeItem::createForm()";
 
 }
 

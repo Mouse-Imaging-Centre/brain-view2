@@ -10,15 +10,13 @@
 #include <Inventor/nodes/SoCube.h>
 #include "Inventor/nodes/SoMaterial.h"
 #include "Inventor/nodes/SoMaterialBinding.h"
-// #include <Inventor/nodes/SoScale.h>
 
 class tagPointItem : public TreeItem {
 public:
     tagPointItem(SoSeparator *root, const QVector<QVariant> &data,
-                 ResourceForm *rf, TreeItem *parent = 0,int r=0, int g=255, int b=255,double tagsize =0.1);
+                 ResourceForm *rf, TreeItem *parent = 0,double tagsize =0.1,float r=0.0, float g=255.0, float b=255.0);
     virtual ~tagPointItem();
     void setLocation(double x, double y, double z);
-// 	void updateCubeSize(double newsize,double tagsize);
 private:
     // the separator onto which the various sphere seps will be attached
     SoSeparator *root;
@@ -30,11 +28,7 @@ private:
     // holds the spheres location
     SoTranslation *translation;
 	SoMaterial *tagmaterial;
-//     SoMaterialBinding *tagmaterialBinding;
 	double tagsize;
 	
-// 	SoScale *scale;
-// 	QVector <SoCube *> tagcubeVect;
-// 	QVector <int> nodeIdVect;
 };
-#endif // TAGPOINTITEM_H
+#endif /* TAGPOINTITEM_H */

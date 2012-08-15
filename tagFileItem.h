@@ -15,10 +15,8 @@ class tagFileItem : public TreeItem {
 public:
     tagFileItem(SoSeparator *root, const QVector<QVariant> &data,
                 ResourceForm *rf, TreeItem *parent = 0);
-    bool loadFile(QFile &file);
-	bool showTag(float *tagpoint, double tagsize);
-// 	void updateSize(double newsize, double tagsize);
-// 	double inittagsize;  
+    bool loadFile(QFile &file, double tagsize= 0.1, float r= 0.0, float g= 255.0, float b= 255.0);
+	bool showTag(float *tagpoint, double tagsize= 0.2, float r= 0.0, float g= 0.0, float b= 255.0);
 	virtual ~tagFileItem();
 private:
     // function to create a sphere for every tag item
@@ -42,4 +40,4 @@ private:
 	
 };
 
-#endif // TAGFILEITEM_H
+#endif /* TAGFILEITEM_H*/

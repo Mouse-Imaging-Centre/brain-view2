@@ -13,8 +13,7 @@
 #include <iostream>   //cout
 
 MainWindow::MainWindow() {
-// 	qDebug() << "Debug. >>MainWindow::MainWindow()";
-
+	
 	// stuff for QSettings
 	QCoreApplication::setOrganizationName("MINC");
 	QCoreApplication::setApplicationName("brain-view");
@@ -28,7 +27,7 @@ MainWindow::MainWindow() {
 	createActions();
 	createMenus();
 	initColourbars();
-// 	createTagbuttons();
+	//createTagbuttons();
 
 	viewer = new BrainQuarter();
 	//colourBar = new ColourBarForm(this);
@@ -41,20 +40,18 @@ MainWindow::MainWindow() {
 	addDockWidget(Qt::RightDockWidgetArea, resourceDock);
 	resourceDock->setWidget(resourceForm);
 	
-// 	tagForm = new TagForm(this, viewer);
-// 	tagDock = new QDockWidget(tr("Tags"), this);
-// 	addDockWidget(Qt::BottomDockWidgetArea, tagDock);
-// 	tagDock->setWidget(tagForm);
-// 	resourceDock->addWidget(tagForm);
+	// 	tagForm = new TagForm(this, viewer);
+	// 	tagDock = new QDockWidget(tr("Tags"), this);
+	// 	addDockWidget(Qt::BottomDockWidgetArea, tagDock);
+	// 	tagDock->setWidget(tagForm);
+	// 	resourceDock->addWidget(tagForm);
 	
 	
 	setCentralWidget(viewer);
-// 	qDebug() << "Debug. <<MainWindow::MainWindow()";
 }
 
 
 void MainWindow::initColourbars() {
-// 	qDebug() << "Debug. >>MainWindow::initColourbars()";
 
     // get the path from the settings
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
@@ -90,7 +87,6 @@ void MainWindow::initColourbars() {
         }
 	}
 
-// 	qDebug() << "Debug. <<MainWindow::initColourbars()";
 }
 
 
@@ -99,7 +95,6 @@ MainWindow::~MainWindow() {
 
 
 bool MainWindow::openFile(QFile &filename) {
-// 	qDebug() << "Debug. >>MainWindow::openFile()";
 
     QFileInfo fileInfo(filename);	
     QString ext = fileInfo.suffix();
@@ -119,24 +114,20 @@ bool MainWindow::openFile(QFile &filename) {
     }
 
 	Q_ASSERT_X( status == true, "MainWindow::openFile", "Failed insert into Resource form" );
-// 	qDebug() << "Debug. <<MainWindow::openFile()";
 	return true;
 }
 
 void MainWindow::openFileFromDialog() {
-// 	qDebug() << "Debug. >>MainWindow::openFileFromDialog()";
 	QString name = QFileDialog::getOpenFileName(this,
                 tr("Open File"), QString(), tr("Files (*.obj *.txt *.vertstats *.tag *.h5 *.config)"));
 	if (! name.isNull()) {
 		QFile filename(name);
 		openFile(filename);
 	}
-// 	qDebug() << "Debug. <<MainWindow::openFileFromDialog()";
 }
 
 
 void MainWindow::createActions() {
-// 	qDebug() << "Debug. >>MainWindow::createActions()";
 
 	openAction = new QAction(tr("&Open File"), this);
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFileFromDialog()));
@@ -147,38 +138,33 @@ void MainWindow::createActions() {
 	quitAction = new QAction(tr("&Quit"), this);
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(quitApplication()));
 
-// 	qDebug() << "Debug. <<MainWindow::createActions()";
 }
 
 
 void MainWindow::createMenus() {
-// 	qDebug() << "Debug. >>MainWindow::createMenus()";
 
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(openAction);
 	fileMenu->addAction(saveTagAction);
 	fileMenu->addAction(quitAction);
 
-// 	qDebug() << "Debug. <<MainWindow::createMenus()";
 }
 
 
 
 void MainWindow::createTagFunc(){
-// 	qDebug() << "Debug. >>MainWindow::createTagFunc()";
 	Tagpoint = (float*) malloc(sizeof(float) * 3);
 	Tagpoint = resourceForm->addTagpoint();
-// 	std::cout << "\nMainWindow::createTagFunc(): 0. Created tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
+	//std::cout << "\nMainWindow::createTagFunc(): 0. Created tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 	Tagsize = resourceForm->returnTagsize();
-// 	std::cout << "\nMainWindow::createTagFunc(): 1. Created tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
+	//std::cout << "\nMainWindow::createTagFunc(): 1. Created tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 
 }
 
 void MainWindow::addTagFunc(){
-// 	qDebug() << "Debug. >>MainWindow::addTagFunc()";
-// 	Tagpoint = (float*) malloc(sizeof(float) * 3);
-// 	Tagpoint = resourceForm->addTagpoint();
-	std::cout << "\nAdded tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
+	// 	Tagpoint = (float*) malloc(sizeof(float) * 3);
+	// 	Tagpoint = resourceForm->addTagpoint();
+	std::cout << "Added tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 		
 	//remove any duplication of tag points:
 	bool tagfound=false;
@@ -195,13 +181,11 @@ void MainWindow::addTagFunc(){
 		tagsVect.append(Tagsize);	//Tagsize
 	}
 	
-// 	qDebug() << "Debug. <<MainWindow::addTagFunc()";
 }
 
 
 
 void MainWindow::saveTagFromDialog() {
-// 	qDebug() << "Debug. >>MainWindow::saveTagFromDialog()";
 	QString sname = QFileDialog::getSaveFileName(this,
                 tr("Save Tags to File"), QString(), tr("Files (*.tag)"));
 	if (! sname.isNull()) {
@@ -210,14 +194,11 @@ void MainWindow::saveTagFromDialog() {
 		saveTagFileFunc(sfilename);
 
 	}
-	
-
-// 	qDebug() << "Debug. <<MainWindow::saveTagFromDialog()";
 }
 
+/** create an empty file filename and save all the created tags in the file in format of .tag **/
 void MainWindow::saveTagFileFunc(QFile &filename){
-	//create an empty file filename and save all the created tags in the file in format of .tag for follow_tree.py
-// 	filename.open(IO_WriteOnly, stderr );
+	// 	filename.open(IO_WriteOnly, stderr );
 
 	FILE *pFile;
 	pFile = fopen (filename.fileName().toLatin1().data(), "w");

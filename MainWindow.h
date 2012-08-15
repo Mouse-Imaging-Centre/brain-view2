@@ -1,76 +1,57 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
-/* MainWindow
- * code for the main window and docking widgets.
- */
+/** MainWindow
+ ** code for the main window and docking widgets.
+ **/
 
 #include <QtGui>
 
 #include <Quarter/QuarterWidget.h>
 
-//#include "ColourBarForm.h"
 #include "BrainQuarter.h"
 #include "ResourceForm.h"
-// #include "TagForm.h"
 
 using namespace SIM::Coin3D::Quarter;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 public:
-	// constructor
+	/* constructor */
 	MainWindow();
-	// destructor
+	/* destructor */
 	virtual ~MainWindow();
 
-	// opens file based on extension
-// 	QFile nullfile(".db");
-// 	bool openFile(QFile &filename, bool cylinder_flag=false, char* dbfile=NULL);
+	/* opens file based on extension */
 	bool openFile(QFile &filename);
 	void saveTagFileFunc(QFile &filename);
 	
 public slots:
-	// prompts user for filename from file dialog
-        void openFileFromDialog();
-        // exits the application
-        void quitApplication();
-// 		void getTagFilename();
-		void saveTagFromDialog();
-		void createTagFunc();
-		void addTagFunc();
+	/* prompts user for filename from file dialog */
+	void openFileFromDialog();
+	/* exits the application */
+	void quitApplication();
+	void saveTagFromDialog();
+	void createTagFunc();
+	void addTagFunc();
 private:
-	// set up the actions (file open, etc.)
+	/* set up the actions (file open, etc.) */
 	void createActions();
-	// set up the menu
+	/* set up the menu */
 	void createMenus();
-        // create the colourbars if they don't already exist
-        void initColourbars();
-/*	//creat buttons to create a new tag point or save tags in a file	
-	void createTagbuttons();*/
-	
+	/* create the colourbars if they don't already exist */
+	void initColourbars();
+
 	QMenu *fileMenu;
-        QAction *openAction;
-		QAction *saveTagAction;
-        QAction *quitAction;
+	QAction *openAction;
+	QAction *saveTagAction;
+	QAction *quitAction;
 		
-// 	QPushButton *createTagbutton;
-// 	QPushButton *saveTagFilebutton;
-	
-	// holds the main viewer application
+	/* holds the main viewer application */
 	BrainQuarter *viewer;
-	// holds the widget to display the colour bar
-	//ColourBarForm *colourBar;
-	// dock for the colour bar widget
-	//QDockWidget *colourBarDock;
-	// tree to keep track of open resources
-	//QTreeView *treeview;
 	ResourceForm *resourceForm;
-// 	TagForm *tagForm;
-	// dock to hold the tree view
+	/* dock to hold the tree view */
 	QDockWidget *resourceDock;
-// 	QDockWidget *tagDock;
-	//void sampleTreeSetup();
 	QVector <float> tagsVect;
 	float *Tagpoint;
 	double Tagsize;

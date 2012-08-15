@@ -7,4 +7,5 @@ MainWindow::createTagFunc(), MainWindow::addTagFunc(), MainWindow::saveTagFileFu
 ResourceForm has been modified and Background Color is added to Properties widget, a widget for tagging is added and a widget for labelling hdf5 is added. GeometryScene and GeometryNode files have been modified for labelling hdf5 cylindrical obejcts and saving the labels. 
 
 The option to connect 2 edges in the cylinder object has been added. 
+The option to delete an edge in the cylinder object has been added.
 Also the option to "save" the file (over-write) or "save as" a new file has been added.

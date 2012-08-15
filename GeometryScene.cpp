@@ -25,7 +25,7 @@
 
 // using namespace H5;
 
-// forward declaration
+/** forward declaration **/
 SoSeparator* bic_graphics_file_to_iv( const char* filename );
 
 
@@ -33,11 +33,10 @@ GeometryScene::GeometryScene(const QVector<QVariant> &data,
 		ResourceForm *rf, TreeItem *parent)
 	: TreeItem(data, rf, parent){
 
-	//qDebug() << "Debug. >>GeometryScene::GeometryScene()";
 	setData(0, "Geometry Scene");
 
 	scene = new SoSeparator();
-				// light
+	// light
  	//scene->addChild(new SoDirectionalLight);
 	
 	geometry = new GeometryNode(scene, data, rf, this);
@@ -45,15 +44,90 @@ GeometryScene::GeometryScene(const QVector<QVariant> &data,
 	this->rf = rf;
 	this->data = data;
 	flag_new_edge = FALSE;
-	//qDebug() << "Debug. <<GeometryScene::GeometryScene()";
+	num_clicked = 0;
+	connectingVect.resize(0);
 }
 
+/** delete the edge from the lists and the viewer **/
+void GeometryScene::deleteThisEdge(){
+	qDebug() << "NodeId " << nodeId <<"="<< nodeIDs[e_num][0]<< " Vessel segment number " << e_num << " is edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") with label # " << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num])<< " will be deleted!";                              
 
+		/*for (int i=0; i<num_edge_total; i++){
+			std::cout <<"\n"<< i <<  ": " << std::flush;
+			for (int j=0; j<childIDs[i].size(); j++){
+				std::cout<< j << "("<< childIDs[i][j] << ")" << nodeIDs[i][j] <<"="<< root->getChild(childIDs[i][j])->getNodeId() << "  " << std::flush;
+			}
+		}*/
+		
+		
+	rf->uilabel.DeleteEdge->setEnabled ( FALSE );
+	rf->uilabel.label->setEnabled ( FALSE );
+	rf->uilabel.LabelVessel->setEnabled ( FALSE );
+	//r u sure u want to delete this edge?
+	QString response = QString("Are you sure you want to delete selected vessel segment?");
+	int answer = QMessageBox::question(0, "Delete vessel?", response, QMessageBox::Yes | QMessageBox::No);
+	if (answer == QMessageBox::Yes){
+		//delete edge
+		//std::cout << "root children : " << root->getNumChildren() << std::endl;
+		int childid = childIDs[e_num][0];
+		for (int i=0; i<childIDs[e_num].size(); i++){
+			root->removeChild(childid);
+		}
+	for (int i=e_num+1; i<nodeIDs.size(); i++){
+		for (int j=0; j< nodeIDs[i].size(); j++){
+			childIDs[i][j]-=childIDs[e_num].size();
+		}
+	}
+	
+	/*nodeIDs.remove(e_num);	
+	childIDs.remove(e_num);
+	labelVect.remove(e_num);
+	edgesVect.remove(2*e_num+1);
+	edgesVect.remove(2*e_num);
+	cylmatVect.remove(e_num);
+	cylradiusVect.remove(e_num);
+	for (int i=0; i<cylnum_transparency0_5.size(); i++){
+		if (cylnum_transparency0_5[i] == e_num){
+			cylnum_transparency0_5.remove(i);
+		}
+		if (cylnum_transparency0_5[i] > e_num){
+			cylnum_transparency0_5[i]--;
+		}
+	}*/
+
+
+	/* SoChildList * childrenlist = root->getChildren();
+		for (int i=0; i<root->getNumChildren(); i++){
+			if (childrenlist[i]->getNodeId() == nodeId){
+				std::cout << "found child : " << root->findChild(childrenlist[i]) << std::endl;
+			}
+		}*/
+		
+		//geometry->updateCylTransparency(cylmatVect[e_num].size(), cylmatVect[e_num], .8);
+		//std::cout << "root children : " << root->getNumChildren() << std::endl;
+		//rf->somethingChanged();
+	
+	num_edge_total--;
+	del_edgesVect.append(e_num);
+	}
+
+	/*for (int i=0; i<num_edge_total; i++){
+		std::cout <<"\n"<< i <<  ": " << std::flush;
+		for (int j=0; j<childIDs[i].size(); j++){
+			std::cout<< j << "("<< childIDs[i][j] << ")" << nodeIDs[i][j] <<"="<< root->getChild(childIDs[i][j])->getNodeId() << "  " << std::flush;
+		}
+	}*/
+	
+}
+
+/** start making the new edge by preparing the vector and wait for 2 edges to be clicked on **/
 void GeometryScene::createNewEdge(){
-	//qDebug() << "\nGeometryScene::createEdge() " ;
-	rf->uilabel.SaveLabeledh5->setEnabled ( FALSE );
+	rf->uilabel.Saveh5->setEnabled ( FALSE );
 	rf->uilabel.Saveash5->setEnabled ( FALSE );
+	rf->uilabel.DeleteEdge->setEnabled ( FALSE );
 	rf->uilabel.AddEdge->setEnabled ( FALSE );
+	rf->uilabel.label->setEnabled ( FALSE );
+	rf->uilabel.LabelVessel->setEnabled ( FALSE );
 	flag_new_edge = TRUE;
 	num_clicked = 0;
 	connectingVect.resize(0);
@@ -72,13 +146,16 @@ bool GeometryScene::edgeExists(int vertx0,int vertx1,QVector <int> Vect){
 	return return_val;
 }
 	
-
+/** once the 2 edges to be connected are clicked, add the new edge to lists and the viewer 
+**{add to edgesVect,and add corresponding to label and nodeId (when showing it) and calc cyl_properties and show! and activate Saveh5, in Saveh5:save edgesVect too}	
+**/
 void GeometryScene::addNewEdge(){
-	//qDebug() << "\nGeometryScene::addEdge() " ;
-	///{add to edgesVect,and add corresponding to label and nodeId (when showing it) and calc cyl_stuff and show! and activate SaveLabeledh5, in SaveLabeledh5:save edgesVect too}	
-	rf->uilabel.SaveLabeledh5->setEnabled ( TRUE );
+	rf->uilabel.Saveh5->setEnabled ( TRUE );
 	rf->uilabel.Saveash5->setEnabled ( TRUE );
-	rf->uilabel.AddEdge->setEnabled ( FALSE );
+	rf->uilabel.AddEdge->setEnabled ( TRUE );
+	rf->uilabel.DeleteEdge->setEnabled ( FALSE );
+	rf->uilabel.label->setEnabled ( FALSE );
+	rf->uilabel.LabelVessel->setEnabled ( FALSE );
 	if (connectingVect.size()!=2){
 		cout <<"ERROR: the number of vertices in the new edge is " << connectingVect.size() << "\nAborted!" <<endl;
 		exit(0);
@@ -100,36 +177,35 @@ void GeometryScene::addNewEdge(){
 		new_edgesVect.append(connectingVect[1]);
 		
 		labelVect.append(int(0));
+		//std::cout << "labelVect.size() "<< labelVect.size() << std::endl;
 		num_edge_total++;
 		
 		float a1 = vertices_centreVect[3*connectingVect[0]]; float b1 = vertices_centreVect[3*connectingVect[0]+1]; float c1 = vertices_centreVect[3*connectingVect[0]+2];
 		float a2 = vertices_centreVect[3*connectingVect[1]]; float b2 = vertices_centreVect[3*connectingVect[1]+1]; float c2 = vertices_centreVect[3*connectingVect[1]+2];
-		cout << "edge (" << connectingVect[0] << ","<< connectingVect[1] <<") has centres [" << a1 << " " << b1 << " " << c1 << "] and [" << a2 << " " << b2 << " " << c2 << "]"<< endl; 
+		cout << "edge (" << connectingVect[0] << ","<< connectingVect[1] <<") has vertices' centres at [" << a1 << " " << b1 << " " << c1 << "] and [" << a2 << " " << b2 << " " << c2 << "]"<< endl; 
 		
 		float centreX = (a1+a2)/2; float centreY = (b1+b2)/2;  float centreZ = (c1+c2)/2;
 		float heights = sqrt((a2-a1)*(a2-a1)+(b2-b1)*(b2-b1)+(c2-c1)*(c2-c1));
 		float tangentX = (a2-a1)/heights; float tangentY = (b2-b1)/heights;  float tangentZ = (c2-c1)/heights;
 		float newedge_rad=0;
-		for (int c=0; c<cylradiusVect[edge1_indx].len; c++){
-			newedge_rad += cylradiusVect[edge1_indx].p[c];
+		for (int c=0; c<cylradiusVect[edge1_indx].size(); c++){
+			newedge_rad += cylradiusVect[edge1_indx][c];
 		}
-		for (int c=0; c<cylradiusVect[edge2_indx].len; c++){
-			newedge_rad += cylradiusVect[edge2_indx].p[c];
+		for (int c=0; c<cylradiusVect[edge2_indx].size(); c++){
+			newedge_rad += cylradiusVect[edge2_indx][c];
 		}
-		newedge_rad = newedge_rad/(cylradiusVect[edge1_indx].len + cylradiusVect[edge2_indx].len);
+		newedge_rad = newedge_rad/(cylradiusVect[edge1_indx].size() + cylradiusVect[edge2_indx].size());
 		
-		/*hvl_ti*  new_*/nodeIDs = (hvl_ti*) realloc (nodeIDs, (int)(num_edge_total)*sizeof(hvl_ti));
-// 		nodeIDs = new_nodeIDs;
-		nodeIDs[num_edge_total-1].len = 1;
-		nodeIDs[num_edge_total-1].p = (int*) calloc((unsigned long)(nodeIDs[num_edge_total-1].len), sizeof(int) );
-		//free(new_nodeIDs); 
+		// /*hvl_ti*  new_*/nodeIDs = (hvl_ti2*) realloc (nodeIDs, (int)(num_edge_total)*sizeof(hvl_ti2));
+		//nodeIDs[num_edge_total-1].len = 1;
+		//nodeIDs[num_edge_total-1].p = (int*) calloc((unsigned long)(nodeIDs[num_edge_total-1].len), sizeof(int) );
+		//nodeIDs[num_edge_total-1].q = (int*) calloc((unsigned long)(nodeIDs[num_edge_total-1].len), sizeof(int) );
 		
-		QVector <SoMaterial *> tmp_cylmatVect;
-		/*hvl_t* new_*/cylradiusVect = (hvl_t*) realloc(cylradiusVect,(int)(num_edge_total)*sizeof(hvl_t) );
-// 		cylradiusVect = new_cylradiusVect;
-		cylradiusVect[num_edge_total-1].len = 1;
-		cylradiusVect[num_edge_total-1].p = (float*) calloc((unsigned long)(cylradiusVect[num_edge_total-1].len), sizeof(float) );
-		//free(new_cylradiusVect);
+		
+		//QVector <SoMaterial *> tmp_cylmatVect;
+		// /*hvl_t* new_*/cylradiusVect = (hvl_t*) realloc(cylradiusVect,(int)(num_edge_total)*sizeof(hvl_t) );
+		//cylradiusVect[num_edge_total-1].len = 1;
+		//cylradiusVect[num_edge_total-1].p = (float*) calloc((unsigned long)(cylradiusVect[num_edge_total-1].len), sizeof(float) );
 				
 
 		scene = new SoSeparator();		//create one node for each cylinder and show them into Scene Graph
@@ -143,36 +219,43 @@ void GeometryScene::addNewEdge(){
 		QFile new_edge_name("additional_edge");
 		output_loadCylinder = geometry->loadCylinder(new_edge_name,centreX,centreY,centreZ,newedge_rad,tangentX,tangentY,tangentZ,heights,0);
 		tmp_cylmatVect.append(output_loadCylinder.nodematerial);
+		tmp_nodeid.append(output_loadCylinder.nodeid);
+		tmp_childid.append(root->getNumChildren()-1);
 		cylmatVect.append(tmp_cylmatVect);
-		cylradiusVect[num_edge_total-1].p[0] = output_loadCylinder.noderadius;
-		nodeIDs[num_edge_total-1].p[0]= output_loadCylinder.nodeid;
+		tmp_cylradiusVect.append(output_loadCylinder.noderadius);
+		cylradiusVect.append(tmp_cylradiusVect);
+		//cylradiusVect[num_edge_total-1].p[0] = output_loadCylinder.noderadius;
+		//nodeIDs[num_edge_total-1].p[0]= output_loadCylinder.nodeid;
+		//nodeIDs[num_edge_total-1].q[0]= root->getNumChildren()-1;
+		nodeIDs.append(tmp_nodeid);
+		childIDs.append(tmp_childid);
 		
 		new_radius.append(newedge_rad);
 		new_heights.append(heights);
 		new_cntrx.append(centreX); new_cntry.append(centreY); new_cntrz.append(centreZ);
 		new_tangx.append(tangentX); new_tangy.append(tangentY); new_tangz.append(tangentZ);
+		tmp_cylmatVect.resize(0); tmp_cylradiusVect.resize(0);  tmp_nodeid.resize(0); tmp_childid.resize(0);
 		
 	}
 	else{
 		cout << "New edge ("<<connectingVect[0] << "," << connectingVect[1]<< ") already exists!" << endl;
 	}
 	
-	//qDebug() << "\nGeometryScene::addEdge() " ;
-
+	num_clicked = 0;
+	connectingVect.resize(0);
 }
 
 bool GeometryScene::loadGeometry(QFile &file, const QVector<QVariant> &data,
 		ResourceForm *rf, TreeItem *parent){
-	//qDebug() << "Debug. >>GeometryScene::loadGeometry()";
 	root = viewer->getRootSeparator();
 	
 	QFileInfo fileInfo(file);
     QString ext = fileInfo.suffix();
 
 
+	/** read the h5 file and pass the radius and tangent height and center of vetex v **/
     if (ext == "h5") {
 		std::cout << "Loading Line object as a cylinder: " <<std::endl;
-		////read the h5 file and pass the radius and tangent height and center of vetex v
 		struct h5_output_type h5_output_data = H5_reader ((char*)file.fileName().toLatin1().data());
 		std::cout << "Successfully read the h5 file " << file.fileName().toLatin1().data() << "!" <<std::endl;
 		num_edge_total = h5_output_data.num_edge;
@@ -188,22 +271,23 @@ bool GeometryScene::loadGeometry(QFile &file, const QVector<QVariant> &data,
 			vertices_centreVect.append(h5_output_data.vertices[3*i+1]);
 			vertices_centreVect.append(h5_output_data.vertices[3*i+2]);
 		}
-		std::cout << "Size of edges " << num_edge_total <<std::endl;
-// 		//save unique cylinder NodeId in order of cylinder numbers from GeometryNode::loadCylinder in here
-		/*hvl_ti **/nodeIDs = (hvl_ti*) malloc((int)(num_edge_total)*sizeof(hvl_ti) );	
+		
+		std::cout << "Number of edges " << num_edge_total <<std::endl;
+		//save unique cylinder NodeId in order of cylinder numbers from GeometryNode::loadCylinder in here
+		// /*hvl_ti **/nodeIDs = (hvl_ti2*) malloc((int)(num_edge_total)*sizeof(hvl_ti2) );	
 		//cylmatVect = (hvl_tSoMat*) malloc((int)(num_edge_total)*sizeof(hvl_tSoMat) );	
-		cylradiusVect = (hvl_t*) malloc((int)(num_edge_total)*sizeof(hvl_t) );
+		//cylradiusVect = (hvl_t*) malloc((int)(num_edge_total)*sizeof(hvl_t) );
 		
 		GeometryNode::load_Cylinder_output_type output_loadCylinder;
 		
 		for( int e = 0; e < num_edge_total; e++ ) {
-			nodeIDs[e].len = h5_output_data.centreX[e].len;
-			nodeIDs[e].p = (int*) malloc((unsigned long)(nodeIDs[e].len)*sizeof(int) );
+			//nodeIDs[e].len = h5_output_data.centreX[e].len;
+			//nodeIDs[e].p = (int*) malloc((unsigned long)(nodeIDs[e].len)*sizeof(int) );
+			//nodeIDs[e].q = (int*) malloc((unsigned long)(nodeIDs[e].len)*sizeof(int) );
 			//cylmatVect[e].len = h5_output_data.centreX[e].len;
 			//(cylmatVect[e].p).resize(cylmatVect[e].len);
-			QVector <SoMaterial *> tmp_cylmatVect;
-			cylradiusVect[e].len = h5_output_data.centreX[e].len;
-			cylradiusVect[e].p = (float*) calloc((unsigned long)(cylradiusVect[e].len),sizeof(float) );
+			//cylradiusVect[e].len = h5_output_data.centreX[e].len;
+			//cylradiusVect[e].p = (float*) calloc((unsigned long)(cylradiusVect[e].len),sizeof(float) );
 			
 			for (int c =0; c < h5_output_data.centreX[e].len ; c++){
 				scene = new SoSeparator();		//create one node for each cylinder and show them into Scene Graph
@@ -214,13 +298,21 @@ bool GeometryScene::loadGeometry(QFile &file, const QVector<QVariant> &data,
 				//this->rf = rf;
 				root->addChild(scene);
 				output_loadCylinder = geometry->loadCylinder(file,h5_output_data.centreX[e].p[c],h5_output_data.centreY[e].p[c],h5_output_data.centreZ[e].p[c],h5_output_data.radius[e].p[c],h5_output_data.tangentX[e].p[c],h5_output_data.tangentY[e].p[c],h5_output_data.tangentZ[e].p[c],1.1*h5_output_data.heights[e].p[c],h5_output_data.label[e]);
-				nodeIDs[e].p[c]= output_loadCylinder.nodeid;
+				tmp_nodeid.append(output_loadCylinder.nodeid);
+				tmp_childid.append(root->getNumChildren()-1);
+				//nodeIDs[e].p[c]= output_loadCylinder.nodeid;
+				//nodeIDs[e].q[c]= root->getNumChildren()-1;
 	 			//std::cout << "parent num children : " << root->getNumChildren() <<std::endl;
 				//cylmatVect[e].p[c]= output_loadCylinder.nodematerial;
 				tmp_cylmatVect.append(output_loadCylinder.nodematerial);
-				cylradiusVect[e].p[c]= output_loadCylinder.noderadius; 
+				tmp_cylradiusVect.append(output_loadCylinder.noderadius);
+				//cylradiusVect[e].p[c]= output_loadCylinder.noderadius; 
 			}
 			cylmatVect.append(tmp_cylmatVect);
+			cylradiusVect.append(tmp_cylradiusVect);
+			nodeIDs.append(tmp_nodeid);
+			childIDs.append(tmp_childid);
+			tmp_cylmatVect.resize(0); tmp_cylradiusVect.resize(0); tmp_nodeid.resize(0); tmp_childid.resize(0);
 		}
 		free (h5_output_data.centreX);	free (h5_output_data.centreY);	free (h5_output_data.centreZ);
 		free (h5_output_data.tangentX);	free (h5_output_data.tangentY);	free (h5_output_data.tangentZ);
@@ -257,7 +349,6 @@ bool GeometryScene::loadGeometry(QFile &file, const QVector<QVariant> &data,
 		}
 	}
 
-	//qDebug() << "Debug. <<GeometryScene::loadGeometry()";
 	return true;
 }
 
@@ -266,35 +357,41 @@ void GeometryScene::createLabelForm() {
 
 	connect(rf->uilabel.radiusSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(updateRadiusTransparency(int)));
-// 	connect(rf->uilabel.LabelVessels, SIGNAL(clicked()),
-// 			this, SLOT(getUserLabel()));
 	connect(rf->uilabel.LabelVessel, SIGNAL(activated( int )),
 			this, SLOT(getUserLabel()));		
-	connect(rf->uilabel.SaveLabeledh5, SIGNAL(clicked()),
+	connect(rf->uilabel.Saveh5, SIGNAL(clicked()),
 			this, SLOT(saveLabel()));
 	connect(rf->uilabel.Saveash5, SIGNAL(clicked()),
 			this, SLOT(saveasLabel()));
-	connect(rf->uilabel.ConnectEdges, SIGNAL(clicked()),
-		   this, SLOT(createNewEdge()));
+	connect(rf->uilabel.DeleteEdge, SIGNAL(clicked()),
+		   this, SLOT(deleteThisEdge()));
 	connect(rf->uilabel.AddEdge, SIGNAL(clicked()),
-		   this, SLOT(addNewEdge()));
+		   this, SLOT(createNewEdge()));
+	/*connect(this, SIGNAL(createEdgeSignal()),
+		   this, SLOT(addNewEdge()));*/
 			
+	rf->uilabel.DeleteEdge->setEnabled ( FALSE );
+ 	rf->uilabel.AddEdge->setEnabled ( TRUE );
+	rf->uilabel.label->setEnabled ( FALSE );
+	rf->uilabel.LabelVessel->setEnabled ( FALSE );
+	rf->uilabel.Saveh5->setEnabled ( TRUE );
+	rf->uilabel.Saveash5->setEnabled ( TRUE );
 	rf->uilabel.radiusSlider->setEnabled ( TRUE );
 	rf->uilabel.radius->setEnabled ( TRUE );
-	rf->uilabel.ConnectEdges->setEnabled ( TRUE );
-}
+} 	
+
+
 
 
 
 void GeometryScene::saveasLabel(){
-	//qDebug() << "\nGeometryScene::saveasLabel() " ;
 	QString slname = QFileDialog::getSaveFileName(0,
                 tr("Save h5 to File"), QString(), tr("Files (*.h5)"));
 	if (! slname.isNull()) {
 		QFile slfile(slname);
 		QFileInfo fileInfo(slfile);
 		QString abspath = fileInfo.absoluteFilePath();
-		qDebug() << "construct a new file " + slfile.fileName() ;
+		//qDebug() << "\nconstruct a new file " + slfile.fileName() ;
 	
 		
 		QFile currfile(h5_filename);
@@ -310,36 +407,65 @@ void GeometryScene::saveasLabel(){
 		}
 	}
 	
-	//qDebug() << "\nGeometryScene::saveasLabel() " ;
-
 }
 
 void GeometryScene::saveh5FileFunc(QFile &newfile){
-	//qDebug() << "\nGeometryScene::saveh5FileFunc() " ;
 	if (QFile::exists(newfile.fileName())){
 		bool status2 = QFile::remove (newfile.fileName());
-		qDebug() << "\nGeometryScene::saveh5FileFunc() remove existing file " + newfile.fileName()+ " " +status2 ;
+		//qDebug() << "\nGeometryScene::saveh5FileFunc() remove existing file " + newfile.fileName()+ " " +status2 ;
 	}
-// copy h5_filename to filename and replace the name of h5_filename, then call saveLabel
-	/*QFile currentfile;
-	currentfile.setFileName(h5_filename);
-	*/QFile newfile2;
+	
+	//copy h5_filename to filename and replace the name of h5_filename, then call saveLabel
+	QFile newfile2;
 	newfile2.setFileName(newfile.fileName());
+	
 	if(!QFile::copy ( h5_filename,newfile2.fileName() ))
-//	if(!QFile::copy(filename.fileName(), h5_filename))
-    //if(!file.copy(newfile))
     {
         qDebug() << "\n File copy failed .. " + h5_filename + " to " + newfile2.fileName() + " Error : " + newfile2.errorString();
     }
-	h5_filename = newfile2.fileName();
-	saveLabel();
-	//qDebug() << "\nGeometryScene::saveh5FileFunc() " ;
+     else{ 
+        //qDebug() << "\n File copied .. " + h5_filename + " to " + newfile2.fileName();
+		h5_filename = newfile2.fileName();
+		saveLabel();
+	}
 
 }
 
 
 void GeometryScene::saveLabel(){
-	//qDebug() << "\nGeometryScene::saveLabel() " ;
+	
+	//qDebug() <<del_edgesVect.size() << " "<<del_edgesVect ;
+	qSort (del_edgesVect);
+	//qDebug() <<del_edgesVect.size() << " "<<del_edgesVect ;	
+	for (int i=del_edgesVect.size()-1; i>-1;i--){
+		int tmp_e_num=del_edgesVect[i];
+		//qDebug() << "e_num deleted:" << tmp_e_num;
+		nodeIDs.remove(tmp_e_num);	
+		childIDs.remove(tmp_e_num);
+		labelVect.remove(tmp_e_num);
+		edgesVect.remove(2*tmp_e_num+1);
+		edgesVect.remove(2*tmp_e_num);
+		cylmatVect.remove(tmp_e_num);
+		cylradiusVect.remove(tmp_e_num);
+		//qDebug() << "e_num deleted2:" << tmp_e_num;
+		for (int i=0; i<cylnum_transparency0_5.size(); i++){
+			if (cylnum_transparency0_5[i] == tmp_e_num){
+				cylnum_transparency0_5.remove(i);
+			}
+		}
+	}
+	for (int i=del_edgesVect.size()-1; i>-1;i--){
+		int tmp_e_num=del_edgesVect[i];
+		for (int i=0; i<cylnum_transparency0_5.size(); i++){
+				if (cylnum_transparency0_5[i] > tmp_e_num){
+					cylnum_transparency0_5[i]--;
+			}
+		}
+	}
+
+	//qDebug() << "Done edge deleting!!" ;
+	
+	
 	if (labelVect.size()!= (edgesVect.size()/2)){
 		std::cout <<"ERROR: Numbe of new edges added to the label and edges are not equal!\nAborted!!"<<endl;
 		return;
@@ -348,8 +474,8 @@ void GeometryScene::saveLabel(){
 		std::cout <<"ERROR: Numbe of new edges added to the new_radius and edges are not equal!\nAborted!!"<<endl;
 		return;
 	}
-	cout << new_edgesVect.size()/2 << /*" " <<new_radius.size() << " " <<new_heights.size()<< " " <<new_cntrx.size()<< " " <<new_tangx.size()<<*/" new edges have been created" << endl;
-// 	cout << edgesVect.size()/2 << " total number of edges" << endl;
+	//cout << new_edgesVect.size()/2 << " " <<new_radius.size() << " " <<new_heights.size()<< " " <<new_cntrx.size()<< " " <<new_tangx.size()<<" new edges have been created" << endl;
+	//cout << edgesVect.size()/2 << " total number of edges="<< num_edge_total << endl;
 	
 	///since the dataset is not chunked extend function will not work for it. C++ API does not have the dataset delete function => we use C API
 	int *Label_buf = (int*) malloc( sizeof(int) * labelVect.size() );
@@ -371,21 +497,16 @@ void GeometryScene::saveLabel(){
 	dataset = H5Dcreate2(group_id, "cyl_label", H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	status = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, Label_buf);
 	status = H5Dclose(dataset);
-	//dataset_id = H5Dopen(file_id, "/vessel_graph/edge_properties/cyl_segment_ID", H5P_DEFAULT);
-	//hdf_plist = H5Dget_create_plist(dataset_id);
-	//if (H5Pget_layout(hdf_plist) == H5D_CHUNKED) {
-	//}
 	status = H5Gclose (group_id);	
 	status = H5Fclose (file_id);
-// 	cout << "wrote label dataset!" << endl;
+ 	//cout << "wrote label dataset!" << endl;
 	free(Label_buf);
 	
 	
 	
-	if (new_edgesVect.size()>0){
+	if (new_edgesVect.size()>0 or del_edgesVect.size()>0){
 		file_id = H5Fopen(h5_filename.toLatin1().data(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-		//hid_t  dataset_e, dataspace_e;
 		int status_n;
 		///write the edges to the graph
 		int *edge_buf = (int*) malloc( sizeof(int) * edgesVect.size() );
@@ -393,7 +514,7 @@ void GeometryScene::saveLabel(){
 			edge_buf[i]=edgesVect[i];
 		}
 			
-		/*hsize_t  dims_e[2];*/	dims[0] = labelVect.size(); 	dims[1] = 2;
+		dims[0] = labelVect.size(); 	dims[1] = 2;
 		group_id = H5Gopen (file_id, "/vessel_graph", H5P_DEFAULT);
 		status = H5Ldelete (group_id, "edges", H5P_DEFAULT);
 		dataspace = H5Screate_simple(rank, dims, NULL);
@@ -401,9 +522,9 @@ void GeometryScene::saveLabel(){
 		status = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, edge_buf);
 		status = H5Dclose(dataset);
 		free(edge_buf);
-// 		cout << "wrote edge dataset!" << endl;
+ 		//cout << "wrote edge dataset!" << endl;
 		
-		///write new_edges
+		/*//write new_edges
 		int *new_edge_buf = (int*) malloc( sizeof(int) * new_edgesVect.size() );
 		for (int i=0; i<new_edgesVect.size(); i++){
 			new_edge_buf[i]=new_edgesVect[i];
@@ -411,25 +532,25 @@ void GeometryScene::saveLabel(){
 			
 		dims[0] = new_edgesVect.size()/2; 	dims[1] = 2;
 		status = H5Lexists(group_id,"new_edges", H5P_DEFAULT);
-		if (!status){		//new_edges doesn't exist => create and write
+		if (!status){		///new_edges doesn't exist => create and write
 			dataspace = H5Screate_simple(rank, dims, NULL);
 			dataset = H5Dcreate2(group_id, "new_edges", H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-// 			cout << "new_edges dataset didn't exist" << endl;
+			cout << "new_edges dataset didn't exist" << endl;
 			status = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_edge_buf);
 			status= H5Dclose(dataset);
 			status = H5Gclose (group_id);	
-// 			cout << "created and wrote new_edges dataset!" << status << endl;
+			cout << "created and wrote new_edges dataset!" << status << endl;
 		}
-		else {	//new_edges exist => read to buffer, resize buffer to write new edges, delete new_edges and write the new one!
+		else {	///new_edges exist => read to buffer, resize buffer to write new edges, delete new_edges and write the new one!
 			dataset = H5Dopen2(group_id, "new_edges", H5P_DEFAULT);
 			dataspace = H5Dget_space(dataset);    // dataspace handle 
 			rank  = H5Sget_simple_extent_ndims(dataspace);
 			status_n  = H5Sget_simple_extent_dims(dataspace, dims, NULL);
-// 			cout << "new_edges dataset rank " << rank << " dims[0][1] " << dims[0] << "," << dims[1] << endl;
+			cout << "new_edges dataset rank " << rank << " dims[0][1] " << dims[0] << "," << dims[1] << endl;
 			int *new_edge_buf_i = (int*) malloc( sizeof(int) * dims[0]*dims[1] );
 			status = H5Dread(dataset, H5T_NATIVE_INT, dataspace, dataspace, H5P_DEFAULT, new_edge_buf_i);
-// 			cout << "new_edges [0][1]" << new_edge_buf_i[0] << " " << new_edge_buf_i[1] << endl;
-			/*int**/  new_edge_buf_i = (int*) realloc (new_edge_buf_i, sizeof(int)*((unsigned long)(dims[0]*dims[1])+new_edgesVect.size()));
+			cout << "new_edges [0][1]" << new_edge_buf_i[0] << " " << new_edge_buf_i[1] << endl;
+			new_edge_buf_i = (int*) realloc (new_edge_buf_i, sizeof(int)*((unsigned long)(dims[0]*dims[1])+new_edgesVect.size()));
 			for (int i=0; i<new_edgesVect.size() ; i++){
 				new_edge_buf_i[i+(dims[0]*dims[1])] = new_edge_buf[i];
 			}
@@ -441,18 +562,88 @@ void GeometryScene::saveLabel(){
 			status = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_edge_buf_i);
 			status = H5Dclose(dataset);
 			status = H5Gclose (group_id);	
-// 			cout << "wrote new_edges dataset " << status << endl;
+			cout << "wrote new_edges dataset " << status << endl;
 			free(new_edge_buf_i);
-			//free(new_edge_buf_o);
 		}
 		free(new_edge_buf);
-// 		cout << "freed new_edge_buf" << endl;
-		
-		///write cyl_properties
+		cout << "freed new_edge_buf" << endl;
+		*/
+
+		///write intermediaries
 		rank = 1;
 		hsize_t  dims_cyl[1];
 		hid_t    datatype;
 		group_id = H5Gopen (file_id, "/vessel_graph/edge_properties", H5P_DEFAULT);
+		
+		
+		hid_t       dataset_intm,dataspace_intm,datatype_intm;
+		dataset_intm = H5Dopen2(group_id, "intermediaries", H5P_DEFAULT);
+		dataspace_intm = H5Dget_space(dataset_intm);    // dataspace handle 
+		rank  = H5Sget_simple_extent_ndims(dataspace_intm);
+		status_n  = H5Sget_simple_extent_dims(dataspace_intm, dims_cyl, NULL);
+		hvl_ti* new_buf_i_intm = (hvl_ti*) malloc( sizeof(hvl_ti) * (unsigned long)(dims_cyl[0]) );
+		datatype_intm  = H5Dget_type(dataset_intm);     // datatype handle 
+		status = H5Dread(dataset_intm, datatype_intm, dataspace_intm, dataspace_intm, H5P_DEFAULT, new_buf_i_intm);
+		new_buf_i_intm = (hvl_ti*) realloc (new_buf_i_intm, sizeof(hvl_ti) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
+		for (int i=0; i<new_cntrx.size(); i++){
+			new_buf_i_intm[i+dims_cyl[0]].len =1;
+			new_buf_i_intm[i+dims_cyl[0]].p = (int *) malloc( sizeof(int) );
+			new_buf_i_intm[i+dims_cyl[0]].p[0]= -1;			/// ??? what to do with the intermediaries of new edges to be empty => should add new_interm to be empty or in graph2graph if its -1 then put []
+		}
+		//cout << "new cyl_centreX " << new_buf_i_intm[21].p[0]<< endl;
+		
+		dims_cyl[0] += new_cntrx.size();
+		//cout << "dims_cyl[0]" << dims_cyl[0] << endl;
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			//cout << "final dims_cyl[0]" << del_dims_cyl[0] << endl;
+			for (int i=0; i<del_edgesVect.size(); i++){
+				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
+				new_buf_i_intm[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_ti* new_buf_o_intm = (hvl_ti*) malloc(sizeof(hvl_ti) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_intm[i].len!=0){
+					new_buf_o_intm[j].len = new_buf_i_intm[i].len;
+					new_buf_o_intm[j].p = (int *) malloc(sizeof(int)*new_buf_i_intm[i].len);
+					for (int k=0; k<new_buf_i_intm[i].len; k++){
+						new_buf_o_intm[j].p[k]=new_buf_i_intm[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//cout << "done"<<endl;
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_cx, dims_cyl);
+			status = H5Dset_extent(dataset_intm, del_dims_cyl);
+			//cout << status<<endl;
+			status = H5Dwrite(dataset_intm, datatype_intm, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_intm);
+			//cout << status << endl;
+			free(new_buf_o_intm);
+			//cout << "Freed new_buf_o_intm"<< endl;
+		}
+		//status = H5Dextend (dataset_cx, dims_cyl);
+		/*//status = H5Ldelete (group_id, "cyl_centreX", H5P_DEFAULT);
+		//dataspace_cx = H5Screate_simple(rank, dims_cyl, NULL);
+		//dataset_cx = H5Dcreate2(group_id, "cyl_centreX", datatype_cx, dataspace_cx, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);*/
+		
+		else {
+			status = H5Dextend (dataset_intm, dims_cyl);
+			status = H5Dwrite(dataset_intm, datatype_intm, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_intm);
+		}
+		status = H5Dclose(dataset_intm);
+		//cout << "wrote intermediaries dataset! "<<status << endl;
+ 		free(new_buf_i_intm);
+		//cout << "freed new_buf_i_intm" << endl;		
+		
+		///write cyl_properties
+/*		rank = 1;
+		hsize_t  dims_cyl[1];
+		hid_t    datatype;
+		group_id = H5Gopen (file_id, "/vessel_graph/edge_properties", H5P_DEFAULT);*/
 		
 		
 		hid_t       dataset_cx,dataspace_cx,datatype_cx;
@@ -461,30 +652,56 @@ void GeometryScene::saveLabel(){
 		rank  = H5Sget_simple_extent_ndims(dataspace_cx);
 		status_n  = H5Sget_simple_extent_dims(dataspace_cx, dims_cyl, NULL);
 		hvl_t* new_buf_i_cx = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-// 		cout << "cyl_centreX dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_cntrx.size " << new_cntrx.size() << endl;
+		//cout << "cyl_centreX dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_cntrx.size " << new_cntrx.size() << endl;
 		datatype_cx  = H5Dget_type(dataset_cx);     // datatype handle 
 		status = H5Dread(dataset_cx, datatype_cx, dataspace_cx, dataspace_cx, H5P_DEFAULT, new_buf_i_cx);
-// 		cout << "cyl_centreX [0][1]" << new_buf_i_cx[0].p[0] << " " << new_buf_i_cx[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_cx = (hvl_t*) realloc (new_buf_i_cx, sizeof(hvl_t) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
+		//cout << "cyl_centreX [0][1]" << new_buf_i_cx[0].p[0] << " " << new_buf_i_cx[1].p[0] << endl;
+		new_buf_i_cx = (hvl_t*) realloc (new_buf_i_cx, sizeof(hvl_t) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_cx[i+dims_cyl[0]].len =1;
 			new_buf_i_cx[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_cx[i+dims_cyl[0]].p[0]= new_cntrx[i];
 		}
-// 		cout << "new cyl_centreX " << new_buf_i_cx[21].p[0]<< endl;
-		//status= H5Dclose(dataset_cx);
+		//cout << "new cyl_centreX " << new_buf_i_cx[21].p[0]<< endl;
+		
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_cx, dims_cyl);
-		//status = H5Ldelete (group_id, "cyl_centreX", H5P_DEFAULT);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
+				new_buf_i_cx[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_cx = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_cx[i].len!=0){
+					new_buf_o_cx[j].len = new_buf_i_cx[i].len;
+					new_buf_o_cx[j].p = (float *) malloc(sizeof(float)*new_buf_i_cx[i].len);
+					for (int k=0; k<new_buf_i_cx[i].len; k++){
+						new_buf_o_cx[j].p[k]=new_buf_i_cx[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_cx, dims_cyl);
+			status = H5Dset_extent(dataset_cx, del_dims_cyl);
+			status = H5Dwrite(dataset_cx, datatype_cx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_cx);
+			free(new_buf_o_cx);
+		}
+		//status = H5Dextend (dataset_cx, dims_cyl);
+		/*//status = H5Ldelete (group_id, "cyl_centreX", H5P_DEFAULT);
 		//dataspace_cx = H5Screate_simple(rank, dims_cyl, NULL);
-		//dataset_cx = H5Dcreate2(group_id, "cyl_centreX", datatype_cx, dataspace_cx, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_cx, datatype_cx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cx);
+		//dataset_cx = H5Dcreate2(group_id, "cyl_centreX", datatype_cx, dataspace_cx, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);*/
+		
+		else {
+			status = H5Dextend (dataset_cx, dims_cyl);
+			status = H5Dwrite(dataset_cx, datatype_cx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cx);
+		}
 		status = H5Dclose(dataset_cx);
-// 		cout << "wrote cyl_centreX dataset! "<<status << endl;
  		free(new_buf_i_cx);
-// 		free(new_buf_o_cx);
-// 		cout << "freed new_buf_i_cx" << endl;
 
 
 		hid_t       dataset_cy,dataspace_cy,datatype_cy;
@@ -492,32 +709,48 @@ void GeometryScene::saveLabel(){
 		dataspace_cy = H5Dget_space(dataset_cy);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_cy);
 		status_n  = H5Sget_simple_extent_dims(dataspace_cy, dims_cyl, NULL);
-// 		cout << "cyl_centreY dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_cntry.size " << new_cntry.size() << endl;
 		hvl_t* new_buf_i_cy = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_cy  = H5Dget_type(dataset_cy);     // datatype handle 
 		status = H5Dread(dataset_cy, datatype_cy, dataspace_cy, dataspace_cy, H5P_DEFAULT, new_buf_i_cy);
-// 		cout << "cyl_centreY [0][1]" << new_buf_i_cy[0].p[0] << " " << new_buf_i_cy[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_cy = (hvl_t*) realloc (new_buf_i_cy, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
+		new_buf_i_cy = (hvl_t*) realloc (new_buf_i_cy, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_cy[i+dims_cyl[0]].len =1;
 			new_buf_i_cy[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_cy[i+dims_cyl[0]].p[0]= new_cntry[i];
 		}
-// 		cout << "new cyl_centreY " << new_buf_i_cy[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_cy);
-		//cout << "H5Dclose " << status << endl; 
+		//cout << "new cyl_centreY " << new_buf_i_cy[21].p[0]<< endl;
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_cy, dims_cyl);
-// 		status = H5Ldelete (group_id, "cyl_centreY", H5P_DEFAULT);
-// 		dataspace_cy = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_cy = H5Dcreate2(group_id, "cyl_centreY", datatype_cy, dataspace_cy, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_cy, datatype_cy, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cy);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				new_buf_i_cy[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_cy = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_cy[i].len!=0){
+					new_buf_o_cy[j].len = new_buf_i_cy[i].len;
+					new_buf_o_cy[j].p = (float *) malloc(sizeof(float)*new_buf_i_cy[i].len);
+					for (int k=0; k<new_buf_i_cy[i].len; k++){
+						new_buf_o_cy[j].p[k]=new_buf_i_cy[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_cy, dims_cyl);
+			status = H5Dset_extent(dataset_cy, del_dims_cyl);
+			status = H5Dwrite(dataset_cy, datatype_cy, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_cy);
+			free(new_buf_o_cy);
+		}
+		else {
+			status = H5Dextend (dataset_cy, dims_cyl);
+			status = H5Dwrite(dataset_cy, datatype_cy, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cy);
+		}
 		status = H5Dclose(dataset_cy);
-// 		cout << "wrote cyl_centreY dataset! "<<status << endl;
 		free(new_buf_i_cy);
-// 		free(new_buf_o_cy);
-// 		cout << "freed new_buf_i_cx" << endl;
 
 
 		hid_t       dataset_cz,dataspace_cz,datatype_cz;
@@ -525,31 +758,47 @@ void GeometryScene::saveLabel(){
 		dataspace_cz = H5Dget_space(dataset_cz);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_cz);
 		status_n  = H5Sget_simple_extent_dims(dataspace_cz, dims_cyl, NULL);
-// 		cout << "cyl_centreZ dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_cntrz.size " << new_cntrz.size() << endl;
 		hvl_t* new_buf_i_cz = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_cz  = H5Dget_type(dataset_cz);     // datatype handle 
 		status = H5Dread(dataset_cz, datatype_cz, dataspace_cz, dataspace_cz, H5P_DEFAULT, new_buf_i_cz);
-// 		cout << "cyl_centreZ [0][1]" << new_buf_i_cz[0].p[0] << " " << new_buf_i_cz[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_cz = (hvl_t*) realloc (new_buf_i_cz, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
+		new_buf_i_cz = (hvl_t*) realloc (new_buf_i_cz, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_cz[i+dims_cyl[0]].len =1;
 			new_buf_i_cz[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_cz[i+dims_cyl[0]].p[0]= new_cntrz[i];
 		}
-// 		cout << "new cyl_centreZ " << new_buf_i_cz[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_cz);
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_cz, dims_cyl);
-// 		status = H5Ldelete (group_id, "cyl_centreZ", H5P_DEFAULT);
-// 		dataspace_cz = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_cz = H5Dcreate2(group_id, "cyl_centreZ", datatype_cz, dataspace_cz, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_cz, datatype_cz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cz);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				new_buf_i_cz[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_cz = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_cz[i].len!=0){
+					new_buf_o_cz[j].len = new_buf_i_cz[i].len;
+					new_buf_o_cz[j].p = (float *) malloc(sizeof(float)*new_buf_i_cz[i].len);
+					for (int k=0; k<new_buf_i_cz[i].len; k++){
+						new_buf_o_cz[j].p[k]=new_buf_i_cz[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_cz, dims_cyl);
+			status = H5Dset_extent(dataset_cz, del_dims_cyl);
+			status = H5Dwrite(dataset_cz, datatype_cz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_cz);
+			free(new_buf_o_cz);
+		}
+		else {
+			status = H5Dextend (dataset_cz, dims_cyl);
+			status = H5Dwrite(dataset_cz, datatype_cz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cz);
+		}
 		status = H5Dclose(dataset_cz);
-// 		cout << "wrote cyl_centreZ dataset! " << status << endl;
 		free(new_buf_i_cz);
-// 		free(new_buf_o_cz);
-// 		cout << "freed new_buf_i_cx" << endl;
 
 		
 		hid_t       dataset_r,dataspace_r,datatype_r;
@@ -557,34 +806,48 @@ void GeometryScene::saveLabel(){
 		dataspace_r = H5Dget_space(dataset_r);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_r);
 		status_n  = H5Sget_simple_extent_dims(dataspace_r, dims_cyl, NULL);
-// 		cout << "cyl_radius dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_radius.size " << new_radius.size() << endl;
 		hvl_t *new_buf_i_r = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_r  = H5Dget_type(dataset_r);     // datatype handle 
-		////H5T_class_t t_class  = H5Tget_class(datatype);
-		////hid_t tid1 = H5Tvlen_create (H5T_NATIVE_FLOAT);
-		////status =H5Dread(dataset, tid1, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i);
 		status = H5Dread(dataset_r, datatype_r, dataspace_r, dataspace_r, H5P_DEFAULT, new_buf_i_r);
-// 		cout << "cyl_radius [0][1]" << new_buf_i_r[0].p[0] << " " << new_buf_i_r[1].p[0] << endl;
-		/*hvl_t**/  new_buf_i_r = (hvl_t*) realloc (new_buf_i_r, sizeof(hvl_t) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
+		new_buf_i_r = (hvl_t*) realloc (new_buf_i_r, sizeof(hvl_t) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_r[i+dims_cyl[0]].len =1;
 			new_buf_i_r[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_r[i+dims_cyl[0]].p[0]= new_radius[i];
 		}
-// 		cout << "new cyl_radius " << new_buf_i_r[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_r);
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_r, dims_cyl);
-//		status = H5Ldelete (group_id, "cyl_radius", H5P_DEFAULT);
-// 		dataspace_r = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_r = H5Dcreate2(group_id, "cyl_radius", datatype_r, dataspace_r, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_r, datatype_r, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_r);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
+				new_buf_i_r[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_r = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_r[i].len!=0){
+					new_buf_o_r[j].len = new_buf_i_r[i].len;
+					new_buf_o_r[j].p = (float *) malloc(sizeof(float)*new_buf_i_r[i].len);
+					for (int k=0; k<new_buf_i_r[i].len; k++){
+						new_buf_o_r[j].p[k]=new_buf_i_r[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_r, dims_cyl);
+			status = H5Dset_extent(dataset_r, del_dims_cyl);
+			status = H5Dwrite(dataset_r, datatype_r, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_r);
+			free(new_buf_o_r);
+		}
+		else {
+			status = H5Dextend (dataset_r, dims_cyl);
+			status = H5Dwrite(dataset_r, datatype_r, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_r);
+		}
 		status = H5Dclose(dataset_r);
-// 		cout << "wrote cyl_radius dataset! " << status << endl;
 		free(new_buf_i_r);
-// 		free(new_buf_o);
-// 		cout << "freed new_buf_i_cx" << endl;
 
 		
 		hid_t       dataset_h,dataspace_h,datatype_h;
@@ -592,31 +855,47 @@ void GeometryScene::saveLabel(){
 		dataspace_h = H5Dget_space(dataset_h);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_h);
 		status_n  = H5Sget_simple_extent_dims(dataspace_h, dims_cyl, NULL);
-// 		cout << "cyl_radius dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_heights.size " << new_heights.size() << endl;
 		hvl_t* new_buf_i_h = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_h  = H5Dget_type(dataset_h);     // datatype handle 
 		status = H5Dread(dataset_h, datatype_h, dataspace_h, dataspace_h, H5P_DEFAULT, new_buf_i_h);
-// 		cout << "cyl_height [0][1]" << new_buf_i_h[0].p[0] << " " << new_buf_i_h[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_h = (hvl_t*) realloc (new_buf_i_h, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
+		new_buf_i_h = (hvl_t*) realloc (new_buf_i_h, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_h[i+dims_cyl[0]].len =1;
 			new_buf_i_h[i+dims_cyl[0]].p = (float *) malloc( sizeof(float ));
 			new_buf_i_h[i+dims_cyl[0]].p[0]= new_heights[i];
 		}
-// 		cout << "new cyl_height " << new_buf_i_h[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_h);
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_h, dims_cyl);
-// 		status = H5Ldelete (group_id, "cyl_height", H5P_DEFAULT);
-// 		dataspace_h = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_h = H5Dcreate2(group_id, "cyl_height", datatype_h, dataspace_h, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_h, datatype_h, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_h);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				new_buf_i_h[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_h = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_h[i].len!=0){
+					new_buf_o_h[j].len = new_buf_i_h[i].len;
+					new_buf_o_h[j].p = (float *) malloc(sizeof(float)*new_buf_i_h[i].len);
+					for (int k=0; k<new_buf_i_h[i].len; k++){
+						new_buf_o_h[j].p[k]=new_buf_i_h[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_h, dims_cyl);
+			status = H5Dset_extent(dataset_h, del_dims_cyl);
+			status = H5Dwrite(dataset_h, datatype_h, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_h);
+			free(new_buf_o_h);
+		}
+		else {
+			status = H5Dextend (dataset_h, dims_cyl);
+			status = H5Dwrite(dataset_h, datatype_h, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_h);
+		}
 		status = H5Dclose(dataset_h);
-// 		cout << "wrote cyl_height dataset! " << status << endl;
 		free(new_buf_i_h);
-// 		free(new_buf_o_h);
-// 		cout << "freed new_buf_i_cx" << endl;
 
 		
 
@@ -625,28 +904,46 @@ void GeometryScene::saveLabel(){
 		dataspace_tx = H5Dget_space(dataset_tx);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_tx);
 		status_n  = H5Sget_simple_extent_dims(dataspace_tx, dims_cyl, NULL);
-// 		cout << "cyl_tangentX dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_tangx.size " << new_tangx.size() << endl;
 		hvl_t* new_buf_i_tx = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_tx  = H5Dget_type(dataset_tx);     // datatype handle 
 		status = H5Dread(dataset_tx, datatype_tx, dataspace_tx, dataspace_tx, H5P_DEFAULT, new_buf_i_tx);
-// 		cout << "cyl_tangentX [0][1]" << new_buf_i_tx[0].p[0] << " " << new_buf_i_tx[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_tx = (hvl_t*) realloc (new_buf_i_tx, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
+		new_buf_i_tx = (hvl_t*) realloc (new_buf_i_tx, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_tx[i+dims_cyl[0]].len =1;
 			new_buf_i_tx[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_tx[i+dims_cyl[0]].p[0]= new_tangx[i];
 		}
-// 		cout << "new cyl_tangentX " << new_buf_i_tx[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_tx);
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_tx, dims_cyl);
-// 		status = H5Ldelete (group_id, "cyl_tangentX", H5P_DEFAULT);
-// 		dataspace_tx = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_tx = H5Dcreate2(group_id, "cyl_tangentX", datatype_tx, dataspace_tx, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_tx, datatype_tx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_tx);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				new_buf_i_tx[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_tx = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_tx[i].len!=0){
+					new_buf_o_tx[j].len = new_buf_i_tx[i].len;
+					new_buf_o_tx[j].p = (float *) malloc(sizeof(float)*new_buf_i_tx[i].len);
+					for (int k=0; k<new_buf_i_tx[i].len; k++){
+						new_buf_o_tx[j].p[k]=new_buf_i_tx[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_tx, dims_cyl);
+			status = H5Dset_extent(dataset_tx, del_dims_cyl);
+			status = H5Dwrite(dataset_tx, datatype_tx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_tx);
+			free(new_buf_o_tx);
+		}
+		else {
+			status = H5Dextend (dataset_tx, dims_cyl);
+			status = H5Dwrite(dataset_tx, datatype_tx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_tx);
+		}
 		status = H5Dclose(dataset_tx);
-// 		cout << "wrote cyl_tangentX dataset! "<< status << endl;
 		free(new_buf_i_tx);
 
 		
@@ -655,28 +952,46 @@ void GeometryScene::saveLabel(){
 		dataspace_ty = H5Dget_space(dataset_ty);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_ty);
 		status_n  = H5Sget_simple_extent_dims(dataspace_ty, dims_cyl, NULL);
-// 		cout << "cyl_tangentY dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_tangy.size " << new_tangy.size() << endl;
 		hvl_t* new_buf_i_ty = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_ty  = H5Dget_type(dataset_ty);     // datatype handle 
 		status = H5Dread(dataset_ty, datatype_ty, dataspace_ty, dataspace_ty, H5P_DEFAULT, new_buf_i_ty);
-// 		cout << "cyl_tangentY [0][1]" << new_buf_i_ty[0].p[0] << " " << new_buf_i_ty[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_ty = (hvl_t*) realloc (new_buf_i_ty, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
+		new_buf_i_ty = (hvl_t*) realloc (new_buf_i_ty, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_ty[i+dims_cyl[0]].len =1;
 			new_buf_i_ty[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_ty[i+dims_cyl[0]].p[0]= new_tangy[i];
 		}
-// 		cout << "new cyl_tangentY " << new_buf_i_ty[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_ty);
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_ty, dims_cyl);
-// 		status = H5Ldelete (group_id, "cyl_tangentY", H5P_DEFAULT);
-// 		dataspace_ty = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_ty = H5Dcreate2(group_id, "cyl_tangentY", datatype_ty, dataspace_ty, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_ty, datatype_ty, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_ty);
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			for (int i=0; i<del_edgesVect.size(); i++){
+				new_buf_i_ty[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_ty = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_ty[i].len!=0){
+					new_buf_o_ty[j].len = new_buf_i_ty[i].len;
+					new_buf_o_ty[j].p = (float *) malloc(sizeof(float)*new_buf_i_ty[i].len);
+					for (int k=0; k<new_buf_i_ty[i].len; k++){
+						new_buf_o_ty[j].p[k]=new_buf_i_ty[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_ty, dims_cyl);
+			status = H5Dset_extent(dataset_ty, del_dims_cyl);
+			status = H5Dwrite(dataset_ty, datatype_ty, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_ty);
+			free(new_buf_o_ty);
+		}
+		else {
+			status = H5Dextend (dataset_ty, dims_cyl);
+			status = H5Dwrite(dataset_ty, datatype_ty, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_ty);
+		}
 		status = H5Dclose(dataset_ty);
-// 		cout << "wrote cyl_tangentY dataset! "<< status << endl;
 		free(new_buf_i_ty);
 
 
@@ -685,40 +1000,67 @@ void GeometryScene::saveLabel(){
 		dataspace_tz = H5Dget_space(dataset_tz);    // dataspace handle 
 		rank  = H5Sget_simple_extent_ndims(dataspace_tz);
 		status_n  = H5Sget_simple_extent_dims(dataspace_tz, dims_cyl, NULL);
-// 		cout << "cyl_tangentZ dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_tangz.size " << new_tangz.size() << endl;
+		//cout << "cyl_tangentZ dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_tangz.size " << new_tangz.size() << endl;
 		hvl_t* new_buf_i_tz = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
 		datatype_tz  = H5Dget_type(dataset_tz);     // datatype handle 
 		status = H5Dread(dataset_tz, datatype_tz, dataspace_tz, dataspace_tz, H5P_DEFAULT, new_buf_i_tz);
-// 		cout << "cyl_tangentZ [0][1]" << new_buf_i_tz[0].p[0] << " " << new_buf_i_tz[1].p[0] << endl;
-		/*hvl_t**/ new_buf_i_tz = (hvl_t*) realloc (new_buf_i_tz, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
+		//cout << "cyl_tangentZ [0][1]" << new_buf_i_tz[0].p[0] << " " << new_buf_i_tz[1].p[0] << endl;
+		new_buf_i_tz = (hvl_t*) realloc (new_buf_i_tz, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_tz[i+dims_cyl[0]].len =1;
 			new_buf_i_tz[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
 			new_buf_i_tz[i+dims_cyl[0]].p[0]= new_tangz[i];
 		}
-// 		cout << "new cyl_tangentZ " << new_buf_i_tz[21].p[0]<< endl;
-// 		status= H5Dclose(dataset_tz);
+		//cout << "new cyl_tangentZ " << new_buf_i_tz[21].p[0]<< endl;
 		dims_cyl[0] += new_cntrx.size();
-// 		cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		status = H5Dextend (dataset_tz, dims_cyl);
-// 		status = H5Ldelete (group_id, "cyl_tangentZ", H5P_DEFAULT);
-// 		dataspace_tz = H5Screate_simple(rank, dims_cyl, NULL);
-// 		dataset_tz = H5Dcreate2(group_id, "cyl_tangentZ", datatype_tz, dataspace_tz, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite(dataset_tz, datatype_tz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_tz);
+		//cout << "dims_cyl[0]" << dims_cyl[0] << endl;
+		if (del_edgesVect.size()>0){
+			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
+			//cout << "final dims_cyl[0]" << del_dims_cyl[0] << endl;
+			for (int i=0; i<del_edgesVect.size(); i++){
+				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
+				new_buf_i_tz[del_edgesVect[i]].len=0;
+				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
+			}
+			hvl_t* new_buf_o_tz = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
+			int j =0;
+			for (int i=0; i< dims_cyl[0]; i++){
+				if (new_buf_i_tz[i].len!=0){
+					new_buf_o_tz[j].len = new_buf_i_tz[i].len;
+					new_buf_o_tz[j].p = (float *) malloc(sizeof(float)*new_buf_i_tz[i].len);
+					for (int k=0; k<new_buf_i_tz[i].len; k++){
+						new_buf_o_tz[j].p[k]=new_buf_i_tz[i].p[k];
+					}
+					j++; 
+					//cout << j << endl;
+				}
+			}
+			//cout << "done: "<<endl;
+			//dims_cyl[0] = del_dims_cyl[0];
+			//status = H5Dextend (dataset_tz, dims_cyl);
+			status = H5Dset_extent(dataset_tz, del_dims_cyl);
+			status = H5Dwrite(dataset_tz, datatype_tz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_tz);
+			//cout << status << endl;
+			free(new_buf_o_tz);
+		}
+		else {
+			status = H5Dextend (dataset_tz, dims_cyl);
+			status = H5Dwrite(dataset_tz, datatype_tz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_tz);
+		}
 		status = H5Dclose(dataset_tz);
-// 		cout << "wrote cyl_tangentZ dataset! "<< status << endl;
 		free(new_buf_i_tz);
 
 		
 		status = H5Gclose (group_id);	
 		status = H5Fclose (file_id);
 
-		//empty the vectors of new edge properties after they were written into the file
+		///empty the vectors of new edge properties after they were written into the file
 		new_radius.resize(0);
 		new_heights.resize(0);
 		new_cntrx.resize(0); new_cntry.resize(0); new_cntrz.resize(0);
 		new_tangx.resize(0); new_tangy.resize(0); new_tangz.resize(0);
-		new_edgesVect.resize(0);	
+		new_edgesVect.resize(0);
+		del_edgesVect.resize(0);	
 	}
 
 	
@@ -815,40 +1157,39 @@ void GeometryScene::saveLabel(){
 }
 
 void GeometryScene::getUserLabel(){
-	//qDebug() << "GeometryScene::getUserLabel() " ;
  	int userLabelnum = 0;
  	QString userLabel;
-//	bool ok;
-	//for the selected cylinder I get the NodeID which corresponds to a cylinder number N=> open H5 and read the N-th segment_ID , then save label as new field for all the edges that have that segment_ID
-	//we then read this in python to assign labels to actual corrected output of vessel tracking
+	
+	/*
+	bool ok;
+	for the selected cylinder I get the NodeID which corresponds to a cylinder number N=> open H5 and read the N-th segment_ID , then save label as new field for all the edges that have that segment_ID
+	we then read this in python to assign labels to actual corrected output of vessel tracking
 	int e_num;
 	for (int i=0; i< num_edge_total ; i++){
 		for (int c=0; c<nodeIDs[i].len ; c++){
 			if (nodeIDs[i].p[c]== nodeId){
 				e_num=i;
-				break;	//cyl_num will have the number of the picked cylinder object
+				break;	//e_num will have the number of the picked cylinder object
 			}
 		}
 	}
-	//qDebug() << "user entered a label ..." ;	
-// 	userLabel = QInputDialog::getInteger(0, "Label selected vessel segment", "Label number [1:255.0]:", labelVect[cyl_num],0,255.0,1,&ok); //opens a dialog with title Label selected vessel segment, inside it message Label number
+	userLabel = QInputDialog::getInteger(0, "Label selected vessel segment", "Label number [1:255.0]:", labelVect[e_num],0,255.0,1,&ok); //opens a dialog with title Label selected vessel segment, inside it message Label number
+	//if user cancled entering label dont' do following steps
+	if (!ok){
+		return;
+	}
+	//std::cout << "User entered Label " <<userLabel << " for vessel segment with NodeId " << nodeId << " of selected cylinder number " << e_num << " with label " << labelVect[e_num] <<std::endl;
+	*/
 	userLabel = rf->uilabel.LabelVessel->currentText();
 	qDebug() << "user entered label " << userLabel ;
 	
-				// 	//if user cancled entering label dont' do following steps
-				// 	if (!ok){
-				// 		return;
-				// 	}
-				//	//std::cout << "User entered Label " <<userLabel << " for vessel segment with NodeId " << nodeId << " of selected cylinder number " << cyl_num << " with label " << labelVect[cyl_num] <<std::endl;
-
 	userLabelnum = label_Name2num (userLabel);
-				
-	//check if this vessel segment was labeled before differently? if it wasnt 0 and different from userLabel, ask relable?
+					
+	///check if this vessel segment was labeled before differently? if it wasnt 0 and different from userLabel, ask relable?
+	//if (labelVect[e_num].compare(userLabel)!=0 && labelVect[e_num].compare (QString("No label\0"))!=0) {		//it has been labeled with a different label from new userLabel 
  	if (labelVect[e_num]!=userLabelnum && labelVect[e_num]!=0) {		//it has been labeled with a different label from new userLabel 
-//	if (labelVect[cyl_num].compare(userLabel)!=0 && labelVect[cyl_num].compare (QString("No label\0"))!=0) {		//it has been labeled with a different label from new userLabel 
 		QString response = QString("Selected vessel was labelled before.Do you want to relabel?");
 		int answer = QMessageBox::question(0, "Relabel vessel?", response, QMessageBox::Yes | QMessageBox::No);
-	// 	std::cout << " After MessageBox" << std::endl;
 		if (answer == QMessageBox::Yes){
 			//relabel
 			labelVect[e_num]=userLabelnum;
@@ -857,15 +1198,19 @@ void GeometryScene::getUserLabel(){
  	else if (labelVect[e_num]==0 ){	//it wasn't labeled before =>label
 		labelVect[e_num]=userLabelnum;
 	}
+	//std::cout << "labelVect.size() "<< labelVect.size() << " : " << e_num << " "<< labelVect[e_num]<< std::endl;
 	
 	
-	//color the selected vessel segment to color from lookup table based on label, transpar=0.5
+	///color the selected vessel segment to color from lookup table based on label, transpar=0.5
+	//	if (labelVect[e_num].compare (QString("No label\0"))!=0 ){	//it was labeled before => color and transparency
  	if (labelVect[e_num]!=0 ){	//it was labeled before => color and transparency
-//	if (labelVect[cyl_num].compare (QString("No label\0"))!=0 ){	//it was labeled before => color and transparency
 		geometry->updateCylinderColour(/*cylmatVect[e_num].len, cylmatVect[e_num].p*/cylmatVect[e_num].size(), cylmatVect[e_num],labelVect[e_num]);
-		cylnum_transparency0_5.append(e_num);
+		if (!cylnum_transparency0_5.contains(e_num)){
+			cylnum_transparency0_5.append(e_num);
+		}
 	}
-	//color the selected vessel segment to undo labeling: r=255.0, g=255.0, b=255.0, transpar=0.0
+	
+	///color the selected vessel segment to undo labeling: r=255.0, g=255.0, b=255.0, transpar=0.0
 	else{
 		geometry->updateCylinderColour(/*cylmatVect[e_num].len, cylmatVect[e_num].p*/cylmatVect[e_num].size(), cylmatVect[e_num], 0,0.0);
 		int trans_ind= cylnum_transparency0_5.lastIndexOf(e_num);
@@ -873,34 +1218,30 @@ void GeometryScene::getUserLabel(){
 			cylnum_transparency0_5.remove(trans_ind);
 		}
 	}
-	//qDebug() << "GeometryScene::getUserLabel() " ;	
 }
 
 
+/** find the threshold radius, find all radius in QVect smaller than threshold and call geometrynode::updateCylTransparency **/
 void GeometryScene::updateRadiusTransparency(int newVal){
-// 	qDebug() << "Debug. <<GeometryScene::updateRadiusTransparency()";
-	//find the threshold radius, find all radius in QVect smaller than threshold and call geometrynode::updateCylTransparency
 	float radthresh= (newVal*(radiusmax- radiusmin)/100)+radiusmin;
-// 	std::cout<< " Threshold radius: " << radthresh << std::endl;
 	for (int e=0; e<num_edge_total; e++){
 		float mean_rad=0;
-		for (int c=0; c<cylradiusVect[e].len; c++){
-			mean_rad += cylradiusVect[e].p[c];
+		for (int c=0; c<cylradiusVect[e].size(); c++){
+			mean_rad += cylradiusVect[e][c];
 		}
-		mean_rad = mean_rad/cylradiusVect[e].len;
+		mean_rad = mean_rad/cylradiusVect[e].size();
 		if (mean_rad<=radthresh) {
-			geometry->updateCylTransparency( /*cylmatVect[e].len, cylmatVect[e].p*/cylmatVect[e].size(), cylmatVect[e], 1);
+			geometry->updateCylTransparency( cylmatVect[e].size(), cylmatVect[e], 1);
 		}
 		else if (mean_rad>radthresh) {
 			if (cylnum_transparency0_5.contains(e)){
-				geometry->updateCylTransparency( /*cylmatVect[e].len, cylmatVect[e].p*/cylmatVect[e].size(), cylmatVect[e], 0.5);
+				geometry->updateCylTransparency( cylmatVect[e].size(), cylmatVect[e], 0.5);
 			}
 			else{
-				geometry->updateCylTransparency( /*cylmatVect[e].len, cylmatVect[e].p*/cylmatVect[e].size(), cylmatVect[e], 0.0);
+				geometry->updateCylTransparency( cylmatVect[e].size(), cylmatVect[e], 0.0);
 			}
 		}
 	}
-// 	qDebug() << "Debug. >>GeometryScene::updateRadiusTransparency()";
 }
 
 GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
@@ -961,9 +1302,9 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 	int rank_c = dataspace_c.getSimpleExtentDims( dims_c, NULL);
 	H5::DataSpace memspace_c ( rank_c, dims_c );
 	H5::DataType ctype = dataset_centreX.getDataType();
-	h5_data.centreX /*hvl_t * centreX_struc*/ = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
-	h5_data.centreY /*hvl_t * centreY_struc*/ = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
-	h5_data.centreZ /*hvl_t * centreZ_struc*/ = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
+	h5_data.centreX  = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
+	h5_data.centreY  = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
+	h5_data.centreZ  = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
 	dataset_centreX.read(h5_data.centreX ,ctype ,memspace_c, dataspace_c); 	
 	dataset_centreY.read(h5_data.centreY ,ctype ,memspace_c, dataspace_c); 	
 	dataset_centreZ.read(h5_data.centreZ ,ctype ,memspace_c, dataspace_c); 	
@@ -989,9 +1330,9 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 		exit(0);
 	}
 	H5::DataType ttype = dataset_tangentX.getDataType();
-	h5_data.tangentX /*hvl_t * tangentX_struc*/ = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
-	h5_data.tangentY /*hvl_t * tangentY_struc*/ = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
-	h5_data.tangentZ /*hvl_t * tangentZ_struc*/ = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
+	h5_data.tangentX  = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
+	h5_data.tangentY  = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
+	h5_data.tangentZ  = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
 	dataset_tangentX.read(h5_data.tangentX ,ttype ,dataspace_t, dataspace_t); 	
 	dataset_tangentY.read(h5_data.tangentY ,ttype ,dataspace_t, dataspace_t); 	
 	dataset_tangentZ.read(h5_data.tangentZ ,ttype ,dataspace_t, dataspace_t); 	
@@ -1014,7 +1355,7 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 		exit(0);
 	}
 	H5::DataType htype = dataset_heights.getDataType();
-	h5_data.heights /*hvl_t * height_struc*/ = (hvl_t*) malloc((unsigned long)(dims_h[0])*sizeof(hvl_t));
+	h5_data.heights  = (hvl_t*) malloc((unsigned long)(dims_h[0])*sizeof(hvl_t));
 	dataset_heights.read(h5_data.heights ,htype ,dataspace_h, dataspace_h); 	
 	//cout << h5_data.heights[0].len << " , " << h5_data.heights[1].len << " , " << h5_data.heights[2].len << " , " << h5_data.heights[3].len << " , " << endl;
 	//cout << h5_data.heights[0].p[0] << " , " << h5_data.heights[0].p[1] << " , " << h5_data.heights[1].p[0] << " , " << h5_data.heights[2].p[1] << " , "<< h5_data.heights[6].p[0] << endl;
@@ -1033,7 +1374,7 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 		exit(0);
 	}
 	H5::DataType rtype = dataset_radius.getDataType();
-	h5_data.radius /*hvl_t * radius_struc*/ = (hvl_t*) malloc((unsigned long)(dims_r[0])*sizeof(hvl_t));
+	h5_data.radius  = (hvl_t*) malloc((unsigned long)(dims_r[0])*sizeof(hvl_t));
 	dataset_radius.read(h5_data.radius ,rtype ,dataspace_r, dataspace_r); 	
 	//cout << h5_data.radius[0].len << " , " << h5_data.radius[1].len << " , " << h5_data.radius[2].len << " , " << h5_data.radius[3].len << " , " << endl;
 	//cout << h5_data.radius[0].p[0] << " , " << h5_data.radius[0].p[1] << " , " << h5_data.radius[1].p[0] << " , " << h5_data.radius[2].p[1] << " , "<< h5_data.radius[6].p[0] << endl;
@@ -1055,7 +1396,7 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 	//hssize_t num_element = dataspace_l.getSimpleExtentNpoints();	//Get number of elements in a dataspace
 	//cout << "dims[0],[1] = " <<dims_l[0] /*<< "," << dims_l[1]*/<< " , rank_l = " << rank_l << " , num_element_l = " << num_element <<endl;
 	H5::DataSpace memspace_l( rank_l, dims_l );
-	h5_data.label /*int * cyl_label*/ = (int*) calloc((unsigned long)(dims_l[0]), sizeof(int));
+	h5_data.label  = (int*) calloc((unsigned long)(dims_l[0]), sizeof(int));
 	dataset_label.read(h5_data.label,H5::PredType::NATIVE_INT,memspace_l, dataspace_l);	//read from file(dataspace) to memoryspace
  	//std::cout << "cyl_label[0] is: "<< h5_data.label[0] << " , " << h5_data.label[1] << " , " << h5_data.label[2] << " , " << h5_data.label[3]<<std::endl;
 	dataset_label.close();
@@ -1116,14 +1457,16 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 	h5_data.num_edge = dims_c[0];
 	h5_data.num_vertex = dims_v[0];
 
-    //cout << "Debug. << h5reader closing " << dbfile << endl;
 	return h5_data;
 }
 
 void GeometryScene::noPointReceived(){
-// 	rf->uitag.CreateTagPoint->setEnabled ( FALSE );
-// 	rf->uitag.AaddTagPoint->setEnabled ( FALSE );
-	rf->uilabel.LabelVessel->setEnabled ( FALSE );	
+	//rf->uitag.CreateTagPoint->setEnabled ( FALSE );
+	//rf->uitag.AaddTagPoint->setEnabled ( FALSE );
+	rf->uilabel.label->setEnabled ( FALSE );
+	rf->uilabel.LabelVessel->setEnabled ( FALSE );
+	rf->uilabel.DeleteEdge->setEnabled ( FALSE );
+	//rf->uilabel.AddEdge->setEnabled ( FALSE );
 }
 
 int GeometryScene::whichEdgeIndx (int edge_ind1,int edge_ind2,int x, int y,int z){
@@ -1140,66 +1483,86 @@ int GeometryScene::whichEdgeIndx (int edge_ind1,int edge_ind2,int x, int y,int z
 }
 
 void GeometryScene::pickReceived(int index, int id, float x, float y, float z,SoType objtype) {
-//  	std::cout << "Debug. >>GeometryScene::pickReceived(): " << x << " " << y << " " << z << std::endl;
-	nodeId=index;
+  	//std::cout << "Debug. >>GeometryScene::pickReceived(): " << x << " " << y << " " << z << " " << num_edge_total << std::endl;
+	nodeId=id;
 	//if clicked on polygon enable Tag buttons, else if enabled, disable it:
 	if (objtype == SoFaceDetail::getClassTypeId() or objtype == SoLineDetail::getClassTypeId()){
 		rf->uitag.CreateTagPoint->setEnabled ( TRUE );
 		rf->uitag.AddTagPoint->setEnabled ( FALSE );
 		rf->uitag.TagSize->setEnabled ( TRUE );
+		rf->uitag.TagColour->setEnabled ( TRUE );
+		rf->uilabel.label->setEnabled ( FALSE );		
 		rf->uilabel.LabelVessel->setEnabled ( FALSE );		
+		rf->uilabel.DeleteEdge->setEnabled ( FALSE );		
+		//rf->uilabel.AddEdge->setEnabled ( FALSE );
 	}
+		
 	else if (objtype == SoCylinderDetail::getClassTypeId()) {
 		rf->uitag.CreateTagPoint->setEnabled ( FALSE );
 		rf->uitag.AddTagPoint->setEnabled ( FALSE );
 		rf->uitag.TagSize->setEnabled ( FALSE );
-		rf->uilabel.LabelVessel->setEnabled ( TRUE );
-		int cyl_num;
-		for (int i=0; i< num_edge_total ; i++){
-			for (int c=0; c<nodeIDs[i].len ; c++){
-				if (nodeIDs[i].p[c]== nodeId){
-					cyl_num=i;
-					break;	//cyl_num will have the number of the picked cylinder object
+		rf->uitag.TagColour->setEnabled ( FALSE );
+		//rf->uilabel.LabelVessel->setEnabled ( TRUE );
+		//int e_num;
+		for (int i=0; i< num_edge_total+del_edgesVect.size() ; i++){
+			//std::cout << i << ":"<< nodeIDs[i].size() << std::endl;
+			for (int c=0; c<nodeIDs[i].size() ; c++){
+				if (nodeIDs[i][c]== nodeId){
+					e_num=i;
+					break;	//e_num will have the number of the picked cylinder object
 				}
 			}
 		}
-		qDebug() << "Vessel segment number " << cyl_num << " is edge ("<< edgesVect[2*cyl_num] << "," << edgesVect[2*cyl_num+1] << ") has label # " << labelVect[cyl_num] << " : " << label_num2Name(labelVect[cyl_num]);                              
-		num_clicked++;
-		if (flag_new_edge){
+		qDebug()<< "\nNodeId " << nodeId  << "Vessel segment number " << e_num << " is edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") has label # " << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num]);                              
+		if (flag_new_edge){	//we are waiting for 2 edges to be clicked for connecting
+			rf->uilabel.label->setEnabled ( FALSE );		
+			rf->uilabel.LabelVessel->setEnabled ( FALSE );		
+			rf->uilabel.DeleteEdge->setEnabled ( FALSE );		
+			
+			num_clicked++;
+			
 			if (num_clicked==1){
-				edge1_indx = cyl_num;
-				int edge_indx = whichEdgeIndx (edgesVect[2*cyl_num],edgesVect[2*cyl_num+1],x,y,z);	// pick one of the following based on location clicked and edge centers:
-				connectingVect.append(edge_indx); 	//connectingVect.append(edgesVect[2*cyl_num]); or //connectingVect.append(edgesVect[2*cyl_num+1]);
+				edge1_indx = e_num;
+				int edge_indx = whichEdgeIndx (edgesVect[2*e_num],edgesVect[2*e_num+1],x,y,z);	// pick one of the following based on location clicked and edge centers:
+				connectingVect.append(edge_indx); 	//connectingVect.append(edgesVect[2*e_num]); or //connectingVect.append(edgesVect[2*e_num+1]);
 			}
 			if (num_clicked==2){
-				if (edge1_indx==cyl_num){		//clicked on same edge 2wice => no new edge => wait for new edge to be clicked
+				if (edge1_indx==e_num){		//clicked on same edge 2wice => no new edge => wait for new edge to be clicked
 					num_clicked--;
 				}
 				else{
-					edge2_indx = cyl_num;
-					int edge_indx = whichEdgeIndx (edgesVect[2*cyl_num],edgesVect[2*cyl_num+1],x,y,z);	// pick one of the following based on location clicked and edge centers:
-					connectingVect.append(edge_indx); 	//connectingVect.append(edgesVect[2*cyl_num]); or //connectingVect.append(edgesVect[2*cyl_num+1]);
+					edge2_indx = e_num;
+					int edge_indx = whichEdgeIndx (edgesVect[2*e_num],edgesVect[2*e_num+1],x,y,z);	// pick one of the following based on location clicked and edge centers:
+					connectingVect.append(edge_indx); 	//connectingVect.append(edgesVect[2*e_num]); or //connectingVect.append(edgesVect[2*e_num+1]);
 				}
 			}
 			if (connectingVect.size()==2){
 				flag_new_edge = FALSE;
-				rf->uilabel.AddEdge->setEnabled ( TRUE );
+				addNewEdge();
+				//emit createEdgeSignal();
 			}
 			
 		}
-		if (num_clicked!=2) {
-			rf->uilabel.AddEdge->setEnabled ( FALSE );
-		}	
+		else{//we have clicked on an edge in h5 and not in the middle of creating a new edge	
+			rf->uilabel.label->setEnabled ( TRUE );		
+			rf->uilabel.LabelVessel->setEnabled ( TRUE );		
+			rf->uilabel.DeleteEdge->setEnabled ( TRUE );		
+			rf->uilabel.AddEdge->setEnabled ( TRUE );		
+		}
 	}
 	else {		
 		rf->uitag.CreateTagPoint->setEnabled ( FALSE );
 		rf->uitag.AddTagPoint->setEnabled ( FALSE );
 		rf->uitag.TagSize->setEnabled ( FALSE );
-		rf->uilabel.LabelVessel->setEnabled ( FALSE );
+		rf->uitag.TagColour->setEnabled ( FALSE );
+		rf->uilabel.label->setEnabled ( FALSE );		
+		rf->uilabel.LabelVessel->setEnabled ( FALSE );		
+		rf->uilabel.DeleteEdge->setEnabled ( FALSE );		
+		//rf->uilabel.AddEdge->setEnabled ( FALSE );	
 	}
 	
 
-	// check to see whether picked point belongs to this scene.
+	/// check to see whether picked point belongs to this scene.
     if (id == geometry->getID()) {
 		std::cout <<"picked point does belong to this scene" <<std::endl;
 		// picked point does belong to this scene
@@ -1218,54 +1581,43 @@ void GeometryScene::pickReceived(int index, int id, float x, float y, float z,So
         this->setData(1, "");
     }
 
-//qDebug() << "Debug. >>GeometryScene::pickReceived()";
-	
 }
 
 
 void GeometryScene::wasSelected() {
-	//qDebug() << "Debug. >>GeometryScene::wasSelected()";
 	rf->setLastGeometry(this);
-	//qDebug() << "Debug. <<GeometryScene::wasSelected()";
 }
 
 
 bool GeometryScene::loadVertstats(QFile &file) {
-	//qDebug() << "Debug. >>GeometryScene::loadVertstats()";
 	textureFileItem *vert = new textureFileItem(scene, itemData, form, this);
-	//qDebug() << "Debug. >>GeometryScene::loadVertstats() vert";
 	vert->loadFile(file);
-	//qDebug() << "Debug. >>GeometryScene::loadVertstats() loadFile";
 	childItems.insert(childCount(), vert);
-	//qDebug() << "Debug. >>GeometryScene::loadVertstats() childItems";
 	// make sure that the texture file receives the signal if local point was selected in
 	// a ray-picking action.
 	connect(this, SIGNAL(localPointPicked(int)), vert, SLOT(pickedPointReceived(int)));
 
-	//qDebug() << "Debug. <<GeometryScene::loadVertstats()";
 	return true;
 }
 
 
 bool GeometryScene::updateLabelLUColor() {
-	//qDebug() << "Debug. >>GeometryScene::updateLabelLUColor()";
 	for( int e = 0; e < labelVect.size(); e++ ) {
-		geometry->updateCylinderColour(/*cylmatVect[e].len, cylmatVect[e].p*/cylmatVect[e].size(), cylmatVect[e],labelVect[e],0.0);
+		geometry->updateCylinderColour(cylmatVect[e].size(), cylmatVect[e],labelVect[e],0.0);
 	}
-	//qDebug() << "Debug. <<GeometryScene::updateLabelLUColor()";
 	return true;
 }
 
 
 
 
-void GeometryScene::radiusCalc(hvl_t *cylradiusVect){
-	radiusmin=cylradiusVect[0].p[0];
-	radiusmax=cylradiusVect[0].p[0];
+void GeometryScene::radiusCalc(QVector<QVector <float> > cylradiusVect){
+	radiusmin=cylradiusVect[0][0];
+	radiusmax=cylradiusVect[0][0];
 	for (int e=0; e<num_edge_total; e++){
-		for (int c=0; c<cylradiusVect[e].len; c++){
-			if (radiusmin>	cylradiusVect[e].p[c]){ radiusmin= cylradiusVect[e].p[c];}
-			if (radiusmax<	cylradiusVect[e].p[c]){ radiusmax= cylradiusVect[e].p[c];}
+		for (int c=0; c<cylradiusVect[e].size(); c++){
+			if (radiusmin>	cylradiusVect[e][c]){ radiusmin= cylradiusVect[e][c];}
+			if (radiusmax<	cylradiusVect[e][c]){ radiusmax= cylradiusVect[e][c];}
 		}
 	}
 	//std::cout << "min and max radius: "<<radiusmin << ", " << radiusmax <<std::endl;
