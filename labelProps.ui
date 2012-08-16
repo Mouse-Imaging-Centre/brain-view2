@@ -29,7 +29,7 @@
     <number>4</number>
    </property>
    <item row="9" column="0">
-    <widget class="QPushButton" name="SaveLabeledh5">
+    <widget class="QPushButton" name="Saveh5">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -38,13 +38,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>70</width>
+       <width>82</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>70</width>
+       <width>82</width>
        <height>16777215</height>
       </size>
      </property>
@@ -54,27 +54,27 @@
     </widget>
    </item>
    <item row="7" column="0">
-    <widget class="QPushButton" name="ConnectEdges">
+    <widget class="QPushButton" name="DeleteEdge">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>50</horstretch>
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>70</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>70</width>
+       <width>82</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>70</width>
+       <width>82</width>
        <height>16777215</height>
       </size>
      </property>
      <property name="text">
-      <string>Connect</string>
+      <string>Delete edge</string>
      </property>
     </widget>
    </item>
@@ -113,13 +113,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>80</width>
+       <width>70</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>80</width>
+       <width>70</width>
        <height>16777215</height>
       </size>
      </property>
@@ -207,13 +207,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>80</width>
+       <width>70</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>80</width>
+       <width>70</width>
        <height>16777215</height>
       </size>
      </property>
