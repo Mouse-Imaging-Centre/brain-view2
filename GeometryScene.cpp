@@ -73,8 +73,8 @@ void GeometryScene::deleteThisEdge(){
 		for (int i=0; i<childIDs[e_num].size(); i++){
 			root->removeChild(childid);
 		}
-	for (int i=e_num+1; i<nodeIDs.size(); i++){
-		for (int j=0; j< nodeIDs[i].size(); j++){
+	for (int i=e_num+1; i<childIDs.size(); i++){
+		for (int j=0; j< childIDs[i].size(); j++){
 			childIDs[i][j]-=childIDs[e_num].size();
 		}
 	}
@@ -220,7 +220,7 @@ void GeometryScene::addNewEdge(){
 		output_loadCylinder = geometry->loadCylinder(new_edge_name,centreX,centreY,centreZ,newedge_rad,tangentX,tangentY,tangentZ,heights,0);
 		tmp_cylmatVect.append(output_loadCylinder.nodematerial);
 		tmp_nodeid.append(output_loadCylinder.nodeid);
-		tmp_childid.append(root->getNumChildren()-1);
+		tmp_childid.append(root->getNumChildren()-1);	//so that number of children-1 becomes the children indeces
 		cylmatVect.append(tmp_cylmatVect);
 		tmp_cylradiusVect.append(output_loadCylinder.noderadius);
 		cylradiusVect.append(tmp_cylradiusVect);
@@ -433,6 +433,13 @@ void GeometryScene::saveh5FileFunc(QFile &newfile){
 
 
 void GeometryScene::saveLabel(){
+	//qDebug() << "\nGeometryScene::saveLabel() " ;
+	
+	///there is a random unresolved error where sometimes this function fails with Segmentation Fault,so we save the current changes in a tmp file for now until this bug is fixed, so that your most recent changes won't get lost			
+	QFile tmpfile( "tmp.h5");	
+	if (QFile::exists(tmpfile.fileName())){QFile::remove(tmpfile.fileName());}
+	QFile::copy(h5_filename,tmpfile.fileName() );
+
 	
 	//qDebug() <<del_edgesVect.size() << " "<<del_edgesVect ;
 	qSort (del_edgesVect);
@@ -505,15 +512,16 @@ void GeometryScene::saveLabel(){
 	
 	
 	if (new_edgesVect.size()>0 or del_edgesVect.size()>0){
+		int num_new_e = new_edgesVect.size()/2;
 		file_id = H5Fopen(h5_filename.toLatin1().data(), H5F_ACC_RDWR, H5P_DEFAULT);
 
 		int status_n;
+
 		///write the edges to the graph
 		int *edge_buf = (int*) malloc( sizeof(int) * edgesVect.size() );
 		for (int i=0; i<edgesVect.size(); i++){
 			edge_buf[i]=edgesVect[i];
 		}
-			
 		dims[0] = labelVect.size(); 	dims[1] = 2;
 		group_id = H5Gopen (file_id, "/vessel_graph", H5P_DEFAULT);
 		status = H5Ldelete (group_id, "edges", H5P_DEFAULT);
@@ -521,8 +529,12 @@ void GeometryScene::saveLabel(){
 		dataset = H5Dcreate2(group_id, "edges", H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, edge_buf);
 		status = H5Dclose(dataset);
+		status = H5Gclose (group_id);	
 		free(edge_buf);
  		//cout << "wrote edge dataset!" << endl;
+
+
+		
 		
 		/*//write new_edges
 		int *new_edge_buf = (int*) malloc( sizeof(int) * new_edgesVect.size() );
@@ -575,7 +587,6 @@ void GeometryScene::saveLabel(){
 		hid_t    datatype;
 		group_id = H5Gopen (file_id, "/vessel_graph/edge_properties", H5P_DEFAULT);
 		
-		
 		hid_t       dataset_intm,dataspace_intm,datatype_intm;
 		dataset_intm = H5Dopen2(group_id, "intermediaries", H5P_DEFAULT);
 		dataspace_intm = H5Dget_space(dataset_intm);    // dataspace handle 
@@ -584,15 +595,13 @@ void GeometryScene::saveLabel(){
 		hvl_ti* new_buf_i_intm = (hvl_ti*) malloc( sizeof(hvl_ti) * (unsigned long)(dims_cyl[0]) );
 		datatype_intm  = H5Dget_type(dataset_intm);     // datatype handle 
 		status = H5Dread(dataset_intm, datatype_intm, dataspace_intm, dataspace_intm, H5P_DEFAULT, new_buf_i_intm);
-		new_buf_i_intm = (hvl_ti*) realloc (new_buf_i_intm, sizeof(hvl_ti) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
+		new_buf_i_intm = (hvl_ti*) realloc (new_buf_i_intm, sizeof(hvl_ti) * (unsigned long)(dims_cyl[0]+num_new_e) );
 		for (int i=0; i<new_cntrx.size(); i++){
 			new_buf_i_intm[i+dims_cyl[0]].len =1;
 			new_buf_i_intm[i+dims_cyl[0]].p = (int *) malloc( sizeof(int) );
 			new_buf_i_intm[i+dims_cyl[0]].p[0]= -1;			/// ??? what to do with the intermediaries of new edges to be empty => should add new_interm to be empty or in graph2graph if its -1 then put []
 		}
-		//cout << "new cyl_centreX " << new_buf_i_intm[21].p[0]<< endl;
-		
-		dims_cyl[0] += new_cntrx.size();
+		dims_cyl[0] += num_new_e;
 		//cout << "dims_cyl[0]" << dims_cyl[0] << endl;
 		if (del_edgesVect.size()>0){
 			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
@@ -600,7 +609,6 @@ void GeometryScene::saveLabel(){
 			for (int i=0; i<del_edgesVect.size(); i++){
 				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
 				new_buf_i_intm[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
 			}
 			hvl_ti* new_buf_o_intm = (hvl_ti*) malloc(sizeof(hvl_ti) * (unsigned long)(del_dims_cyl[0]));
 			int j =0;
@@ -612,24 +620,16 @@ void GeometryScene::saveLabel(){
 						new_buf_o_intm[j].p[k]=new_buf_i_intm[i].p[k];
 					}
 					j++; 
-					//cout << j << endl;
 				}
 			}
-			//cout << "done"<<endl;
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_cx, dims_cyl);
 			status = H5Dset_extent(dataset_intm, del_dims_cyl);
-			//cout << status<<endl;
 			status = H5Dwrite(dataset_intm, datatype_intm, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_intm);
-			//cout << status << endl;
 			free(new_buf_o_intm);
-			//cout << "Freed new_buf_o_intm"<< endl;
 		}
 		//status = H5Dextend (dataset_cx, dims_cyl);
 		/*//status = H5Ldelete (group_id, "cyl_centreX", H5P_DEFAULT);
 		//dataspace_cx = H5Screate_simple(rank, dims_cyl, NULL);
 		//dataset_cx = H5Dcreate2(group_id, "cyl_centreX", datatype_cx, dataspace_cx, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);*/
-		
 		else {
 			status = H5Dextend (dataset_intm, dims_cyl);
 			status = H5Dwrite(dataset_intm, datatype_intm, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_intm);
@@ -638,422 +638,36 @@ void GeometryScene::saveLabel(){
 		//cout << "wrote intermediaries dataset! "<<status << endl;
  		free(new_buf_i_intm);
 		//cout << "freed new_buf_i_intm" << endl;		
-		
-		///write cyl_properties
-/*		rank = 1;
-		hsize_t  dims_cyl[1];
-		hid_t    datatype;
-		group_id = H5Gopen (file_id, "/vessel_graph/edge_properties", H5P_DEFAULT);*/
-		
-		
-		hid_t       dataset_cx,dataspace_cx,datatype_cx;
-		dataset_cx = H5Dopen2(group_id, "cyl_centreX", H5P_DEFAULT);
-		dataspace_cx = H5Dget_space(dataset_cx);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_cx);
-		status_n  = H5Sget_simple_extent_dims(dataspace_cx, dims_cyl, NULL);
-		hvl_t* new_buf_i_cx = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		//cout << "cyl_centreX dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_cntrx.size " << new_cntrx.size() << endl;
-		datatype_cx  = H5Dget_type(dataset_cx);     // datatype handle 
-		status = H5Dread(dataset_cx, datatype_cx, dataspace_cx, dataspace_cx, H5P_DEFAULT, new_buf_i_cx);
-		//cout << "cyl_centreX [0][1]" << new_buf_i_cx[0].p[0] << " " << new_buf_i_cx[1].p[0] << endl;
-		new_buf_i_cx = (hvl_t*) realloc (new_buf_i_cx, sizeof(hvl_t) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_cx[i+dims_cyl[0]].len =1;
-			new_buf_i_cx[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_cx[i+dims_cyl[0]].p[0]= new_cntrx[i];
-		}
-		//cout << "new cyl_centreX " << new_buf_i_cx[21].p[0]<< endl;
-		
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
-				new_buf_i_cx[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_cx = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_cx[i].len!=0){
-					new_buf_o_cx[j].len = new_buf_i_cx[i].len;
-					new_buf_o_cx[j].p = (float *) malloc(sizeof(float)*new_buf_i_cx[i].len);
-					for (int k=0; k<new_buf_i_cx[i].len; k++){
-						new_buf_o_cx[j].p[k]=new_buf_i_cx[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_cx, dims_cyl);
-			status = H5Dset_extent(dataset_cx, del_dims_cyl);
-			status = H5Dwrite(dataset_cx, datatype_cx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_cx);
-			free(new_buf_o_cx);
-		}
-		//status = H5Dextend (dataset_cx, dims_cyl);
-		/*//status = H5Ldelete (group_id, "cyl_centreX", H5P_DEFAULT);
-		//dataspace_cx = H5Screate_simple(rank, dims_cyl, NULL);
-		//dataset_cx = H5Dcreate2(group_id, "cyl_centreX", datatype_cx, dataspace_cx, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);*/
-		
-		else {
-			status = H5Dextend (dataset_cx, dims_cyl);
-			status = H5Dwrite(dataset_cx, datatype_cx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cx);
-		}
-		status = H5Dclose(dataset_cx);
- 		free(new_buf_i_cx);
-
-
-		hid_t       dataset_cy,dataspace_cy,datatype_cy;
-		dataset_cy = H5Dopen2(group_id, "cyl_centreY", H5P_DEFAULT);
-		dataspace_cy = H5Dget_space(dataset_cy);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_cy);
-		status_n  = H5Sget_simple_extent_dims(dataspace_cy, dims_cyl, NULL);
-		hvl_t* new_buf_i_cy = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_cy  = H5Dget_type(dataset_cy);     // datatype handle 
-		status = H5Dread(dataset_cy, datatype_cy, dataspace_cy, dataspace_cy, H5P_DEFAULT, new_buf_i_cy);
-		new_buf_i_cy = (hvl_t*) realloc (new_buf_i_cy, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_cy[i+dims_cyl[0]].len =1;
-			new_buf_i_cy[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_cy[i+dims_cyl[0]].p[0]= new_cntry[i];
-		}
-		//cout << "new cyl_centreY " << new_buf_i_cy[21].p[0]<< endl;
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				new_buf_i_cy[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_cy = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_cy[i].len!=0){
-					new_buf_o_cy[j].len = new_buf_i_cy[i].len;
-					new_buf_o_cy[j].p = (float *) malloc(sizeof(float)*new_buf_i_cy[i].len);
-					for (int k=0; k<new_buf_i_cy[i].len; k++){
-						new_buf_o_cy[j].p[k]=new_buf_i_cy[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_cy, dims_cyl);
-			status = H5Dset_extent(dataset_cy, del_dims_cyl);
-			status = H5Dwrite(dataset_cy, datatype_cy, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_cy);
-			free(new_buf_o_cy);
-		}
-		else {
-			status = H5Dextend (dataset_cy, dims_cyl);
-			status = H5Dwrite(dataset_cy, datatype_cy, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cy);
-		}
-		status = H5Dclose(dataset_cy);
-		free(new_buf_i_cy);
-
-
-		hid_t       dataset_cz,dataspace_cz,datatype_cz;
-		dataset_cz = H5Dopen2(group_id, "cyl_centreZ", H5P_DEFAULT);
-		dataspace_cz = H5Dget_space(dataset_cz);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_cz);
-		status_n  = H5Sget_simple_extent_dims(dataspace_cz, dims_cyl, NULL);
-		hvl_t* new_buf_i_cz = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_cz  = H5Dget_type(dataset_cz);     // datatype handle 
-		status = H5Dread(dataset_cz, datatype_cz, dataspace_cz, dataspace_cz, H5P_DEFAULT, new_buf_i_cz);
-		new_buf_i_cz = (hvl_t*) realloc (new_buf_i_cz, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_cz[i+dims_cyl[0]].len =1;
-			new_buf_i_cz[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_cz[i+dims_cyl[0]].p[0]= new_cntrz[i];
-		}
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				new_buf_i_cz[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_cz = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_cz[i].len!=0){
-					new_buf_o_cz[j].len = new_buf_i_cz[i].len;
-					new_buf_o_cz[j].p = (float *) malloc(sizeof(float)*new_buf_i_cz[i].len);
-					for (int k=0; k<new_buf_i_cz[i].len; k++){
-						new_buf_o_cz[j].p[k]=new_buf_i_cz[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_cz, dims_cyl);
-			status = H5Dset_extent(dataset_cz, del_dims_cyl);
-			status = H5Dwrite(dataset_cz, datatype_cz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_cz);
-			free(new_buf_o_cz);
-		}
-		else {
-			status = H5Dextend (dataset_cz, dims_cyl);
-			status = H5Dwrite(dataset_cz, datatype_cz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_cz);
-		}
-		status = H5Dclose(dataset_cz);
-		free(new_buf_i_cz);
-
-		
-		hid_t       dataset_r,dataspace_r,datatype_r;
-		dataset_r = H5Dopen2(group_id, "cyl_radius", H5P_DEFAULT);
-		dataspace_r = H5Dget_space(dataset_r);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_r);
-		status_n  = H5Sget_simple_extent_dims(dataspace_r, dims_cyl, NULL);
-		hvl_t *new_buf_i_r = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_r  = H5Dget_type(dataset_r);     // datatype handle 
-		status = H5Dread(dataset_r, datatype_r, dataspace_r, dataspace_r, H5P_DEFAULT, new_buf_i_r);
-		new_buf_i_r = (hvl_t*) realloc (new_buf_i_r, sizeof(hvl_t) * (unsigned long)(dims_cyl[0]+new_cntrx.size()) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_r[i+dims_cyl[0]].len =1;
-			new_buf_i_r[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_r[i+dims_cyl[0]].p[0]= new_radius[i];
-		}
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
-				new_buf_i_r[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_r = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_r[i].len!=0){
-					new_buf_o_r[j].len = new_buf_i_r[i].len;
-					new_buf_o_r[j].p = (float *) malloc(sizeof(float)*new_buf_i_r[i].len);
-					for (int k=0; k<new_buf_i_r[i].len; k++){
-						new_buf_o_r[j].p[k]=new_buf_i_r[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_r, dims_cyl);
-			status = H5Dset_extent(dataset_r, del_dims_cyl);
-			status = H5Dwrite(dataset_r, datatype_r, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_r);
-			free(new_buf_o_r);
-		}
-		else {
-			status = H5Dextend (dataset_r, dims_cyl);
-			status = H5Dwrite(dataset_r, datatype_r, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_r);
-		}
-		status = H5Dclose(dataset_r);
-		free(new_buf_i_r);
-
-		
-		hid_t       dataset_h,dataspace_h,datatype_h;
-		dataset_h = H5Dopen2(group_id, "cyl_height", H5P_DEFAULT);
-		dataspace_h = H5Dget_space(dataset_h);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_h);
-		status_n  = H5Sget_simple_extent_dims(dataspace_h, dims_cyl, NULL);
-		hvl_t* new_buf_i_h = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_h  = H5Dget_type(dataset_h);     // datatype handle 
-		status = H5Dread(dataset_h, datatype_h, dataspace_h, dataspace_h, H5P_DEFAULT, new_buf_i_h);
-		new_buf_i_h = (hvl_t*) realloc (new_buf_i_h, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_h[i+dims_cyl[0]].len =1;
-			new_buf_i_h[i+dims_cyl[0]].p = (float *) malloc( sizeof(float ));
-			new_buf_i_h[i+dims_cyl[0]].p[0]= new_heights[i];
-		}
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				new_buf_i_h[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_h = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_h[i].len!=0){
-					new_buf_o_h[j].len = new_buf_i_h[i].len;
-					new_buf_o_h[j].p = (float *) malloc(sizeof(float)*new_buf_i_h[i].len);
-					for (int k=0; k<new_buf_i_h[i].len; k++){
-						new_buf_o_h[j].p[k]=new_buf_i_h[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_h, dims_cyl);
-			status = H5Dset_extent(dataset_h, del_dims_cyl);
-			status = H5Dwrite(dataset_h, datatype_h, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_h);
-			free(new_buf_o_h);
-		}
-		else {
-			status = H5Dextend (dataset_h, dims_cyl);
-			status = H5Dwrite(dataset_h, datatype_h, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_h);
-		}
-		status = H5Dclose(dataset_h);
-		free(new_buf_i_h);
-
-		
-
-		hid_t       dataset_tx,dataspace_tx,datatype_tx;
-		dataset_tx = H5Dopen2(group_id, "cyl_tangentX", H5P_DEFAULT);
-		dataspace_tx = H5Dget_space(dataset_tx);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_tx);
-		status_n  = H5Sget_simple_extent_dims(dataspace_tx, dims_cyl, NULL);
-		hvl_t* new_buf_i_tx = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_tx  = H5Dget_type(dataset_tx);     // datatype handle 
-		status = H5Dread(dataset_tx, datatype_tx, dataspace_tx, dataspace_tx, H5P_DEFAULT, new_buf_i_tx);
-		new_buf_i_tx = (hvl_t*) realloc (new_buf_i_tx, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_tx[i+dims_cyl[0]].len =1;
-			new_buf_i_tx[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_tx[i+dims_cyl[0]].p[0]= new_tangx[i];
-		}
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				new_buf_i_tx[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_tx = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_tx[i].len!=0){
-					new_buf_o_tx[j].len = new_buf_i_tx[i].len;
-					new_buf_o_tx[j].p = (float *) malloc(sizeof(float)*new_buf_i_tx[i].len);
-					for (int k=0; k<new_buf_i_tx[i].len; k++){
-						new_buf_o_tx[j].p[k]=new_buf_i_tx[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_tx, dims_cyl);
-			status = H5Dset_extent(dataset_tx, del_dims_cyl);
-			status = H5Dwrite(dataset_tx, datatype_tx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_tx);
-			free(new_buf_o_tx);
-		}
-		else {
-			status = H5Dextend (dataset_tx, dims_cyl);
-			status = H5Dwrite(dataset_tx, datatype_tx, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_tx);
-		}
-		status = H5Dclose(dataset_tx);
-		free(new_buf_i_tx);
-
-		
-		hid_t       dataset_ty ,dataspace_ty,datatype_ty;
-		dataset_ty = H5Dopen2(group_id, "cyl_tangentY", H5P_DEFAULT);
-		dataspace_ty = H5Dget_space(dataset_ty);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_ty);
-		status_n  = H5Sget_simple_extent_dims(dataspace_ty, dims_cyl, NULL);
-		hvl_t* new_buf_i_ty = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_ty  = H5Dget_type(dataset_ty);     // datatype handle 
-		status = H5Dread(dataset_ty, datatype_ty, dataspace_ty, dataspace_ty, H5P_DEFAULT, new_buf_i_ty);
-		new_buf_i_ty = (hvl_t*) realloc (new_buf_i_ty, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_ty[i+dims_cyl[0]].len =1;
-			new_buf_i_ty[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_ty[i+dims_cyl[0]].p[0]= new_tangy[i];
-		}
-		dims_cyl[0] += new_cntrx.size();
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			for (int i=0; i<del_edgesVect.size(); i++){
-				new_buf_i_ty[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_ty = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_ty[i].len!=0){
-					new_buf_o_ty[j].len = new_buf_i_ty[i].len;
-					new_buf_o_ty[j].p = (float *) malloc(sizeof(float)*new_buf_i_ty[i].len);
-					for (int k=0; k<new_buf_i_ty[i].len; k++){
-						new_buf_o_ty[j].p[k]=new_buf_i_ty[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_ty, dims_cyl);
-			status = H5Dset_extent(dataset_ty, del_dims_cyl);
-			status = H5Dwrite(dataset_ty, datatype_ty, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_ty);
-			free(new_buf_o_ty);
-		}
-		else {
-			status = H5Dextend (dataset_ty, dims_cyl);
-			status = H5Dwrite(dataset_ty, datatype_ty, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_ty);
-		}
-		status = H5Dclose(dataset_ty);
-		free(new_buf_i_ty);
-
-
-		hid_t       dataset_tz ,dataspace_tz,datatype_tz;
-		dataset_tz = H5Dopen2(group_id, "cyl_tangentZ", H5P_DEFAULT);
-		dataspace_tz = H5Dget_space(dataset_tz);    // dataspace handle 
-		rank  = H5Sget_simple_extent_ndims(dataspace_tz);
-		status_n  = H5Sget_simple_extent_dims(dataspace_tz, dims_cyl, NULL);
-		//cout << "cyl_tangentZ dataset rank " << rank << " dims_cyl[0] " << dims_cyl[0] << " new_tangz.size " << new_tangz.size() << endl;
-		hvl_t* new_buf_i_tz = (hvl_t*) malloc( sizeof(hvl_t) * (unsigned long)(dims_cyl[0]) );
-		datatype_tz  = H5Dget_type(dataset_tz);     // datatype handle 
-		status = H5Dread(dataset_tz, datatype_tz, dataspace_tz, dataspace_tz, H5P_DEFAULT, new_buf_i_tz);
-		//cout << "cyl_tangentZ [0][1]" << new_buf_i_tz[0].p[0] << " " << new_buf_i_tz[1].p[0] << endl;
-		new_buf_i_tz = (hvl_t*) realloc (new_buf_i_tz, sizeof(hvl_t) * ((unsigned long)(dims_cyl[0])+(new_edgesVect.size()/2)) );
-		for (int i=0; i<new_cntrx.size(); i++){
-			new_buf_i_tz[i+dims_cyl[0]].len =1;
-			new_buf_i_tz[i+dims_cyl[0]].p = (float *) malloc( sizeof(float) );
-			new_buf_i_tz[i+dims_cyl[0]].p[0]= new_tangz[i];
-		}
-		//cout << "new cyl_tangentZ " << new_buf_i_tz[21].p[0]<< endl;
-		dims_cyl[0] += new_cntrx.size();
-		//cout << "dims_cyl[0]" << dims_cyl[0] << endl;
-		if (del_edgesVect.size()>0){
-			hsize_t del_dims_cyl[1]; del_dims_cyl[0] = num_edge_total;	//if there is del_edgesVect
-			//cout << "final dims_cyl[0]" << del_dims_cyl[0] << endl;
-			for (int i=0; i<del_edgesVect.size(); i++){
-				//cout << "i=" << i << " edge #"<< del_edgesVect[i]<<endl;
-				new_buf_i_tz[del_edgesVect[i]].len=0;
-				//new_buf_i_cx[del_edgesVect[i]].p = (float *) realloc (new_buf_i_cx[del_edgesVect[i]].p,0);	
-			}
-			hvl_t* new_buf_o_tz = (hvl_t*) malloc(sizeof(hvl_t) * (unsigned long)(del_dims_cyl[0]));
-			int j =0;
-			for (int i=0; i< dims_cyl[0]; i++){
-				if (new_buf_i_tz[i].len!=0){
-					new_buf_o_tz[j].len = new_buf_i_tz[i].len;
-					new_buf_o_tz[j].p = (float *) malloc(sizeof(float)*new_buf_i_tz[i].len);
-					for (int k=0; k<new_buf_i_tz[i].len; k++){
-						new_buf_o_tz[j].p[k]=new_buf_i_tz[i].p[k];
-					}
-					j++; 
-					//cout << j << endl;
-				}
-			}
-			//cout << "done: "<<endl;
-			//dims_cyl[0] = del_dims_cyl[0];
-			//status = H5Dextend (dataset_tz, dims_cyl);
-			status = H5Dset_extent(dataset_tz, del_dims_cyl);
-			status = H5Dwrite(dataset_tz, datatype_tz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_o_tz);
-			//cout << status << endl;
-			free(new_buf_o_tz);
-		}
-		else {
-			status = H5Dextend (dataset_tz, dims_cyl);
-			status = H5Dwrite(dataset_tz, datatype_tz, H5S_ALL, H5S_ALL, H5P_DEFAULT, new_buf_i_tz);
-		}
-		status = H5Dclose(dataset_tz);
-		free(new_buf_i_tz);
-
-		
 		status = H5Gclose (group_id);	
 		status = H5Fclose (file_id);
 
+		
+		///write cyl_properties
+		char* cyl_prop = "cyl_centreX";
+		writeCylProp2H5(cyl_prop,num_new_e, new_cntrx, del_edgesVect);
+		
+		cyl_prop = "cyl_centreY";
+		writeCylProp2H5(cyl_prop,num_new_e, new_cntry, del_edgesVect);
+		
+		cyl_prop = "cyl_centreZ";
+		writeCylProp2H5(cyl_prop,num_new_e, new_cntrz, del_edgesVect);
+		
+		cyl_prop = "cyl_radius";
+		writeCylProp2H5(cyl_prop,num_new_e, new_radius, del_edgesVect);
+		
+		cyl_prop = "cyl_height";
+		writeCylProp2H5(cyl_prop,num_new_e, new_heights, del_edgesVect);
+		
+		cyl_prop = "cyl_tangentX";
+		writeCylProp2H5(cyl_prop,num_new_e, new_tangx, del_edgesVect);
+			
+		cyl_prop = "cyl_tangentY";
+		writeCylProp2H5(cyl_prop,num_new_e, new_tangy, del_edgesVect);
+			
+		cyl_prop = "cyl_tangentZ";
+		writeCylProp2H5(cyl_prop,num_new_e, new_tangz, del_edgesVect);
+
+		
 		///empty the vectors of new edge properties after they were written into the file
 		new_radius.resize(0);
 		new_heights.resize(0);
@@ -1154,6 +768,82 @@ void GeometryScene::saveLabel(){
 
 	
  	qDebug() << "Debug. >>GeometryScene::saveLabel()...Successfully wrote the labeled H5 file" << h5_filename.toLatin1().data()<<"!\n";
+}
+
+
+/** function to write cylinder cx,cy,cz,h,r,tx,ty,tz properties as part of the save function 
+* global variables used: h5_filename,num_edge_total 
+*/		
+void GeometryScene::writeCylProp2H5(char * prop_name,int num_new_edge, QVector <float> new_edges_prop_val, QVector <int> deleted_edgesVect){		
+		hid_t       file_id, group_id, dataset, dataspace, datatype, hdf_plist;  
+		herr_t      status;
+		int rank = 1;
+		hsize_t  dims[1];
+		int status_n;
+		
+		file_id = H5Fopen(h5_filename.toLatin1().data(), H5F_ACC_RDWR, H5P_DEFAULT);
+		group_id = H5Gopen (file_id, "/vessel_graph/edge_properties", H5P_DEFAULT);
+		
+		dataset = H5Dopen2(group_id, prop_name, H5P_DEFAULT);
+		dataspace = H5Dget_space(dataset);    // dataspace handle 
+		rank  = H5Sget_simple_extent_ndims(dataspace);
+		status_n  = H5Sget_simple_extent_dims(dataspace, dims, NULL);
+		hvl_tf* buf_i = (hvl_tf*) malloc( sizeof(hvl_tf) * (unsigned long)(dims[0]) );
+		//cout << "cyl_centreX dataset rank " << rank << " dims[0] " << dims[0] << " num_new_edge " << num_new_edge << endl;
+		datatype  = H5Dget_type(dataset);     // datatype handle 
+		status = H5Dread(dataset, datatype, dataspace, dataspace, H5P_DEFAULT, buf_i);
+		//cout << status << prop_name<<"[0][1]" << buf_i[0].p[0] << " " << buf_i[1].p[0] << endl;
+		if (num_new_edge>0)
+		{
+			buf_i = (hvl_tf*) realloc (buf_i, sizeof(hvl_tf) * (unsigned long)(dims[0]+num_new_edge) );
+			for (int i=0; i<num_new_edge; i++){
+				buf_i[i+dims[0]].len =1;
+				buf_i[i+dims[0]].p = (float *) malloc( sizeof(float) );
+				buf_i[i+dims[0]].p[0]= new_edges_prop_val[i];
+			}
+			dims[0] += num_new_edge;
+			//cout << "dims[0]" << dims[0] << endl;
+		}
+		if (deleted_edgesVect.size()>0){
+			hsize_t del_dims[1]; del_dims[0] = num_edge_total;	//if there is deleted_edgesVect
+			cout << "final dims[0]" << del_dims[0] << endl;
+			for (int i=0; i<deleted_edgesVect.size(); i++){
+				buf_i[deleted_edgesVect[i]].len=0;
+				cout << "i=" << i << " edge #"<< deleted_edgesVect[i]<<endl;
+			}
+			hvl_tf* buf_o = (hvl_tf*) malloc(sizeof(hvl_tf) * (unsigned long)(del_dims[0]));
+			int j =0;
+			for (int i=0; i< dims[0]; i++){
+				if (buf_i[i].len!=0){
+					buf_o[j].len = buf_i[i].len;
+					buf_o[j].p = (float *) malloc(sizeof(float)*buf_i[i].len);
+					for (int k=0; k<buf_i[i].len; k++){
+						buf_o[j].p[k]=buf_i[i].p[k];
+					}
+					j++;
+					cout << j << " " << flush;
+				}
+			}
+			cout << "done deleting"<<endl;
+			status = H5Dset_extent(dataset, del_dims);
+			cout << status<<endl;
+			status = H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_o);
+			cout << status << endl;
+			free(buf_o);
+			cout << "Freed buf_o"<< endl;
+		}
+		else {
+			status = H5Dextend (dataset, dims);
+			status = H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_i);
+		}
+		status = H5Dclose(dataset);
+		cout << "wrote "<< prop_name <<" dataset! "<<status << endl;
+ 		free(buf_i);
+		cout << "freed buf_i" << endl;
+
+		status = H5Gclose (group_id);	
+		status = H5Fclose (file_id);
+
 }
 
 void GeometryScene::getUserLabel(){
@@ -1302,9 +992,9 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 	int rank_c = dataspace_c.getSimpleExtentDims( dims_c, NULL);
 	H5::DataSpace memspace_c ( rank_c, dims_c );
 	H5::DataType ctype = dataset_centreX.getDataType();
-	h5_data.centreX  = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
-	h5_data.centreY  = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
-	h5_data.centreZ  = (hvl_t*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_t));
+	h5_data.centreX  = (hvl_tf*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_tf));
+	h5_data.centreY  = (hvl_tf*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_tf));
+	h5_data.centreZ  = (hvl_tf*) malloc((unsigned long)(dims_c[0])*sizeof(hvl_tf));
 	dataset_centreX.read(h5_data.centreX ,ctype ,memspace_c, dataspace_c); 	
 	dataset_centreY.read(h5_data.centreY ,ctype ,memspace_c, dataspace_c); 	
 	dataset_centreZ.read(h5_data.centreZ ,ctype ,memspace_c, dataspace_c); 	
@@ -1330,9 +1020,9 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 		exit(0);
 	}
 	H5::DataType ttype = dataset_tangentX.getDataType();
-	h5_data.tangentX  = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
-	h5_data.tangentY  = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
-	h5_data.tangentZ  = (hvl_t*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_t));
+	h5_data.tangentX  = (hvl_tf*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_tf));
+	h5_data.tangentY  = (hvl_tf*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_tf));
+	h5_data.tangentZ  = (hvl_tf*) malloc((unsigned long)(dims_t[0])*sizeof(hvl_tf));
 	dataset_tangentX.read(h5_data.tangentX ,ttype ,dataspace_t, dataspace_t); 	
 	dataset_tangentY.read(h5_data.tangentY ,ttype ,dataspace_t, dataspace_t); 	
 	dataset_tangentZ.read(h5_data.tangentZ ,ttype ,dataspace_t, dataspace_t); 	
@@ -1355,7 +1045,7 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 		exit(0);
 	}
 	H5::DataType htype = dataset_heights.getDataType();
-	h5_data.heights  = (hvl_t*) malloc((unsigned long)(dims_h[0])*sizeof(hvl_t));
+	h5_data.heights  = (hvl_tf*) malloc((unsigned long)(dims_h[0])*sizeof(hvl_tf));
 	dataset_heights.read(h5_data.heights ,htype ,dataspace_h, dataspace_h); 	
 	//cout << h5_data.heights[0].len << " , " << h5_data.heights[1].len << " , " << h5_data.heights[2].len << " , " << h5_data.heights[3].len << " , " << endl;
 	//cout << h5_data.heights[0].p[0] << " , " << h5_data.heights[0].p[1] << " , " << h5_data.heights[1].p[0] << " , " << h5_data.heights[2].p[1] << " , "<< h5_data.heights[6].p[0] << endl;
@@ -1374,7 +1064,7 @@ GeometryScene::h5_output_type GeometryScene::H5_reader (char* dbfile){
 		exit(0);
 	}
 	H5::DataType rtype = dataset_radius.getDataType();
-	h5_data.radius  = (hvl_t*) malloc((unsigned long)(dims_r[0])*sizeof(hvl_t));
+	h5_data.radius  = (hvl_tf*) malloc((unsigned long)(dims_r[0])*sizeof(hvl_tf));
 	dataset_radius.read(h5_data.radius ,rtype ,dataspace_r, dataspace_r); 	
 	//cout << h5_data.radius[0].len << " , " << h5_data.radius[1].len << " , " << h5_data.radius[2].len << " , " << h5_data.radius[3].len << " , " << endl;
 	//cout << h5_data.radius[0].p[0] << " , " << h5_data.radius[0].p[1] << " , " << h5_data.radius[1].p[0] << " , " << h5_data.radius[2].p[1] << " , "<< h5_data.radius[6].p[0] << endl;

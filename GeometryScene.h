@@ -42,11 +42,12 @@ public:
 	QString label_num2Name (int label);
      int label_Name2num (QString labelName);		
 	bool edgeExists(int vertx0,int vertx1,QVector <int> Vect);
+	void writeCylProp2H5(char * prop_name,int num_new_edge, QVector <float> new_edges_prop_val, QVector <int> deleted_edgesVect);		
 	
 	typedef struct  {
       size_t len; /* Length of VL data (in base type units) */      
       float *p;    /* Pointer to VL data */        
-	} hvl_t;
+	} hvl_tf;		//hvl_t is a defined structure of H5 C API which has void * instead of my float * => needs to be type casted to be able to be used!. safe not to overwrite it => we define hvl_tf
 
 	typedef struct  {
       size_t len; /* Length of VL data (in base type units) */      
@@ -57,10 +58,10 @@ public:
 	struct h5_output_type {
 		int num_edge;
 		int num_vertex;
-		hvl_t *centreX; hvl_t *centreY; hvl_t *centreZ;
-		hvl_t *tangentX; hvl_t *tangentY; hvl_t *tangentZ;
-		hvl_t *radius;
-		hvl_t *heights;
+		hvl_tf *centreX; hvl_tf *centreY; hvl_tf *centreZ;
+		hvl_tf *tangentX; hvl_tf *tangentY; hvl_tf *tangentZ;
+		hvl_tf *radius;
+		hvl_tf *heights;
 		int *label;
 		int *edges;
 		float *vertices;
