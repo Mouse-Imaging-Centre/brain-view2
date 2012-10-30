@@ -6,17 +6,18 @@
 #include "textureFileItem.h"
 #include "Inventor/nodes/SoSeparator.h"
 //#include <bicpl.h>
-#include <stdio.h>    
+#include <stdio.h>    //FILE, fopen(), fclose()
 #include <stdlib.h>
-#include <sys/stat.h> 
-#include <string>     
-#include <fstream>    
-#include <iostream>   
-// #include "hdf5.h"		/* C API */
-#include "H5Cpp.h"		/* C++ API */
+#include <sys/stat.h> //stat, stat()
+#include <string>     //string
+#include <fstream>    //fstream 
+#include <iostream>   //cout
+// #include "hdf5.h"		//C API
+#include "H5Cpp.h"		//C++ API
 #include "H5File.h"
 #include <QVector>
-
+// #include <QFile>
+// #include <QTextStream>
 
 #include "ui_labelProps.h"
 #include <QtGui>
@@ -36,7 +37,7 @@ public:
 	bool loadVertstats(QFile &file);
 	bool updateLabelLUColor();
 	int whichEdgeIndx (int edge_ind1,int edge_ind2,int x, int y,int z);
-
+//  	bool loadLabelLU(QFile &file);
 	void wasSelected();
 	QString h5_filename;
 	QString label_num2Name (int label);
@@ -54,6 +55,16 @@ public:
       int *p;    /* Pointer to VL data */        
 	} hvl_ti;
 
+// 	typedef struct  {
+//       size_t len; /* Length of VL data (in base type units) */      
+//       int *p;    /* Pointer to VL data */ 
+//       int *q;
+// 	} hvl_ti2;
+	
+// 	typedef struct  {
+//       size_t len; /* Length of VL data (in base type units) */      
+//       QVector <SoMaterial *> p;    /* Pointer to VL data */        
+// 	} hvl_tSoMat;
 
 	struct h5_output_type {
 		int num_edge;
@@ -63,9 +74,10 @@ public:
 		hvl_tf *radius;
 		hvl_tf *heights;
 		int *label;
+		//int *id;
 		int *edges;
 		float *vertices;
-		//h5_output_type() : height({0.0}) {}		/*initializing height to default value */
+// 		h5_output_type() : height({0.0}) {}		//initializing height to default value*/
 	};
 	
 	//struct h5_output_type * H5_reader (char* dbfile);
@@ -74,13 +86,17 @@ public:
 	int num_edge_total;
 	
 	
-
+// 	struct load_Cylinder_output_type {
+// 		int nodeid;
+// 		SoMaterial *nodematerial;
+// // 		load_Cylinder_output_type : nodematerial(new SoMaterial) {}
+// 	};
 //signals:
         // signal emitted if the picked point in the scene belongs to this scenegraph
         //void localPointPicked(int index);
 public slots:
         // called when an object (not necessarily in this geometryScene) was picked
-        void pickReceived(int index, int id, float x, float y, float z,SoType objtype);
+        void pickReceived(int index, int id,int real_id, float x, float y, float z,SoType objtype);
 		void noPointReceived();
 		void saveLabel();
 		void saveasLabel();
@@ -90,6 +106,8 @@ public slots:
 		void getUserLabel();
 		void updateRadiusTransparency(int newVal);
 		
+// 		 // called when an object (not necessarily in this geometryScene) was picked to be labeled
+//         void assignLabel(int index, int id, int x, int y, int z);
 // signals:
 //          //void pointPickedColor(int indx1, int indx2, float r, float g, float b);
 // 	    void createEdgeSignal();
@@ -97,19 +115,22 @@ private:
 	
 	void radiusCalc(QVector <QVector <float> > cylradiusVect);
 	ResourceForm *rf;
-	/* the root separator from the viewer */
+	// the root separator from the viewer
 	SoSeparator *root;
-	/* the separator which will hold all the geometry bits */
+	// the separator which will hold all the geometry bits
 	SoSeparator *scene;
-	/* the actual geometry bits */
+	// the actual geometry bits
 	GeometryNode *geometry;
 	
 	QVector<QVariant> data;
 
+	//hvl_ti2 * nodeIDs;
 	QVector< QVector <int> > nodeIDs;
 	QVector< QVector <int> > childIDs;
 	int nodeId;
 	int e_num;
+	//SoMaterial *nodematerial;
+	/*hvl_tSoMat *cylmatVect;*/ 	
 	QVector <QVector <SoMaterial *> > cylmatVect;
 	QVector <QVector <float> > cylradiusVect;	//hvl_t *cylradiusVect;  	
 	
@@ -136,6 +157,7 @@ private:
 	QWidget *labelWidget;
 	QVBoxLayout *labelLayout;
 
+	//QVector <int> segmentIDVect;
 	QVector <int> cylnum_transparency0_5;
 
 	QVector <SoMaterial *> tmp_cylmatVect;

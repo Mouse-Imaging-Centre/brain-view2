@@ -9,3 +9,5 @@ ResourceForm has been modified and Background Color is added to Properties widge
 The option to connect 2 edges in the cylinder object has been added. 
 The option to delete an edge in the cylinder object has been added.
 Also the option to "save" the file (over-write) or "save as" a new file has been added.
+
+The menubar for location of tag on the surface has been added. Changes in the delete vessel buttons. Removed verbose messages to the screen.
