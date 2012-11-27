@@ -13,8 +13,8 @@ tagFileItem::tagFileItem(SoSeparator *root,
     // the root separator from calling function onto which
     // all new bits will be attached.
     this->root = root;
-	//this->root=viewer->getRootSeparator();
-	//std::cout << "Woohooo!" << std::endl;
+    //this->root=viewer->getRootSeparator();
+    //std::cout << "Woohooo!" << std::endl;
     // create all the necessary nodes
     tagSeparator = new SoSeparator;
     scale = new SoScale;
@@ -33,7 +33,7 @@ tagFileItem::tagFileItem(SoSeparator *root,
     tagSeparator->addChild(scale);
 
     root->addChild(tagSeparator);
-  	// inittagsize=0.05;	//initialize to the initial value of the tagSize QWidget
+    // inittagsize=0.05;	//initialize to the initial value of the tagSize QWidget
 }
 
 tagFileItem::~tagFileItem() {

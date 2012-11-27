@@ -31,7 +31,7 @@ public:
 public slots:
         void upperValueChanged();
         void lowerValueChanged();
-	    // when new texture selected in combo-box.
+	// when new texture selected in combo-box.
         void newTextureSelected(int index);
         void setPickInfo(int index);
 private:

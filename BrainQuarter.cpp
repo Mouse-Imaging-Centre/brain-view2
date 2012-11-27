@@ -91,11 +91,11 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 
 		if (objtype == SoFaceDetail::getClassTypeId()) {
 		///// if object is polygon:
-			std::cout << "\nPicked point on Polygon obejct!" << faceTagOpt <<std::endl;
+			//std::cout << "\nPicked point on Polygon obejct!" << faceTagOpt <<std::endl;
 			SoFaceDetail *fd = new SoFaceDetail();
 			//SoFaceDetail *fd = (SoFaceDetail *) point->getDetail();  //fd is faceDetail
 			fd = (SoFaceDetail *) point->getDetail();
-// 			std::cout << "Picker - num points: " << fd->getNumPoints() << std::endl; //Number of vertices making up the polygon. 
+// 			//std::cout << "Picker - num points: " << fd->getNumPoints() << std::endl; //Number of vertices making up the polygon. 
 			//if object is polygon Picker - num points: 4
  			//if (fd->getNumPoints() ==4) {
 			const SoPointDetail *pd = fd->getPoint(0); //getPoint(const int idx) Returns a pointer into the array of vertices, starting at the idx'th  vertice of the polygon
@@ -135,7 +135,7 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 
 		else if (objtype == SoLineDetail::getClassTypeId()) {
 		//if obejct is line:
-			std::cout << "\nPicked point on Line obejct!" <<std::endl;
+			//std::cout << "\nPicked point on Line obejct!" <<std::endl;
 			SoLineDetail *ld = new SoLineDetail();
 			ld = (SoLineDetail *) point->getDetail();
 			//std::cout << "Picker - num points: " << ld->getNumPoints() << std::endl;
@@ -159,7 +159,7 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 		}
 		
 		else if (objtype == SoCylinderDetail::getClassTypeId()) {
-			std::cout << "\nPicked point on Cylinder obejct!" <<std::endl;
+			//std::cout << "\nPicked point on Cylinder obejct!" <<std::endl;
 			SoCylinderDetail *cd = new SoCylinderDetail();
 			cd = (SoCylinderDetail *) point->getDetail();
 			//int cylpart = cd->getPart;
@@ -176,6 +176,7 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 }
 
 BrainQuarter::~BrainQuarter() {
+	root->unref();
 }
 
 

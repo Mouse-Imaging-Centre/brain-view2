@@ -54,7 +54,7 @@ GeometryScene::GeometryScene(const QVector<QVariant> &data,
 void GeometryScene::deleteThisEdge(){
 	//qDebug() << "\nGeometryScene::deleteThisEdge() "<<  num_edge_total;
 	
-		qDebug() << "NodeId " << nodeId <<"="<< nodeIDs[e_num][0]<< " Vessel segment number " << e_num << " is edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") with label # " << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num])<< " will be deleted!";                              
+		//qDebug() << "NodeId " << nodeId <<"="<< nodeIDs[e_num][0]<< " Vessel segment number " << e_num << " is edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") with label# " << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num])<< " will be deleted!";                              
 
 /*		for (int i=0; i<num_edge_total; i++){
 			std::cout <<"\n"<< i <<  ": " << std::flush;
@@ -114,6 +114,7 @@ void GeometryScene::deleteThisEdge(){
 	
 	num_edge_total--;
 	del_edgesVect.append(e_num);
+	qDebug() << /*"NodeId " << nodeId <<"="<< nodeIDs[e_num][0]<< " Vessel segment number " << e_num << " is*/ "edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") with label #" << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num])<< " is deleted!\n";
 	}
 /*		for (int i=0; i<num_edge_total; i++){
 			std::cout <<"\n"<< i <<  ": " << std::flush;
@@ -176,7 +177,7 @@ void GeometryScene::addNewEdge(){
 	
 	
 	if (!edgeExists(connectingVect[0],connectingVect[1],edgesVect)){
-		cout << "New edge ("<<connectingVect[0] << "," << connectingVect[1]<< ") is added!" << endl;
+		cout << "New edge ("<<connectingVect[0] << "," << connectingVect[1]<< ") is added!\n" << endl;
 		edgesVect.append(connectingVect[0]);
 		edgesVect.append(connectingVect[1]);
 		new_edgesVect.append(connectingVect[0]);
@@ -1227,7 +1228,7 @@ void GeometryScene::pickReceived(int index, int id,int real_id, float x, float y
 				}
 			}
 		}
-		qDebug() << "NodeId " << nodeId <<"="<< nodeIDs[e_num][0]<< " Vessel segment number " << e_num << " is edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") has label # " << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num]);                              
+		qDebug() << /*"NodeId " << nodeId <<"="<< nodeIDs[e_num][0]<< " Vessel segment number " << e_num << " is */"edge ("<< edgesVect[2*e_num] << "," << edgesVect[2*e_num+1] << ") has label #" << labelVect[e_num] << " : " << label_num2Name(labelVect[e_num]);                              
 		if (flag_new_edge){	//we are waiting for 2 edges to be clicked for connecting
 			rf->uilabel.label->setEnabled ( FALSE );		
 			rf->uilabel.LabelVessel->setEnabled ( FALSE );		

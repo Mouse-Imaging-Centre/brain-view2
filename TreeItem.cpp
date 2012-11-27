@@ -212,10 +212,10 @@ void TreeItem::updateTagSize(double newsize){
 }
 
 void TreeItem::TagcolourDialog(){
-	qDebug() << "Debug. >>TreeItem::TagcolourDialog()";
+	//qDebug() << "Debug. >>TreeItem::TagcolourDialog()";
 	QColor tagcolour = QColorDialog::getColor();
 	if (tagcolour.isValid()) {
-		form->uitag.TagColour->setText(tagcolour.name());
+		//form->uitag.TagColour->setText(tagcolour.name());
 		form->uitag.TagColour->setPalette(QPalette(tagcolour));
 		form->uitag.TagColour->setAutoFillBackground(true);
 		int tr,tg,tb;
@@ -223,7 +223,7 @@ void TreeItem::TagcolourDialog(){
 		currTagR = float(tr); currTagG = float(tg); currTagB = float(tb); 
 
 	}	
-	qDebug() << "Debug. <<TreeItem::TagcolourDialog()";
+	//qDebug() << "Debug. <<TreeItem::TagcolourDialog()";
 	
 }
 

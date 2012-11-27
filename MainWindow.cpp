@@ -216,7 +216,7 @@ void MainWindow::addTagFunc(){
 // 	qDebug() << "Debug. >>MainWindow::addTagFunc()";
 // 	Tagpoint = (float*) malloc(sizeof(float) * 3);
 // 	Tagpoint = resourceForm->addTagpoint();
-	std::cout << "Added tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
+//	std::cout << "Added tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 		
 	//remove any duplication of tag points:
 	bool tagfound=false;
@@ -231,6 +231,7 @@ void MainWindow::addTagFunc(){
 		tagsVect.append(Tagpoint[1]);	//Tag(y)
 		tagsVect.append(Tagpoint[2]);	//Tag(z)
 		tagsVect.append(Tagsize);	//Tagsize
+		std::cout << "Added tag : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<std::endl;	
 	}
 	
 // 	qDebug() << "Debug. <<MainWindow::addTagFunc()";
@@ -282,7 +283,9 @@ void MainWindow::saveTagFileFunc(QFile &filename){
 
 void MainWindow::quitApplication() {
 	// code to prompt for exit, save stuff, etc. could go here
-//	qDebug() << "Debug. [ MainWindow() ] Closing ... " ;
+	//qDebug() << "Debug. [ MainWindow() ] Closing ... " ;
+	//root->unref(); //will do in BrainQuarter destructor   
+	delete viewer;
 	exit(0);
 }
 

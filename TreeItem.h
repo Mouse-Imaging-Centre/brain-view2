@@ -88,7 +88,7 @@ public:
 
     // this method is called every time the user selectes the particular item in the GUI.
     // subclasses can reimplement to do something useful here
-    virtual void wasSelected() { std::cout << "Eeeek " << parent()->childNumber() << std::endl; };
+    virtual void wasSelected() { /*std::cout << "Eeeek " << parent()->childNumber() << std::endl;*/ };
 
     signals:
         void propertyFormInstantiated(QWidget *widget);

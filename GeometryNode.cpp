@@ -132,7 +132,7 @@ void GeometryNode::colourDialog() {
 // 	qDebug() << "Debug. >>GeometryNode::colourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
-		ui.colourButton->setText(colour.name());
+		//ui.colourButton->setText(colour.name());
 		ui.colourButton->setPalette(QPalette(colour));
 		ui.colourButton->setAutoFillBackground(true);
 		updateColour(colour);
@@ -144,7 +144,7 @@ void GeometryNode::bckgrncolourDialog() {
  	//qDebug() << "Debug. >>GeometryNode::bckgrncolourDialog()";
 	QColor colour = QColorDialog::getColor();
 	if (colour.isValid()) {
-		ui.bckgrndButton->setText(colour.name());
+		//ui.bckgrndButton->setText(colour.name());
 		ui.bckgrndButton->setPalette(QPalette(colour));
 		ui.bckgrndButton->setAutoFillBackground(true);
 		this->rf = rf;
@@ -248,7 +248,7 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 	if (object_list[i]->object_type == POLYGONS) {
 // 		qDebug() << "Debug. >>GeometryNode::loadObj()";
 		//std::cout <<"object_is_line =" << object_is_line <<std::endl;
-		std::cout << "Loading Polygon object number: " << i <<std::endl;
+		//std::cout << "Loading Polygon object number: " << i <<std::endl;
 	// go ahead and load the polygons.
 		obj = loadPolygons(object_list[i]->specific.polygons);
 // 		qDebug() << "Debug. <<GeometryNode::loadObj()";
@@ -260,7 +260,7 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 		object_is_line=1;
 		//std::cout <<"object_is_line =" << object_is_line <<std::endl;
 		//go ahead and load the line object.
-		std::cout << "Loading Line object number: " << i <<std::endl;
+		//std::cout << "Loading Line object number: " << i <<std::endl;
 		obj = loadLines( (object_list[i])->specific.lines );
 		//qDebug() << "Debug. <<GeometryNode::loadObj()";
 	}
