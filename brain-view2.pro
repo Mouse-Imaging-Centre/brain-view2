@@ -16,6 +16,7 @@ VERSION = 0.1.1
 #INVENTORDIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
 #HDF5DIR = /projects/mice/share/arch/linux-x86_64-eglibc2_11_1/
 #qmake-qt4 MINCDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ INVENTORDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ QUARTERDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ HDF5DIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ brain-view2.pro
+#or: qmake MINCDIR=/usr/local/ INVENTORDIR=/usr/local/ QUARTERDIR=/usr/local/ HDF5DIR=/usr/local/hdf5/ brain-view2.pro
 
 COINLIBS = $$system(coin-config --ldflags)
 COININCLUDE = $$system(coin-config --includedir)
@@ -24,9 +25,12 @@ CONFIG += debug
 QT += opengl
 
 INCLUDEPATH += $${QUARTERDIR}/include
+INCLUDEPATH += $${QUARTERDIR}/include/Quarter/
 INCLUDEPATH += $${MINCDIR}/include
 INCLUDEPATH += $${INVENTORDIR}/Inventor
+INCLUDEPATH += $${INVENTORDIR}/include/bicInventor/
 INCLUDEPATH += $$COININCLUDE
+INCLUDEPATH += $${HDF5DIR}/include
 
 LIBS += $$COINLIBS
 LIBS += -L$${MINCDIR}/lib
