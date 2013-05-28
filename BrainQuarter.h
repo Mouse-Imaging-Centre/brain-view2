@@ -23,6 +23,9 @@
 #include <QtDebug>
 #include <QtGui>
 
+#include <mniVertstatsFile.h>
+
+
 using namespace SIM::Coin3D::Quarter;
 
 class BrainQuarter : public QuarterWidget {
@@ -40,6 +43,7 @@ public:
         virtual QSize minimumSizeHint(void) const;
         void getPickedPoint(SoPickedPoint *point,SoPickedPoint *point2);
 	void setTagOpt(int tagopt) {faceTagOpt = tagopt;};	
+	void setVerboseStat(bool stat);
 
 
 	int faceTagOpt;
@@ -55,6 +59,7 @@ private:
         SoBaseColor *col;
         SoPerspectiveCamera *pcam;
         SoEventCallback *ecb;
+		bool ifVerbose;
 
 //`	int faceTagOpt;
 };

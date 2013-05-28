@@ -33,7 +33,7 @@ static void event_cb(void *ud, SoEventCallback *n) {
 		//rp.setPoint(cursorPosition);
 		//rp.setRadius(8.0);
 		rp.setPickAll(TRUE);	//all the objects the ray intersects with should be picked. If not, only the intersection point of the object closest to the camera will be picked.
-		SoNode *newroot = viewer->getSceneGraph();
+		//SoNode *newroot = viewer->getSceneGraph();
        rp.apply(viewer->getSceneGraph());
 // 		rp.apply(viewer->getOverlaySceneGraph());
         SoPickedPoint *point = rp.getPickedPoint(0);
@@ -49,6 +49,8 @@ BrainQuarter::BrainQuarter(QWidget *parent) : QuarterWidget(parent) {
     root->ref();
     pcam = new SoPerspectiveCamera;
     root->addChild(pcam);
+	
+	ifVerbose = false;
 
 	// light
  	//root->addChild(new SoDirectionalLight);
@@ -66,41 +68,43 @@ BrainQuarter::BrainQuarter(QWidget *parent) : QuarterWidget(parent) {
 	//createSampleSceneGraph();
 
 	faceTagOpt = 1; //Default to tag polygon in middle point
-// 	qDebug() << "Debug. <<BrainQuarter::BrainQuarter()";
+
 }
 
 void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) {
-	//qDebug() << "Debug. >>BrainQuarter::getPickedPoint()";
     // only do something if a the mouse cursor was over a valid piece of geometry
     if (point != NULL && point->isOnGeometry()) {
 
-       // std::cout << "\nOn geometry ..." << std::endl;
+       // qDebug() << "\nOn geometry ..." ;
         SbVec3f v = point->getPoint(); //the world space of the picked point.
 		SbVec4f t = point->getTextureCoords();	//the image space texture coordinates. 
+/*		
 		int matindx = point->getMaterialIndex(); //the material index.
-//        std::cout << "\nOn geometry ... Found: " << v[0] << " " << v[1] << " "<< v[2] << std::endl;
-//         std::cout << "Texture: " << t[0] << " " << t[1] << " " << t[2] << " " << t[3] << std::endl;
-// 		std::cout << "Material Index " << matindx << std::endl;
+		qDebug() << "\nOn geometry ... Found: " << v[0] << " " << v[1] << " "<< v[2] ;
+		qDebug() << "Texture: " << t[0] << " " << t[1] << " " << t[2] << " " << t[3] ;
+		qDebug() << "Material Index " << matindx ;
+*/
         SoPath *path = point->getPath();	//the path to the picked object. //
 		SoNode * tail = static_cast<SoFullPath*>(path)->getTail(); //SoPath::getTail() will return the first node in the path.  If you need the actual tail node (with hidden children), you need to cast the path to SoFullPath
 
-//         std::cout << "ID: " << path->getTail()->getNodeId() << std::endl;
+//		qDebug() << "ID: " << path->getTail()->getNodeId() ;
 		SbVec3f objIntersect = point->getObjectPoint();//the object space point, in the object space specified by node. If node equals NULL, the object space of the node where the point was actually picked will be used (this is what one would usually be interested in)
 		const SoDetail *objdetail = point->getDetail();  	
 		SoType objtype = objdetail->getTypeId();
 
 		if (objtype == SoFaceDetail::getClassTypeId()) {
-		///// if object is polygon:
-			//std::cout << "\nPicked point on Polygon obejct!" << faceTagOpt <<std::endl;
+			//qDebug() << "\nPicked point on Polygon obejct!" << faceTagOpt;
 			SoFaceDetail *fd = new SoFaceDetail();
 			//SoFaceDetail *fd = (SoFaceDetail *) point->getDetail();  //fd is faceDetail
 			fd = (SoFaceDetail *) point->getDetail();
-// 			//std::cout << "Picker - num points: " << fd->getNumPoints() << std::endl; //Number of vertices making up the polygon. 
+			//qDebug() << "Picker - num points: " << fd->getNumPoints() ; //Number of vertices making up the polygon. 
 			//if object is polygon Picker - num points: 4
  			//if (fd->getNumPoints() ==4) {
 			const SoPointDetail *pd = fd->getPoint(0); //getPoint(const int idx) Returns a pointer into the array of vertices, starting at the idx'th  vertice of the polygon
 			/////const SoPointDetail* SoFaceDetail::getPoint(int) const: Assertion `idx >= 0 && idx < this->numpoints' 
-// 			std::cout << "Index: " << pd->getCoordinateIndex() << std::endl; //Returns index into coordinate set for the point's 3D coordinates. 
+			if ( ifVerbose )
+				qDebug() << "Polygon Index: " << pd->getCoordinateIndex() <<":"; //Returns index into coordinate set for the point's 3D coordinates. 
+
 			
 			SbVec3f v2 = point2->getPoint(); //the world space of the picked point.
 			if (faceTagOpt ==0){
@@ -118,14 +122,15 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 			pickedtag[1]=v2[1];
 			pickedtag[2]=v2[2];
 			}
-			
-// 			std::cout << "Found point1: " << v[0] << " " << v[1] << " "<< v[2] << std::endl;
-// 			std::cout << "Found point2: " << v2[0] << " " << v2[1] << " "<< v2[2] << std::endl;
-//			std::cout << "Center tag: " << pickedtag[0] << " " << pickedtag[1] << " "<< pickedtag[2] << std::endl<< std::endl;
-			
-// 			const SoPointDetail *pd2 = fd->getPoint(2); //getPoint(const int idx) Returns a pointer into the array of vertices, starting at the idx'th  vertice of the polygon
-// 			std::cout << "Index pd2: " << pd2->getCoordinateIndex() << std::endl; //Returns index into coordinate set for the point's 3D coordinates. 
 
+/*
+			qDebug() << "Found point1: " << v[0] << " " << v[1] << " "<< v[2] ;
+			qDebug() << "Found point2: " << v2[0] << " " << v2[1] << " "<< v2[2] ;
+			qDebug() << "Center tag: " << pickedtag[0] << " " << pickedtag[1] << " "<< pickedtag[2] ;
+			
+			const SoPointDetail *pd2 = fd->getPoint(2); //getPoint(const int idx) Returns a pointer into the array of vertices, starting at the idx'th  vertice of the polygon
+			qDebug() << "Index pd2: " << pd2->getCoordinateIndex() ; //Returns index into coordinate set for the point's 3D coordinates. 
+*/
 			// emit a signal containing the coordinate picked and ID of the bit of geometry containing
 			// this point. This ID will be used by the slots attached to this signal to decide whether
 			// to do anything or not.
@@ -134,24 +139,27 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 		
 
 		else if (objtype == SoLineDetail::getClassTypeId()) {
-		//if obejct is line:
-			//std::cout << "\nPicked point on Line obejct!" <<std::endl;
 			SoLineDetail *ld = new SoLineDetail();
 			ld = (SoLineDetail *) point->getDetail();
-			//std::cout << "Picker - num points: " << ld->getNumPoints() << std::endl;
+			//qDebug() << "Picker - num points: " << ld->getNumPoints() ;
 			const SoPointDetail *pd0 = ld->getPoint0(); //Returns SoPointDetail describing the line start point. 
  			const SoPointDetail *pd1 = ld->getPoint1(); //Returns SoPointDetail describing the line end point.
-			std::cout << "(Index p0-p1) graph edge =[" << pd0->getCoordinateIndex() <<"," << pd1->getCoordinateIndex() <<"]"<< std::endl;
-// 			std::cout << "Index p1: " << pd1->getCoordinateIndex() << std::endl;
-// 			std::cout << "material Index p0: " << pd0->getMaterialIndex() << std::endl;
-// 			std::cout << "material Index p1: " << pd1->getMaterialIndex() << std::endl;
-
+			if ( ifVerbose )
+				qDebug() << "(Index p0-p1) graph edge =[" << pd0->getCoordinateIndex() <<"," << pd1->getCoordinateIndex() <<"]";
+/*
+			qDebug() << "Index p1: " << pd1->getCoordinateIndex() ;
+			qDebug() << "material Index p0: " << pd0->getMaterialIndex() ;
+			qDebug() << "material Index p1: " << pd1->getMaterialIndex() ;
+*/
 			pickedtag[0]=v[0]; 
 			pickedtag[1]=v[1];
 			pickedtag[2]=v[2];
-// 			std::cout << "Found point1: " << v[0] << " " << v[1] << " "<< v[2] << std::endl;
-// 			std::cout << "Found point2: " << v2[0] << " " << v2[1] << " "<< v2[2] << std::endl;
-//			std::cout << "Center tag: " << pickedtag[0] << " " << pickedtag[1] << " "<< pickedtag[2] << std::endl<< std::endl;
+/*			
+			qDebug() << "Found point1: " << v[0] << " " << v[1] << " "<< v[2] ;
+			qDebug() << "Found point2: " << v2[0] << " " << v2[1] << " "<< v2[2] ;
+			qDebug() << "Center tag: " << pickedtag[0] << " " << pickedtag[1] << " "<< pickedtag[2] << "\n";
+*/
+
 			// emit a signal containing the coordinate picked and ID of the bit of geometry containing
 			// this point. This ID will be used by the slots attached to this signal to decide whether
 			// to do anything or not.
@@ -159,7 +167,6 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 		}
 		
 		else if (objtype == SoCylinderDetail::getClassTypeId()) {
-			//std::cout << "\nPicked point on Cylinder obejct!" <<std::endl;
 			SoCylinderDetail *cd = new SoCylinderDetail();
 			cd = (SoCylinderDetail *) point->getDetail();
 			//int cylpart = cd->getPart;
@@ -169,10 +176,11 @@ void BrainQuarter::getPickedPoint(SoPickedPoint *point , SoPickedPoint *point2) 
 	}
 	
 	else {
-		//std::cout << "\nNot on geometry ..." << std::endl;
+		if ( ifVerbose )
+			qDebug() << "\nNot on geometry ..." ;
 		emit pointNotPicked();
 	}
-// 	qDebug() << "Debug. <<BrainQuarter::getPickedPoint()";
+
 }
 
 BrainQuarter::~BrainQuarter() {
@@ -184,14 +192,15 @@ BrainQuarter::~BrainQuarter() {
  //   return pcam->getViewportBounds(
 
 SoSeparator* BrainQuarter::getRootSeparator() {
-// 	qDebug() << "Debug. >>BrainQuarter::getRootSeparator()";
 	return root;
-// 	qDebug() << "Debug. <<BrainQuarter::getRootSeparator()";
+}
+
+void BrainQuarter::setVerboseStat(bool stat) {
+	ifVerbose = stat;
 }
 
 // create the sample scene - a yellow cone
 void BrainQuarter::createSampleSceneGraph() {
-	//qDebug() << "Debug. >>BrainQuarter::createSampleSceneGraph()";
     root = new SoSeparator;
     root->ref();
 
@@ -201,12 +210,9 @@ void BrainQuarter::createSampleSceneGraph() {
 
     root->addChild(new SoCone);
     setSceneGraph(root);
-	//qDebug() << "Debug. <<BrainQuarter::createSampleSceneGraph()";
 }
 
 QSize BrainQuarter::minimumSizeHint(void) const
 {
-	//qDebug() << "Debug. >>BrainQuarter::minimumSizeHint()";
 	return QSize(640, 480);
-	//qDebug() << "Debug. <<BrainQuarter::minimumSizeHint()";
 }

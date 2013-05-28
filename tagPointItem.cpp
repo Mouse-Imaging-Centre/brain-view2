@@ -47,7 +47,7 @@ void tagPointItem::setLocation(double x, double y, double z) {
 void tagPointItem::updateCubeSize(double newsize,double tagsize){
 	scale->scaleFactor={float(newsize/tagsize), float(newsize/tagsize), float(newsize/tagsize)};
 	int num= root->getNumChildren();
-	std::cout <<"number of children in the tag Separator:" << num << std::endl;
+	qDebug() <<"number of children in the tag Separator:" << num ;
 	cube = root->getChild(num-1);
 	root->getChild(num-1)->scaleFactor=newsize/tagsize;
 	root->getChild(num-1)->height=newsize;

@@ -135,6 +135,7 @@ private:
 	QVector <QVector <float> > cylradiusVect;	//hvl_t *cylradiusVect;  	
 	
 	QVector <int> labelVect;
+	QVector <float> diamVect;
 	QVector <int> edgesVect;
 	QVector <int> new_edgesVect;
 	QVector <float> new_radius;

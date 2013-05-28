@@ -154,10 +154,7 @@ bool TreeItem::setData(int column, const QVariant &value)
 //! [11]
 
 
-/*GeometryScene * TreeItem::insertGeometry(QFile &file, bool cylinder_flag,char* dbfile) {*/
-// GeometryScene * TreeItem::insertGeometry(QFile &file) {
 bool TreeItem::insertGeometry(QFile &file) {
-	//qDebug() << "Debug. >>TreeItem::insertGeometry()";
 	QVector<QVariant> data(columnCount());
 	GeometryScene *item = new GeometryScene(data, form, this);
 	item->setViewer(viewer);
@@ -165,7 +162,6 @@ bool TreeItem::insertGeometry(QFile &file) {
 //     item->loadGeometry(file, data, form, this,cylinder_flag,dbfile);
     item->loadGeometry(file, data, form, this);
 
-	//qDebug() << "Debug. >>TreeItem::insertGeometry()";
 //     return item;
 	return true;
 }
@@ -195,24 +191,21 @@ bool TreeItem::createTag(float *tagpoint){
     tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
                                         data, form, this);
     childItems.insert(childCount(), item);
-	//std::cout<<"current tag size : " << currentTagSize << std::endl;
+	//qDebug()<<"current tag size : " << currentTagSize ;
 	item->showTag(tagpoint,currentTagSize,currTagR,currTagG,currTagB);	
 }
 
 void TreeItem::updateTagSize(double newsize){
-//	qDebug() << "Debug. >>TreeItem::updateTagSize()";
 	QVector<QVariant> data(columnCount());
     tagFileItem *item = new tagFileItem(viewer->getRootSeparator(),
                                         data, form, this);
-//	std::cout << "viewer root number of children: " << 	viewer->getRootSeparator()->getNumChildren() << std::endl;								
+//	qDebug() << "viewer root number of children: " << 	viewer->getRootSeparator()->getNumChildren() ;								
 //     childItems.insert(childCount(), item);
 // 	item->updateSize(newsize,currentTagSize);
 	currentTagSize= newsize;		//update the tagsize for next tags
-//	qDebug() << "Debug. <<TreeItem::updateTagSize()";
 }
 
 void TreeItem::TagcolourDialog(){
-	//qDebug() << "Debug. >>TreeItem::TagcolourDialog()";
 	QColor tagcolour = QColorDialog::getColor();
 	if (tagcolour.isValid()) {
 		//form->uitag.TagColour->setText(tagcolour.name());
@@ -223,8 +216,6 @@ void TreeItem::TagcolourDialog(){
 		currTagR = float(tr); currTagG = float(tg); currTagB = float(tb); 
 
 	}	
-	//qDebug() << "Debug. <<TreeItem::TagcolourDialog()";
-	
 }
 
 bool TreeItem::insertCone() {
@@ -240,7 +231,6 @@ bool TreeItem::insertCone() {
 }
 
 QWidget* TreeItem::createForm() {
-	//qDebug() << "Debug. >>TreeItem::createForm()";
 
 }
 

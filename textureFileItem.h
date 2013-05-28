@@ -26,8 +26,10 @@ public slots:
     // most recent pick action was on the local bit of geometry, it sends a signal
     // with the index which is picked up here. This re-emits a signal which is in
     // turn picked up by the textureColumns, who update their info.
-    void pickedPointReceived(int index) { emit setPickedPoint(index); };
+    void pickedPointReceived(int index) ;
+    //void pickedPointReceived(int index) { emit setPickedPoint(index); };
 private:
+	ResourceForm *rf;
     void createColumn();
     // holds the geometry separator to which the Switch node will be attached.
     SoSeparator *root;

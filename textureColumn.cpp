@@ -58,7 +58,7 @@ void textureColumn::fillTextureVector() {
 	QString defaultDir = QString(QFileInfo(settings.fileName()).path()).append("/textures/");
 	QString textureDir = settings.value("textureDir", defaultDir).toString();
 	//QString textureDir = QDir(":/resources/colourbars").absolutePath();
-	qDebug() << "Debug. [ fillTextureVector() ] Using texture directory: " << textureDir;
+	//qDebug() << "Debug. [ fillTextureVector() ] Using texture directory: " << textureDir;
 	settings.setValue("textureDir", textureDir);
 
 	QDir d = QDir(textureDir);
@@ -69,7 +69,7 @@ void textureColumn::fillTextureVector() {
 		if (fileName.endsWith(".png")) {
 			fileName.prepend("/");
 			fileName.prepend(textureDir);
-			qDebug() << "Debug. [ fillTextureVector() ] Texture full filename: "<< fileName;
+// 			qDebug() << "Debug. [ fillTextureVector() ] Texture full filename: "<< fileName;
 			textureFiles->append(fileName);
 		}
 	}

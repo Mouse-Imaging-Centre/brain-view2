@@ -30,6 +30,7 @@ public:
 // 	bool openFile(QFile &filename, bool cylinder_flag=false, char* dbfile=NULL);
 	bool openFile(QFile &filename);
 	void saveTagFileFunc(QFile &filename);
+	
 
 	
 public slots:
@@ -44,6 +45,7 @@ public slots:
         void setTagOptionFromDialog0(){viewer->setTagOpt(0);};
         void setTagOptionFromDialog1(){viewer->setTagOpt(1);};
         void setTagOptionFromDialog2(){viewer->setTagOpt(2);};
+		void verboseStatus(); 
 
 
 //		void setTagOptionFromDialog(int tagopt);
@@ -67,6 +69,10 @@ private:
 	QAction *surfaceAction;
 	QAction *midpointAction;
 	QAction *backsurfaceAction;
+	
+	QMenu *outMenu;
+	QAction *verboseAction; 	//to be used in ResourceForm definition and by BrainQuarter, GeometryScene and textureFileItem
+	
 
 // 	QPushButton *createTagbutton;
 // 	QPushButton *saveTagFilebutton;

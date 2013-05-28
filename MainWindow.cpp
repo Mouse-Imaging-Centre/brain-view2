@@ -13,7 +13,6 @@
 #include <iostream>   //cout
 
 MainWindow::MainWindow() {
-// 	qDebug() << "Debug. >>MainWindow::MainWindow()";
 
 	// stuff for QSettings
 	QCoreApplication::setOrganizationName("MINC");
@@ -28,7 +27,6 @@ MainWindow::MainWindow() {
 	createActions();
 	createMenus();
 	initColourbars();
-// 	createTagbuttons();
 
 	viewer = new BrainQuarter();
 	//colourBar = new ColourBarForm(this);
@@ -49,14 +47,12 @@ MainWindow::MainWindow() {
 	
 	
 	setCentralWidget(viewer);
-// 	qDebug() << "Debug. <<MainWindow::MainWindow()";
 
 
 }
 
 
 void MainWindow::initColourbars() {
-// 	qDebug() << "Debug. >>MainWindow::initColourbars()";
 
     // get the path from the settings
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MINC", "brain-view");
@@ -92,7 +88,6 @@ void MainWindow::initColourbars() {
         }
 	}
 
-// 	qDebug() << "Debug. <<MainWindow::initColourbars()";
 }
 
 
@@ -101,7 +96,6 @@ MainWindow::~MainWindow() {
 
 
 bool MainWindow::openFile(QFile &filename) {
-// 	qDebug() << "Debug. >>MainWindow::openFile()";
 
     QFileInfo fileInfo(filename);	
     QString ext = fileInfo.suffix();
@@ -121,19 +115,17 @@ bool MainWindow::openFile(QFile &filename) {
     }
 
 	Q_ASSERT_X( status == true, "MainWindow::openFile", "Failed insert into Resource form" );
-// 	qDebug() << "Debug. <<MainWindow::openFile()";
+
 	return true;
 }
 
 void MainWindow::openFileFromDialog() {
-// 	qDebug() << "Debug. >>MainWindow::openFileFromDialog()";
 	QString name = QFileDialog::getOpenFileName(this,
                 tr("Open File"), QString(), tr("Files (*.obj *.txt *.vertstats *.tag *.h5 *.config)"));
 	if (! name.isNull()) {
 		QFile filename(name);
 		openFile(filename);
 	}
-// 	qDebug() << "Debug. <<MainWindow::openFileFromDialog()";
 }
 
 
@@ -142,8 +134,8 @@ void MainWindow::openFileFromDialog() {
 	//viewer->setTagOpt(tagopt);
 }
 */
+
 void MainWindow::createActions() {
- 	//qDebug() << "Debug. >>MainWindow::createActions()";
 
 	openAction = new QAction(tr("&Open File"), this);
 	openAction->setShortcuts(QKeySequence::Open);
@@ -177,13 +169,19 @@ void MainWindow::createActions() {
 	backsurfaceAction->setCheckable(TRUE);
 	connect(backsurfaceAction, SIGNAL(triggered()), this, SLOT(setTagOptionFromDialog2()));
 
+	
+	
+	verboseAction = new QAction(tr("&Verbose"), this);
+	verboseAction->setShortcut(tr("Ctrl+V"));
+	//verboseAction->isCheckable ();
+	verboseAction->setCheckable(TRUE);
+	verboseAction->setChecked(false);
+	//connect(verboseAction, SIGNAL(triggered()), this, SLOT(verboseApplication()));
 
- 	//qDebug() << "Debug. <<MainWindow::createActions()";
 }
 
 
 void MainWindow::createMenus() {
- 	//qDebug() << "Debug. >>MainWindow::createMenus()";
 
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(openAction);
@@ -195,28 +193,24 @@ void MainWindow::createMenus() {
 	tagMenu->addAction(midpointAction);
 	tagMenu->addAction(backsurfaceAction);
 
+	outMenu = menuBar()->addMenu(tr("&Output"));
+	outMenu->addAction(verboseAction);
 
-
- 	//qDebug() << "Debug. <<MainWindow::createMenus()";
 }
 
 
 
 void MainWindow::createTagFunc(){
-// 	qDebug() << "Debug. >>MainWindow::createTagFunc()";
 	Tagpoint = (float*) malloc(sizeof(float) * 3);
 	Tagpoint = resourceForm->addTagpoint();
-// 	std::cout << "\nMainWindow::createTagFunc(): 0. Created tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 	Tagsize = resourceForm->returnTagsize();
-// 	std::cout << "\nMainWindow::createTagFunc(): 1. Created tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
-
+	if ( verboseAction->isChecked() )
+		qDebug() << "Created tag : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] ;	
 }
 
 void MainWindow::addTagFunc(){
-// 	qDebug() << "Debug. >>MainWindow::addTagFunc()";
 // 	Tagpoint = (float*) malloc(sizeof(float) * 3);
 // 	Tagpoint = resourceForm->addTagpoint();
-//	std::cout << "Added tag point is : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<" with size " << Tagsize <<std::endl;
 		
 	//remove any duplication of tag points:
 	bool tagfound=false;
@@ -231,27 +225,25 @@ void MainWindow::addTagFunc(){
 		tagsVect.append(Tagpoint[1]);	//Tag(y)
 		tagsVect.append(Tagpoint[2]);	//Tag(z)
 		tagsVect.append(Tagsize);	//Tagsize
-		std::cout << "Added tag : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] <<std::endl;	
+		if ( verboseAction->isChecked() )
+			qDebug() << "Added tag : " << Tagpoint[0] <<" , " << Tagpoint[1] << " , " << Tagpoint[2] ;	
 	}
 	
-// 	qDebug() << "Debug. <<MainWindow::addTagFunc()";
 }
 
 
 
 void MainWindow::saveTagFromDialog() {
-// 	qDebug() << "Debug. >>MainWindow::saveTagFromDialog()";
 	QString sname = QFileDialog::getSaveFileName(this,
                 tr("Save Tags to File"), QString(), tr("Files (*.tag)"));
 	if (! sname.isNull()) {
 		QFile sfilename(sname);
-		std::cout << "construct a file " << sfilename.fileName().toLatin1().data()<<std::endl;
+		if ( verboseAction->isChecked() )
+			qDebug() << "construct a file " << sfilename.fileName().toLatin1().data();
 		saveTagFileFunc(sfilename);
 
 	}
 	
-
-// 	qDebug() << "Debug. <<MainWindow::saveTagFromDialog()";
 }
 
 void MainWindow::saveTagFileFunc(QFile &filename){
@@ -262,14 +254,16 @@ void MainWindow::saveTagFileFunc(QFile &filename){
 	pFile = fopen (filename.fileName().toLatin1().data(), "w");
 	if (pFile == NULL)
 	{
-		std::cout <<"No file for saving the tags!" <<std::endl;
+		qDebug() <<"ERROR! No file for saving the tags!" ;
 		return;
 	}
 	else
 	{
 		fprintf (pFile, "MNI Tag Point File\nVolumes = 1;\n\nPoints =\n");
 		int tagnum= (tagsVect.size())/4;	//number of tags (x,y,z,size)
-		std::cout << tagnum <<"tags created!" << std::endl;
+		
+		if ( verboseAction->isChecked() )
+			qDebug() << tagnum <<"tags created!";
 		
 
 		for (int i=0; i<(tagnum-1) ; i++){
@@ -289,3 +283,6 @@ void MainWindow::quitApplication() {
 	exit(0);
 }
 
+void MainWindow::verboseStatus() {
+	resourceForm->setVerboseStatus(verboseAction->isChecked());
+}

@@ -14,7 +14,7 @@ tagFileItem::tagFileItem(SoSeparator *root,
     // all new bits will be attached.
     this->root = root;
     //this->root=viewer->getRootSeparator();
-    //std::cout << "Woohooo!" << std::endl;
+    //qDebug() << "Woohooo!" ;
     // create all the necessary nodes
     tagSeparator = new SoSeparator;
     scale = new SoScale;
@@ -86,7 +86,7 @@ bool tagFileItem::showTag(float *tagpoint, double tagsize, float r, float g, flo
                             tagpoint[2]);
 		
 	/*		newTagVect.append(newTag);			
-			std::cout <<"size of newTagVect in create tag: " << newTagVect.size() << std::endl;*/
+			qDebug() <<"size of newTagVect in create tag: " << newTagVect.size() ;*/
 	//         childItems.insert(childCount(), newTag);
 	return true;
 }

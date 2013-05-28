@@ -230,17 +230,13 @@ bool TreeModel::setData(const QModelIndex &index, const QVariant &value,
 	//emit this->modelReset();
 	//emit layoutChanged();
 	//reset();
-	//std::cout << "hello?" << std::endl;
 
-	//qDebug() << "Debug. <<TreeModel::setData()";
 	return rv;
 }
 
 void TreeModel::somethingChanged() {
-// 	qDebug() << "Debug. >>TreeModel::somethingChanged()";
 	emit layoutChanged();
 	//qDebug() << "Debug. [ somethingChanged() ]  GRUNKLE";
-// 	qDebug() << "Debug. <<TreeModel::somethingChanged()";
 }
 
 bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,

@@ -7,6 +7,7 @@ textureFileItem::textureFileItem( SoSeparator *root, const QVector<QVariant> &da
 
 
 	this->root = root;
+	this->rf = rf;
 
 	/** Scene Graph:
 	 ** root holds the geometry scene
@@ -51,7 +52,27 @@ void textureFileItem::getAllColumns() {
 	}
 }
 
-
+void textureFileItem::pickedPointReceived(int index) { 
+	//qDebug() << "index " << index;
+	vector <string> headers = vertstatsFile->getDataHeader();
+	vector <string>::iterator it;
+	int vertscnt =0 ;
+	for (it = headers.begin(); it < headers.end(); it++) {
+		//qDebug() <<  QString::fromStdString(*it) << ":" << vertstatsFile->getDataColumn(vertscnt)[index];
+		//if ( verboseAction->isChecked() )
+		rf->emitVerboseSignal();
+		if (rf->getVerboseStatus())
+			cout << *it << ":" << vertstatsFile->getDataColumn(vertscnt)[index] << "  "<< flush;
+		vertscnt++;
+	}
+	//if ( verboseAction->isChecked() )
+	rf->emitVerboseSignal();
+	if (rf->getVerboseStatus())
+		cout << endl<<endl;
+	//qDebug()<< "\n";
+	
+	emit setPickedPoint(index); 
+};
 
 
 
