@@ -54,7 +54,7 @@ bool tagFileItem::loadFile(QFile &file, double tagsize, float r, float g, float 
                        &weights,
                        &structure_ids,
                        &patient_ids,
-                       &labels) != OK) {
+                       &labels) != VIO_OK) {
         return false;
     }
 

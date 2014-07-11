@@ -1,0 +1,246 @@
+#to get the source code into the current folder in terminal:
+bzr branch lp:brain-view/0.1 /brain_view_new  {this folder should not already exists}
+
+
+
+#changes to brain-view2.pro:
+comment MINCDIR
+comment QAURTERDIR
+
+
+#in terminal in the directory of the brain-view2.pro: (on topolino and not other machines!)
+export LD_LIBRARY_PATH=/projects/mice/share/arch/linux64/lib/:/projects/mice/share/arch/linux64/include:/projects/mice/share/arch/linux/lib/:/usr/:/usr/lib/:/usr/include/:/micehome/sghanavati/lib:$LD_LIBRARY_PATH
+
+echo $LD_LIBRARY_PATH 
+/projects/mice/share/arch/linux64/lib:/projects/mice/share/arch/linux64/bin/VTKbin/bin:/projects/mice/share/arch/linux/lib:/micehome/sghanavati/lib/:/micehome/sghanavati/lib/:/projects/mice/share/arch/linux64/include/:/usr/:/usr/lib/:/projects/mice/share/arch/linux64/
+
+make clean
+qmake-qt4 MINCDIR=/projects/mice/share/arch/linux-3_2_0-36-generic-x86_64-eglibc-2_15/ QUARTERDIR=/projects/mice/share/arch/linux-3_2_0-36-generic-x86_64-eglibc-2_15/ brain-view2.pro
+#qmake-qt4 MINCDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ QUARTERDIR=/projects/mice/share/arch/linux-x86_64-eglibc2_11_1/ brain-view2.pro
+
+#qmake-qt4 MINCDIR=/projects/mice/share/arch/linux64/ QUARTERDIR=/micehome/sghanavati/ brain-view2.pro
+	(this will give -I/projects/mice/share/arch/linux64/include and -L/projects/mice/share/arch/linux64//lib/ in Makefile)
+
+#qmake-qt4 MINCDIR=/projects/mice/share/arch/linux64 QUARTERDIR=/micehome/sghanavati/ brain-view2.pro
+	(this will give -I/projects/mice/share/arch/linux-x86_64-glibc2_3/include and -L/projects/mice/share/arch/linux64/lib/ in Makefile)
+
+make     or {make -lqt}?
+or make -j4 (to use 4 processors)
+
+
+./brain-view2 /tmp/test.obj
+./brain-view2 ../test_brainview_line.obj
+./brain-view2 ../test_brainview_line.obj ../file_tree_mask_blur_5branch.db 
+./brain-view2 ../file_tree_mask_blur_5branch.obj ../file_tree_mask_blur_5branch_graph2graph.h5
+./brain-view2 ../file_tree_5branch_segmentID_graph2graph.h5
+
+
+test:
+dir: /projects/souris/jason/human/darren/201105/processed-3T
+
+brain-view2 avg-left.obj avg-left-threesubjects.vertstats avg-right.obj avg-right-threesubjects.vertstats
+##############################################################################################################################################
+To make the test data:
+ssh -X bianca
+Run vessel tracking: get file_tree_5branch.obj and file_tree_5branch.h5
+h5ls -r file_tree_5branch.h5
+ssh -X bianca:
+export PYTHONPATH=/home/jgsled/lib64_ubuntu_hardy/python:$PYTHONPATH
+python /projects/souris/sghanavati/Brain_view/Prepare_codes/Prepare4Brainview.py:
+	python /micehome/jgsled/bin/tree2graph.py file_tree_5branch.h5 file_tree_5branch.db
+	python /micehome/jgsled/bin/delete_internal_leaves.py input.db output.db
+	*correct location of vertices : # optimize location of branch points
+		graph_analysis.adjust_junctions(g, vertex_offsets)
+	*correct radius by 1.6*old_radius : # diameters need to corrected for estimation bias due to blurring
+		diameters = [h.edge_property(edge, 'diameter') for edge in h.edge_list()] 
+		diameters = array(diameters)*1.06
+	python /projects/souris/sghanavati/Brain_view/Prepare_codes/graph2graphsegmentID.py input.db output_basename
+	python /projects/souris/sghanavati/Brain_view/Prepare_codes/graph2cylinder.py input.db output_basename
+	python /micehome/jgsled/bin/graph2graph.py file_tree_5branch.db file_tree_5branch_graph2graph.h5
+	python /micehome/jgsled/bin/graph2obj.py graph.db graph.obj
+h5ls -r file_tree_5branch_graph2graph.h5
+h5ls -rv file_tree_5branch_graph2graph.h5
+###########################################################################################################################################
+To make a polygon.obj:
+marching-cubes input.mnc output.obj intensity_threshold
+or 
+python /home/jsgled/bin/graph2isosurf.py graph.db template.mnc output.obj
+or
+python /home/jsgled/bin/path2isosurf.py path.db/h5 template.mnc output.obj
+
+################################################################################################################################
+
+Brainview module streams:
+sghanavati@topolino:/projects/souris/sghanavati/Brain_view/brainview0_1_lineobj_h5_v5_cylinder$ ./brain-view2 /projects/souris/sghanavati/code_results/follow_tree/MCid_456/MCid_456_tree3.obj
+
+Debug. >>MainWindow::MainWindow() 
+Debug. [ MainWindow() ] Settings path 1:  "/home/sghanavati/.config/MINC/brain-view.conf" 
+Debug. [ MainWindow() ] Settings path 2:  "/home/sghanavati/.config/MINC/brain-view.ini" 
+Debug. [ MainWindow() ] Application Pid:  20988 
+Debug. >>MainWindow::createActions() 
+Debug. <<MainWindow::createActions() 
+Debug. >>MainWindow::createMenus() 
+Debug. <<MainWindow::createMenus() 
+Debug. >>MainWindow::initColourbars() 
+Debug. [ initColourbars() ] TextureDir:  "/home/sghanavati/.config/MINC/textures/" 
+Debug. [ initColourbars() ] Texture file full path:  ":/resources/colourbars/sunrise.png" 
+Debug. [ initColourbars() ] Texture file basename:  "sunrise" 
+Debug. [ initColourbars() ] Texture file full path:  ":/resources/colourbars/hotblue.png" 
+Debug. [ initColourbars() ] Texture file basename:  "hotblue" 
+Debug. [ initColourbars() ] Texture file full path:  ":/resources/colourbars/spectral.png" 
+Debug. [ initColourbars() ] Texture file basename:  "spectral" 
+Debug. [ initColourbars() ] Texture file full path:  ":/resources/colourbars/hotred.png" 
+Debug. [ initColourbars() ] Texture file basename:  "hotred" 
+Debug. [ initColourbars() ] Texture file full path:  ":/resources/colourbars/full_saturation.png" 
+Debug. [ initColourbars() ] Texture file basename:  "full_saturation" 
+Debug. <<MainWindow::initColourbars() 
+Debug. >>BrainQuarter::BrainQuarter() 
+Debug. <<BrainQuarter::BrainQuarter() 
+Debug. <<ResourceForm::ResourceForm() 
+Debug. >>ResourceForm::ResourceForm() 
+Debug. <<MainWindow::MainWindow() 
+Debug: Loading ...  /projects/souris/sghanavati/code_results/follow_tree/MCid_456/MCid_456_tree3.obj 
+Debug. >>MainWindow::openFile() 
+Debug. >>ResourceForm::insertGeometry()
+Debug. >>GeometryScene::GeometryScene() 
+Debug. <<GeometryScene::GeometryScene() 
+Debug. >>GeometryScene::loadGeometry() 
+Debug. >>BrainQuarter::getRootSeparator() 
+ Before MessageBox 
+ After MessageBox
+ in loadGeometry flag_label = 0 => user doesn't want to label the loaded geometry! 
+Debug. >>GeometryNode::loadObj() 
+object_is_line =1
+Loading Line object number: 0
+Debug. >>GeometryNode::loadLines 
+ID: 537037
+Debug. <<GeometryNode::loadLines() 
+Debug. <<GeometryNode::loadObj() 
+Debug: << geometry->loadObj # 0  status =  true 
+Debug. <<GeometryScene::loadGeometry() 
+Debug. >>ResourceForm::insertGeometry():lastGeometry
+Debug. <<ResourceForm::insertGeometry():lastGeometry
+Debug. <<ResourceForm::insertGeometry():connect pointPicked viewer
+Debug. >>ResourceForm::viewAll()
+Debug. <<ResourceForm::viewAll()
+Debug. >>ResourceForm::somethingChanged()
+Debug. >>TreeModel::somethingChanged() 
+Debug. [ somethingChanged() ]  GRUNKLE 
+Debug. <<TreeModel::somethingChanged() 
+Debug. >>ResourceForm::somethingChanged()
+Debug. <<ResourceForm::insertGeometry()
+Debug. <<MainWindow::openFile() 
+Debug: Showing the window ...  
+Debug. >>BrainQuarter::minimumSizeHint() 
+Debug: Going to event loop ...  
+Debug. <<ResourceForm::setPropertyForm() 
+Debug. >>GeometryNode::createForm() 
+Debug. <<GeometryNode::createForm() 
+Debug. >>ResourceForm::setPropertyForm() 
+Debug. <<ResourceForm::selectedItem() 
+Eeeek 0
+Debug. >>ResourceForm::selectedItem() 
+Debug. >>GeometryNode::colourDialog() 
+Debug. >>GeometryNode::updateColour() 
+Debug. <<GeometryNode::updateColour() 
+Debug. <<GeometryNode::colourDialog() 
+Debug. >>MainWindow::openFileFromDialog() 
+Debug. >>MainWindow::openFile() 
+Debug. >>ResourceForm::insertGeometry()
+Debug. >>GeometryScene::GeometryScene() 
+Debug. <<GeometryScene::GeometryScene() 
+Debug. >>GeometryScene::loadGeometry() 
+Debug. >>BrainQuarter::getRootSeparator() 
+ Before MessageBox 
+ After MessageBox
+ in loadGeometry flag_label = 0 => user doesn't want to label the loaded geometry! 
+Debug. >>GeometryNode::loadObj() 
+object_is_line =0
+Loading Polygon object number: 0
+Debug. >>GeometryNode::loadPolygons() 
+ID: 28644761
+Debug. <<GeometryNode::loadPolygons() 
+Debug. <<GeometryNode::loadObj() 
+Debug: << geometry->loadObj # 0  status =  true 
+Debug. <<GeometryScene::loadGeometry() 
+Debug. >>ResourceForm::insertGeometry():lastGeometry
+Debug. <<ResourceForm::insertGeometry():lastGeometry
+Debug. <<ResourceForm::insertGeometry():connect pointPicked viewer
+Debug. >>ResourceForm::viewAll()
+Debug. <<ResourceForm::viewAll()
+Debug. >>ResourceForm::somethingChanged()
+Debug. >>TreeModel::somethingChanged() 
+Debug. [ somethingChanged() ]  GRUNKLE 
+Debug. <<TreeModel::somethingChanged() 
+Debug. >>ResourceForm::somethingChanged()
+Debug. <<ResourceForm::insertGeometry()
+Debug. <<MainWindow::openFile() 
+Debug. <<MainWindow::openFileFromDialog() 
+Debug. <<ResourceForm::setPropertyForm() 
+Debug. >>GeometryNode::destroyForm() 
+Debug. <<GeometryNode::destroyForm() 
+Debug. >>GeometryNode::destroyForm() 
+Debug. <<GeometryNode::destroyForm() 
+Debug. >>GeometryNode::createForm() 
+Debug. <<GeometryNode::createForm() 
+Debug. >>ResourceForm::setPropertyForm() 
+Debug. <<ResourceForm::selectedItem() 
+Eeeek 1
+Debug. >>ResourceForm::selectedItem() 
+Debug. >>GeometryNode::updateTransparency() 
+Debug. <<GeometryNode::updateTransparency() 
+Debug. <<BrainQuarter::getPickedPoint() 
+Woooohooo!
+
+Woooohooo!
+
+Debug. <<BrainQuarter::getPickedPoint() 
+Woooohooo!
+
+Woooohooo!
+
+On geometry ...
+Found: -0.325689 -8.57235 -1.76005
+Texture: 0 0 0 1
+Material Index 0
+ID: 28644761
+Picked point on Polygon obejct!
+Picker - num points: 5
+Index: 1110490
+Found point1: -0.325689 -8.57235 -1.76005
+Found point2: -0.339997 -8.5145 -1.86302
+Found center tag: -0.332843 -8.54342 -1.81153
+Debug. >>GeometryScene::pickReceived() 
+Debug. <<GeometryScene::pickReceived() 
+Debug. >>GeometryScene::pickReceived() 
+picked point does belong to this scene
+Debug. >>ResourceForm::somethingChanged()
+Debug. >>TreeModel::somethingChanged() 
+Debug. [ somethingChanged() ]  GRUNKLE 
+Debug. <<TreeModel::somethingChanged() 
+Debug. >>ResourceForm::somethingChanged()
+Debug. <<GeometryScene::pickReceived() 
+Debug. <<BrainQuarter::getPickedPoint() 
+
+Debug. <<BrainQuarter::getPickedPoint() 
+Woooohooo!
+
+Woooohooo!
+
+Woooohooo!
+
+Woooohooo!
+
+On geometry ...
+Found: -1.6792 -7.67394 -1.71271
+Texture: 0 0 0 1
+Material Index 82459
+ID: 537037
+Picked point on Line obejct!
+Index p0: 82459
+Debug. >>GeometryScene::pickReceived() 
+Debug. <<GeometryScene::pickReceived() 
+Debug. >>GeometryScene::pickReceived() 
+Debug. <<GeometryScene::pickReceived() 
+Debug. <<BrainQuarter::getPickedPoint() 
+Woooohooo!

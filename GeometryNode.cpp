@@ -211,13 +211,13 @@ bool GeometryNode::loadObj(QFile &file, int i) {
 	setData(0, QFileInfo(file).baseName());
 
 	// lots of this code came from bicInventor - and parts are still missing
-    File_formats format;
+    VIO_File_formats format;
     int num_objects;
     object_struct** object_list;
 
     // FIXME: fix bicpl for constness on these damn strings!!!
     if ( input_graphics_file( (char*)file.fileName().toLatin1().data(),
-    		&format, &num_objects, &object_list ) != OK ) {
+    		&format, &num_objects, &object_list ) != VIO_OK ) {
     	return false;
     }
 

@@ -30,7 +30,6 @@ void textureFileItem::loadFile(QFile &file) {
 	
 	/* the name within the TreeItem hierarchy */
 	setData(0, QFileInfo(file).baseName());
-
 	vertstatsFile->loadFile( (char *) file.fileName().toLatin1().data());
 	getAllColumns();
 }
@@ -43,6 +42,10 @@ void textureFileItem::getAllColumns() {
 
 	vector <string> headers = vertstatsFile->getDataHeader();
 	vector <string>::iterator it;
+	int num = 0;
+	for (it = headers.begin(); it < headers.end(); it++) { num++;}
+	
+	
 	for (it = headers.begin(); it < headers.end(); it++) {
 		textureColumn *newColumn = new textureColumn(textureSwitch, itemData, form, this);
 		newColumn->loadTextureColumn(vertstatsFile, QString::fromStdString(*it));

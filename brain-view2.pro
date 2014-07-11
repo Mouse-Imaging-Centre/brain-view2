@@ -49,7 +49,6 @@ LIBS += -L$${MINCDIR}/lib \
         -lpcre++ \
         -lpcre \
         -lbicpl \
-        -lvolume_io2 \
         -lminc2
 
 LIBS += -L$${INVENTORDIR}/lib \
@@ -77,7 +76,8 @@ HEADERS = MainWindow.h \
     textureColumn.h \
     textureFileItem.h \
     tagFileItem.h \
-    tagPointItem.h
+    tagPointItem.h \
+    mniVertstatsFile.h
 SOURCES = MainWindow.cpp \
     BrainQuarter.cpp \
     TreeItem.cpp \
@@ -89,5 +89,6 @@ SOURCES = MainWindow.cpp \
     textureColumn.cpp \
     textureFileItem.cpp \
     tagFileItem.cpp \
-    tagPointItem.cpp
+    tagPointItem.cpp \
+    mniVertstatsFile.cc
 RESOURCES += colourbars.qrc

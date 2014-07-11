@@ -26,7 +26,7 @@ private:
     // second set of tags (if present in tag file)
     double **tags2;
     // labels of tags
-    STRING *labels;
+    VIO_STR *labels;
     // root separator from calling function
     SoSeparator *root;
     // scale applied to all tags

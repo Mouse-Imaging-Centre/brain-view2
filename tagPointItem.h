@@ -3,6 +3,8 @@
 
 #include "TreeItem.h"
 
+#define HAVE_MINC2 1
+
 #include <volume_io.h>
 
 #include <Inventor/nodes/SoTranslation.h>

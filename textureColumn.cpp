@@ -158,6 +158,7 @@ void textureColumn::wasSelected() {
 void textureColumn::loadTextureColumn(mniVertstatsFile *file, QString columnName) {
 
 	setData(0, columnName);
+
 	*this->data = file->getDataColumn(columnName.toLatin1().data());
 	// determine the low and high
 	vertexColumn::iterator it;

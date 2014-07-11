@@ -1,6 +1,8 @@
 #ifndef RESOURCEFORM_H_
 #define RESOURCEFORM_H_
 
+#define HAVE_MINC2 1
+
 #include "ui_resourceForm.h"
 #include "ui_tagProps.h"
 #include "ui_labelProps.h"

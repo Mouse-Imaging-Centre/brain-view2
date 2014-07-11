@@ -1,6 +1,8 @@
 #ifndef GEOMETRYNODE_H_
 #define GEOMETRYNODE_H_
 
+#define HAVE_MINC2 1
+
 #include "TreeItem.h"
 #include <bicpl.h>
 

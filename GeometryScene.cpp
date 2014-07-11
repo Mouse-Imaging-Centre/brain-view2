@@ -343,11 +343,11 @@ bool GeometryScene::loadGeometry(QFile &file, const QVector<QVariant> &data,
 	}
 	
 	if (ext == "obj") {
-		File_formats format;
+		VIO_File_formats format;
 		int num_objects;
 		object_struct** object_list;
 		// FIXME: fix bicpl for constness on these damn strings!!!
-		if ( input_graphics_file( (char*)file.fileName().toLatin1().data(), &format, &num_objects, &object_list ) != OK ) {
+		if ( input_graphics_file( (char*)file.fileName().toLatin1().data(), &format, &num_objects, &object_list ) != VIO_OK ) {
 			return false;
 		}
 		if (num_objects > 1) {
