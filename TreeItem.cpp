@@ -24,7 +24,7 @@ TreeItem::TreeItem(const QVector<QVariant> &data,
     itemData = data;
     haveProps = false;
     formInstantiated = false;
-	currentTagSize=0.1; 	//initialize tag size to defult of SpinBox in Widget
+	currentTagSize=0.05; 	//initialize tag size to defult of SpinBox in Widget
 	currTagR= 0.0 ; currTagG= 255.0; currTagB= 255.0;
 }
 //! [0]

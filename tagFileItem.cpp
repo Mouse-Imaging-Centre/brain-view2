@@ -60,9 +60,10 @@ bool tagFileItem::loadFile(QFile &file, double tagsize, float r, float g, float 
 
     // iterate over tags and create tagPointItems
     for (int i=0; i < n_tag_points; i++) {
+        //Get the tag size and color from the ui
 		//double tagsize = 0.1;
-		if  ( (weights[1] > 0) && (weights[1] < 1.0))
-				tagsize = weights[1];
+// 		if  ( (weights[0] > 0) && (weights[0] < 1.0))
+// 				tagsize = weights[0];
 		tagPointItem *newTag = new tagPointItem(tagSeparator,
 										itemData,
 										form,
